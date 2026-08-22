@@ -7,6 +7,7 @@ import no.nav.tilgangsmaskin.felles.rest.TokenType.UNAUTHENTICATED
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import org.springframework.security.core.context.SecurityContextHolder.getContext
 import org.springframework.security.oauth2.jwt.Jwt
+import org.springframework.security.oauth2.server.resource.authentication.AbstractOAuth2TokenAuthenticationToken
 import org.springframework.stereotype.Component
 import java.util.*
 
@@ -31,7 +32,7 @@ class Token {
     private fun jwt() = getContext().authentication?.let { authentication ->
         when (val principal = authentication.principal) {
             is Jwt -> principal
-            else -> null
+            else -> (authentication as? AbstractOAuth2TokenAuthenticationToken<*>)?.token as? Jwt
         }
     }
     val clusterAndSystem

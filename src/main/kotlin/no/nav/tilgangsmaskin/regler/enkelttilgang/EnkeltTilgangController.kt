@@ -2,12 +2,14 @@ package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
-import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.security.OOAuth2RequireOBO
 import no.nav.tilgangsmaskin.felles.rest.ProdController
+import no.nav.tilgangsmaskin.felles.security.requiredAnsattId
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
 import no.nav.tilgangsmaskin.tilgang.openapi.ProblemDetailApiResponse
 import org.springframework.http.HttpStatus.ACCEPTED
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -20,12 +22,12 @@ private const val DESCRIPTION_OVERSTYR = "${MSG}openapi.tilgang.overstyr.descrip
 @ProdController
 @OOAuth2RequireOBO
 @Tag(name = "EnkeltTilgangController", description = ENKELTTILGANG_CONTROLLER_TAG_DESCRIPTION)
-class EnkeltTilgangController(private val enkelt: EnkeltTilgangTjeneste, private val token: Token) {
+class EnkeltTilgangController(private val enkelt: EnkeltTilgangTjeneste) {
 
     @PostMapping("overstyr")
     @ResponseStatus(ACCEPTED)
     @ProblemDetailApiResponse(summary = SUMMARY_OVERSTYR, description = DESCRIPTION_OVERSTYR)
-    fun enkeltTilgang(@RequestBody @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData) {
-        enkelt.registrerTilgang(token.requiredAnsattId, data)
+    fun enkeltTilgang(@AuthenticationPrincipal principal: OAuth2AuthenticatedPrincipal, @RequestBody @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData) {
+        enkelt.registrerTilgang(principal.requiredAnsattId(), data)
     }
 }

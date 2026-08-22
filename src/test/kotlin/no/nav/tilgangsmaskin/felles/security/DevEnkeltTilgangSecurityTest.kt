@@ -7,7 +7,6 @@ import io.mockk.every
 import io.mockk.verify
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
-import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV_GCP
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
@@ -37,13 +36,9 @@ class DevEnkeltTilgangSecurityTest(mockMvc: MockMvc, mapper: JsonMapper) : Behav
     @MockkBean
     private lateinit var enkelt: EnkeltTilgangTjeneste
 
-    @MockkBean
-    private lateinit var token: Token
-
     init {
         beforeEach {
-            clearMocks(token, regel, enkelt, answers = false)
-             every { token.requiredAnsattId } returns TEST_ANSATT_ID
+            clearMocks(regel, enkelt, answers = false)
              every { enkelt.registrerTilgang(TEST_ANSATT_ID, dto) } returns true
         }
 

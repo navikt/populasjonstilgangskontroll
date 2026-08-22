@@ -8,7 +8,6 @@ import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.verify
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
-import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
@@ -42,15 +41,9 @@ class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private val ma
     @MockkBean
     private lateinit var enkeltTilgangTjeneste: EnkeltTilgangTjeneste
 
-    @MockkBean
-    private lateinit var token: Token
-
-
-
     init {
         beforeEach {
-            clearMocks(token, regelTjeneste, enkeltTilgangTjeneste, answers = false)
-            every { token.requiredAnsattId } returns TEST_ANSATT_ID
+            clearMocks(regelTjeneste, enkeltTilgangTjeneste, answers = false)
             every { enkeltTilgangTjeneste.registrerTilgang(TEST_ANSATT_ID, any()) } returns true
         }
 

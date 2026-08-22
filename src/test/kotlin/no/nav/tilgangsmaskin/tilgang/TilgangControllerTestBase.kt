@@ -20,6 +20,7 @@ import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpHeaders.HOST
 import org.springframework.http.ProblemDetail
 import org.springframework.http.converter.json.ProblemDetailJacksonMixin
+import org.springframework.core.MethodParameter
 import org.springframework.restdocs.ManualRestDocumentation
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
@@ -37,8 +38,15 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
+import org.springframework.web.bind.support.WebDataBinderFactory
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
+import org.springframework.web.method.support.HandlerMethodArgumentResolver
+import org.springframework.web.method.support.ModelAndViewContainer
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.oauth2.core.DefaultOAuth2AuthenticatedPrincipal
+import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal
 
 abstract class TilgangControllerTestBase : BehaviorSpec() {
 
@@ -76,9 +84,26 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
 
     private val restDocumentation = ManualRestDocumentation()
     private lateinit var validator: LocalValidatorFactoryBean
+    private val principal = DefaultOAuth2AuthenticatedPrincipal(
+        mapOf("NAVident" to ansattId.verdi),
+        emptyList()
+    )
 
     @RestControllerAdvice
     private class ProblemDetailExceptionHandler : ResponseEntityExceptionHandler()
+
+    private inner class AuthenticationPrincipalArgumentResolver : HandlerMethodArgumentResolver {
+        override fun supportsParameter(parameter: MethodParameter) =
+            parameter.hasParameterAnnotation(AuthenticationPrincipal::class.java) &&
+                parameter.parameterType == OAuth2AuthenticatedPrincipal::class.java
+
+        override fun resolveArgument(
+            parameter: MethodParameter,
+            mavContainer: ModelAndViewContainer?,
+            webRequest: NativeWebRequest,
+            binderFactory: WebDataBinderFactory?
+        ) = principal
+    }
 
     protected companion object {
         private val avvisningskoder = AvvisningsKode.entries.joinToString(", ") { it.name }
@@ -109,10 +134,11 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
             clearAllMocks()
             restDocumentation.beforeTest(TilgangControllerTestBase::class.java, case.name.name)
             mockMvc = standaloneSetup(
-                TilgangController(regelTjeneste, cache,token),
-                EnkeltTilgangController(enkeltTilgangTjeneste, token),
-                BulkTilgangController(regelTjeneste, token)
+                TilgangController(regelTjeneste, cache),
+                EnkeltTilgangController(enkeltTilgangTjeneste),
+                BulkTilgangController(regelTjeneste)
             )
+                .setCustomArgumentResolvers(AuthenticationPrincipalArgumentResolver())
                 .setControllerAdvice(ProblemDetailExceptionHandler())
                 .setValidator(validator)
                 .apply<StandaloneMockMvcBuilder>(documentationConfiguration(restDocumentation)

@@ -8,7 +8,6 @@ import io.mockk.every
 import io.mockk.justRun
 import io.mockk.verify
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
-import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.rest.Token.Companion.APP
 import no.nav.tilgangsmaskin.felles.rest.Token.Companion.IDTYP
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP
@@ -45,12 +44,8 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
     @MockkBean
     private lateinit var enkeltTilgangTjeneste: EnkeltTilgangTjeneste
 
-    @MockkBean
-    private lateinit var token: Token
-
     init {
         beforeEach {
-            every { token.requiredAnsattId } returns TEST_ANSATT_ID
             justRun { regelTjeneste.kompletteRegler(any(), any()) }
             justRun { regelTjeneste.kjerneregler(any(), any()) }
             every { regelTjeneste.bulkRegler(any(), any()) } returns AggregertBulkRespons(TEST_ANSATT_ID)
@@ -73,10 +68,8 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                     }.andReturn().withBody(UNAUTHORIZED, MANGLER_BEARER_TOKEN)
                 }
             }
-
             When("request har gyldig oauth2-token") {
                 Then("returnerer 204") {
-                    every { token.requiredAnsattId } returns TEST_ANSATT_ID
                     mockMvc.post("$PROD_BASE_PATH/komplett") {
                         headers {
                             setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID))

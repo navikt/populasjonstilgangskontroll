@@ -12,7 +12,7 @@ class SlackApplicationReadyNotifier(
     @EventListener(ApplicationReadyEvent::class)
     fun onApplicationReady() =
         runCatching {
-            publisher.publish("$pod startet", "Startet  _${pod}_ for image _${image}_",":rocket")
+            publisher.publish("$pod startet", "Startet  _${pod}_ for image _${image}_",":rocket:")
             log.info("Startet $pod for image $image")
         }.onFailure {
             log.warn("Feilet ved sending av startup-notifikasjon", it)

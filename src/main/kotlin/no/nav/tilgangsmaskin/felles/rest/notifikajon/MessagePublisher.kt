@@ -14,6 +14,7 @@ interface MessagePublisher {
     fun info(header: String, msg: String) = logger.info("$header: $msg")
     fun warn(header: String, msg: String) = logger.warn("$header: $msg")
     fun error(header: String, msg: String) = logger.error("$header: $msg")
+    fun publish(header: String, msg: String, vararg emojis: String) = info(header, msg)
 }
 
 @Component

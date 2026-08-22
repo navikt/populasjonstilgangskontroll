@@ -2,35 +2,40 @@ package no.nav.tilgangsmaskin.felles.security
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldContain
-import io.kotest.matchers.collections.shouldNotContain
-import no.nav.tilgangsmaskin.felles.rest.Token.Companion.AZP_NAME
-import no.nav.tilgangsmaskin.felles.security.OAuth2AuthorityAddingJwtAuthenticationConverter.SystemAuthority
+import io.kotest.matchers.collections.shouldContainAll
+import no.nav.tilgangsmaskin.felles.rest.Token.Companion.APP
+import no.nav.tilgangsmaskin.felles.rest.Token.Companion.IDTYP
+import no.nav.tilgangsmaskin.felles.rest.Token.Companion.OID
 import org.springframework.security.oauth2.jwt.Jwt
 
 class OAuth2AuthorityAddingJwtAuthenticationConverterTest : BehaviorSpec({
     val converter = OAuth2AuthorityAddingJwtAuthenticationConverter()
-    val gosysAuthority  = SystemAuthority("gosys")
 
-    Given("JWT-konvertering med azp_name") {
-        When("azp_name inneholder ${gosysAuthority.system}") {
-            Then("legges $gosysAuthority til") {
+    Given("JWT-konvertering for token-type og roller") {
+        When("tokenet er OBO og har roller") {
+            Then("legges OBO- og ROLE-authorities til") {
                 val jwt = Jwt.withTokenValue("token")
                     .header("alg", "none")
-                    .claim(AZP_NAME, "dev-gcp:tilgangsmaskin:gosys")
+                    .claim(OID, "123e4567-e89b-12d3-a456-426614174000")
+                    .claim(ROLES_CLAIM, listOf("ENKELT", "ROLE_DEV"))
                     .build()
 
-                converter.convert(jwt).authorities shouldContain gosysAuthority
+                converter.convert(jwt).authorities.map { it.authority }.shouldContainAll(
+                    OBO_AUTHORITY,
+                    "ROLE_ENKELT",
+                    "ROLE_DEV",
+                )
             }
         }
 
-        When("azp_name mangler") {
-            Then("inneholder ikke ${gosysAuthority.system}") {
-               val jwt = Jwt.withTokenValue("token")
+        When("tokenet er CCF") {
+            Then("legges CCF-authority til") {
+                val jwt = Jwt.withTokenValue("token")
                     .header("alg", "none")
-                    .claim("sub", "subject")
+                    .claim(IDTYP, APP)
                     .build()
 
-                converter.convert(jwt).authorities.shouldNotContain(gosysAuthority)
+                converter.convert(jwt).authorities.map { it.authority } shouldContain CCF_AUTHORITY
             }
         }
     }

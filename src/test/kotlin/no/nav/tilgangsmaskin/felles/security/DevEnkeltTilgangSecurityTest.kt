@@ -8,7 +8,6 @@ import io.mockk.verify
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
 import no.nav.tilgangsmaskin.felles.rest.Token
-import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV_GCP
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
@@ -44,7 +43,6 @@ class DevEnkeltTilgangSecurityTest(mockMvc: MockMvc, mapper: JsonMapper) : Behav
     init {
         beforeEach {
             clearMocks(token, regel, enkelt, answers = false)
-             every { token.type } returns OBO
              every { token.requiredAnsattId } returns TEST_ANSATT_ID
              every { enkelt.registrerTilgang(TEST_ANSATT_ID, dto) } returns true
         }
@@ -54,7 +52,7 @@ class DevEnkeltTilgangSecurityTest(mockMvc: MockMvc, mapper: JsonMapper) : Behav
                 Then("returnerer 202 for overstyr") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
-                            setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID, mapOf("roles" to listOf("ROLE_DEV"))))
+                            setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID, mapOf(ROLES_CLAIM to listOf("ROLE_DEV"))))
                         }
                         contentType = APPLICATION_JSON
                         content = payload

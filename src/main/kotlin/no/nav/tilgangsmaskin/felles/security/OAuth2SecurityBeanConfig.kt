@@ -2,11 +2,10 @@ package no.nav.tilgangsmaskin.felles.security
 
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.NOT_PROD_GCP
-import org.springframework.beans.factory.ObjectProvider
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Profile
+import org.springframework.context.annotation.Primary
 import org.springframework.core.convert.converter.Converter
 import org.springframework.security.authentication.AbstractAuthenticationToken
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
@@ -24,10 +23,10 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpRequestInterceptor.authorizationFailureHandler
 import org.springframework.security.oauth2.client.web.client.support.OAuth2RestClientHttpServiceGroupConfigurer.from
 import org.springframework.security.oauth2.jwt.Jwt
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.access.AccessDeniedHandler
-import org.springframework.stereotype.Component
+import org.springframework.core.env.Environment
+import org.springframework.core.env.Profiles
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer
 
 private const val ROLE = "ROLE_"
@@ -40,7 +39,7 @@ private val UNPROTECTED_ENDPOINTS = arrayOf("/$DEV/**", "/swagger-ui/**", "/v3/a
 class OAuth2SecurityBeanConfig {
     @Bean
     fun securityFilterChain(http: HttpSecurity,
-                            converter: ObjectProvider<Converter<Jwt, AbstractAuthenticationToken>>,
+                            converter: Converter<Jwt, AbstractAuthenticationToken>,
                             deniedHandler: AccessDeniedHandler,
                             entryPoint: AuthenticationEntryPoint) =
         http.authorizeHttpRequests { requests ->
@@ -53,12 +52,21 @@ class OAuth2SecurityBeanConfig {
             }
             .oauth2ResourceServer { oauth2 ->
                 oauth2.jwt { jwt ->
-                    converter.ifAvailable?.let(jwt::jwtAuthenticationConverter)
+                    jwt.jwtAuthenticationConverter(converter)
                 }
                 oauth2.authenticationEntryPoint(entryPoint)
             }
-            .statelessApiDefaults()
+            .stateless()
             .build()
+
+    @Bean
+    @Primary
+    fun oauth2AuthorityAddingJwtAuthenticationConverter(env: Environment): Converter<Jwt, AbstractAuthenticationToken> =
+        if (env.acceptsProfiles(Profiles.of(PROD_GCP))) {
+            OAuth2AuthorityAddingJwtAuthenticationConverter()
+        } else {
+            OAuth2AuthorityAddingJwtAuthenticationConverter(setOf(SimpleGrantedAuthority(DEV_ROLE)))
+        }
 
     @Bean
     fun securityObservationSettings()  =
@@ -95,7 +103,7 @@ class OAuth2SecurityBeanConfig {
             setAuthorizationFailureHandler(failureHandler)
         }
 
-    private fun HttpSecurity.statelessApiDefaults() =
+    private fun HttpSecurity.stateless() =
         requestCache { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(STATELESS) }
             .csrf { it.disable() }
@@ -103,11 +111,4 @@ class OAuth2SecurityBeanConfig {
             .httpBasic { it.disable() }
             .logout { it.disable() }
 
-
-    @Component
-    @Profile(NOT_PROD_GCP)
-    class DefaultDevRoleAddingJwtAuthenticationConverter : Converter<Jwt, AbstractAuthenticationToken> {
-        override fun convert(source: Jwt): AbstractAuthenticationToken =
-            JwtAuthenticationToken(source, listOf(SimpleGrantedAuthority(DEV_ROLE)))
-    }
 }

@@ -37,7 +37,9 @@ class EntraAnsattGruppeResolver(private val entra: EntraTjeneste,
                 log.trace("CC-flow: {} slo opp globale og GEO-grupper i Entra", ansattId)
             }
         }.recoverCatching { e ->
-            (e as? NotFoundRestException)?.let { notFound(ansattId, it) } ?: throw e
+            (e as? NotFoundRestException)?.let {
+                notFound(ansattId, it)
+            } ?: throw e
         }.getOrThrow()
 
 

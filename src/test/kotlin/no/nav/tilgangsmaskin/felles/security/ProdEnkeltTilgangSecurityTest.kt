@@ -9,7 +9,6 @@ import io.mockk.every
 import io.mockk.verify
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
 import no.nav.tilgangsmaskin.felles.rest.Token
-import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
@@ -51,7 +50,6 @@ class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private val ma
     init {
         beforeEach {
             clearMocks(token, regelTjeneste, enkeltTilgangTjeneste, answers = false)
-            every { token.type } returns OBO
             every { token.requiredAnsattId } returns TEST_ANSATT_ID
             every { enkeltTilgangTjeneste.registrerTilgang(TEST_ANSATT_ID, any()) } returns true
         }
@@ -64,7 +62,7 @@ class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private val ma
                 Then("returnerer 202 for enkelttilgang") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
-                            setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID, mapOf("roles" to listOf(ENKELT))))
+                            setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID, mapOf(ROLES_CLAIM to listOf(ENKELT))))
                         }
                         contentType = APPLICATION_JSON
                         content = payload
@@ -84,7 +82,7 @@ class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private val ma
                 Then("returnerer 202 for enkelttilgang") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
-                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf("roles" to listOf(ENKELT, UTILGJENGELIG))))
+                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf(ROLES_CLAIM to listOf(ENKELT, UTILGJENGELIG))))
                         }
                         contentType = APPLICATION_JSON
                         content = payload
@@ -102,7 +100,7 @@ class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private val ma
                 Then("avvises med 403 for enkelttilgang") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
-                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf("roles" to listOf(UTILGJENGELIG))))
+                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf(ROLES_CLAIM to listOf(UTILGJENGELIG))))
                         }
                         contentType = APPLICATION_JSON
                         content = payload

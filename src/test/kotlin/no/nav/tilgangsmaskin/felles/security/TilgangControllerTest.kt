@@ -9,9 +9,8 @@ import io.mockk.justRun
 import io.mockk.verify
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
 import no.nav.tilgangsmaskin.felles.rest.Token
-import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
-import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
-import no.nav.tilgangsmaskin.felles.security.OAuth2TokenTypeAuthorization.Companion.mismatch
+import no.nav.tilgangsmaskin.felles.rest.Token.Companion.APP
+import no.nav.tilgangsmaskin.felles.rest.Token.Companion.IDTYP
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
@@ -77,7 +76,6 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
 
             When("request har gyldig oauth2-token") {
                 Then("returnerer 204") {
-                    every { token.type } returns OBO
                     every { token.requiredAnsattId } returns TEST_ANSATT_ID
                     mockMvc.post("$PROD_BASE_PATH/komplett") {
                         headers {
@@ -120,10 +118,9 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
         Given("method security på OBO-endepunkter") {
             When("request bruker CCF-token") {
                 Then("returnerer 403 for komplett") {
-                    every { token.type } returns CCF
                     mockMvc.post("$PROD_BASE_PATH/komplett") {
                         headers {
-                            setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID))
+                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf(IDTYP to APP)))
                         }
                         contentType = APPLICATION_JSON
                         content = mapper.writeValueAsString(TEST_BRUKER_ID)
@@ -134,14 +131,13 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                         content {
                             contentType(APPLICATION_PROBLEM_JSON)
                         }
-                    }.andReturn().withBody(FORBIDDEN, mismatch(OBO, token.type))
+                    }.andReturn().withBody(FORBIDDEN, "Access Denied")
                 }
 
                 Then("returnerer 403 for bulk") {
-                    every { token.type } returns CCF
                     mockMvc.post("$PROD_BASE_PATH/bulk/obo") {
                         headers {
-                            setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID))
+                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf(IDTYP to APP)))
                         }
                         contentType = APPLICATION_JSON
                         content = mapper.writeValueAsString(setOf(BrukerIdOgRegelsett(TEST_BRUKER_ID.verdi)))
@@ -152,15 +148,14 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                         content {
                             contentType(APPLICATION_PROBLEM_JSON)
                         }
-                    }.andReturn().withBody(FORBIDDEN, mismatch(OBO, token.type))
+                    }.andReturn().withBody(FORBIDDEN, "Access Denied")
                 }
 
                 Then("returnerer 403 for overstyr") {
                     val gyldigTil = now().plusMonths(2)
-                    every { token.type } returns CCF
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
-                            setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID))
+                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf(IDTYP to APP, "roles" to listOf(ENKELT))))
                         }
                         contentType = APPLICATION_JSON
                         content = mapper.writeValueAsString(EnkeltTilgangData(TEST_BRUKER_ID, "En god begrunnelse", gyldigTil))
@@ -171,7 +166,7 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                         content {
                             contentType(APPLICATION_PROBLEM_JSON)
                         }
-                    }.andReturn().withBody(FORBIDDEN, mismatch(OBO, token.type))
+                    }.andReturn().withBody(FORBIDDEN, "Access Denied")
                 }
             }
         }
@@ -179,8 +174,6 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
         Given("method security på CCF-endepunkter") {
             When("request bruker OBO-token") {
                 Then("returnerer 403 for komplett CCF-endepunkt") {
-                    every { token.type } returns OBO
-
                     mockMvc.post("$PROD_BASE_PATH/ccf/komplett/${TEST_ANSATT_ID.verdi}") {
                         headers {
                             setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID))
@@ -194,12 +187,10 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                         content {
                             contentType(APPLICATION_PROBLEM_JSON)
                         }
-                    }.andReturn().withBody(FORBIDDEN, mismatch(CCF, token.type))
+                    }.andReturn().withBody(FORBIDDEN, "Access Denied")
                 }
 
                 Then("returnerer 403 for bulk CCF-endepunkt") {
-                    every { token.type } returns OBO
-
                     mockMvc.post("$PROD_BASE_PATH/bulk/ccf/${TEST_ANSATT_ID.verdi}") {
                         headers {
                             setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID))
@@ -213,7 +204,7 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                         content {
                             contentType(APPLICATION_PROBLEM_JSON)
                         }
-                    }.andReturn().withBody(FORBIDDEN, mismatch(CCF, token.type))
+                    }.andReturn().withBody(FORBIDDEN, "Access Denied")
                 }
             }
         }

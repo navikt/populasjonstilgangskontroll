@@ -2,13 +2,12 @@ package no.nav.tilgangsmaskin.tilgang
 
 import io.kotest.assertions.assertSoftly
 import io.kotest.matchers.shouldBe
-import io.mockk.every
 import io.mockk.justRun
+import io.mockk.every
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
-import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode.AVVIST_STRENGT_FORTROLIG_ADRESSE
@@ -28,17 +27,10 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
     init {
 
         Given("OBO enkeltoppslag") {
-
-            beforeEach {
-                every {
-                    token.type
-                } returns OBO
-            }
-
             When("komplett kalles med OBO-token") {
                 Then("returnerer 204 ved tilgang") {
                     justRun {
-                        regelTjeneste.kompletteRegler(any(), brukerId)
+                        regelTjeneste.kompletteRegler(ansattId, brukerId)
                     }
                     mockMvc.post("$PROD_BASE_PATH/komplett") {
                         contentType = APPLICATION_JSON; content = "\"$brukerId\""
@@ -61,7 +53,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         override fun evaluer(ansatt: Ansatt, bruker: Bruker) = false
                     }
                     every {
-                        regelTjeneste.kompletteRegler(any(), brukerId)
+                        regelTjeneste.kompletteRegler(ansattId, brukerId)
                     } throws RegelException(testAnsatt, testBruker, testRegel)
 
                     val result = mockMvc.post("$PROD_BASE_PATH/komplett") {
@@ -171,15 +163,14 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
         Given("Enkelttilgang") {
 
             val gyldigTil = LocalDate.now().plusMonths(2)
-
-            beforeEach { every { token.type } returns OBO }
+            val request = EnkeltTilgangData(BrukerId(brukerId), "En god begrunnelse", gyldigTil)
 
             When("enkelttilgang kalles med gyldig request og OBO-token") {
                 Then("returnerer 202 og dokumenteres i rest docs") {
-                    every { enkeltTilgangTjeneste.registrerTilgang(any(), any()) } returns true
+                    every { enkeltTilgangTjeneste.registrerTilgang(ansattId, request) } returns true
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         contentType = APPLICATION_JSON
-                        content = mapper.writeValueAsString(EnkeltTilgangData(BrukerId(brukerId), "En god begrunnelse", gyldigTil))
+                        content = mapper.writeValueAsString(request)
                     }.andExpect {
                         status {
                             isAccepted()

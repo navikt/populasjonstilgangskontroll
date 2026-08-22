@@ -14,7 +14,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.getOne
-import no.nav.tilgangsmaskin.felles.rest.Token
+import no.nav.tilgangsmaskin.felles.security.AuthContext
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
@@ -35,14 +35,14 @@ class NomTjenesteTest(private val tjeneste: NomTjeneste, private val repo: NomRe
     class NomTestConfig : CacheTestConfig(NOM)
 
     @MockkBean
-    private lateinit var token: Token
+    private lateinit var authContext: AuthContext
 
     private val ansattId = AnsattId("Z999999")
     private val brukerId = BrukerId("08526835670")
 
     init {
         beforeEach {
-            every { token.system } returns "test"
+            every { authContext.system } returns "test"
             repo.deleteAll()
             cache.clear(NOM_CACHE)
         }

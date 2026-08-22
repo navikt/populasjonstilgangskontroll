@@ -3,9 +3,9 @@ package no.nav.tilgangsmaskin.felles.security
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldContainAll
-import no.nav.tilgangsmaskin.felles.rest.Token.Companion.APP
-import no.nav.tilgangsmaskin.felles.rest.Token.Companion.IDTYP
-import no.nav.tilgangsmaskin.felles.rest.Token.Companion.OID
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.APP
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.IDTYP
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.OID
 import org.springframework.security.oauth2.jwt.Jwt
 
 class OAuth2AuthorityAddingJwtAuthenticationConverterTest : BehaviorSpec({

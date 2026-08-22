@@ -1,9 +1,9 @@
 package no.nav.tilgangsmaskin.felles.security
 
-import no.nav.tilgangsmaskin.felles.rest.Token.Companion.APP
-import no.nav.tilgangsmaskin.felles.rest.Token.Companion.IDTYP
-import no.nav.tilgangsmaskin.felles.rest.Token.Companion.NAVIDENT
-import no.nav.tilgangsmaskin.felles.rest.Token.Companion.OID
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.APP
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.IDTYP
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.NAVIDENT
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.OID
 import org.springframework.core.convert.converter.Converter
 import org.springframework.security.authentication.AbstractAuthenticationToken
 import org.springframework.security.core.GrantedAuthority

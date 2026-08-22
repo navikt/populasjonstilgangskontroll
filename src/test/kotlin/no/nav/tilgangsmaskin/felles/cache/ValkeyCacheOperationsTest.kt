@@ -32,7 +32,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.FORTROLIG
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.UGRADERT
 import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheOperationsTest.ValkeyCacheTestConfig
-import no.nav.tilgangsmaskin.felles.rest.Token
+import no.nav.tilgangsmaskin.felles.security.AuthContext
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
@@ -101,7 +101,7 @@ class ValkeyCacheOperationsTest(
     }
 
     @MockkBean
-    private lateinit var token: Token
+    private lateinit var authContext: AuthContext
 
     @MockkBean(relaxed = true)
     private lateinit var oppfrisker: CacheOppfrisker
@@ -110,8 +110,8 @@ class ValkeyCacheOperationsTest(
     init {
 
         beforeEach {
-            every { token.system } returns "test"
-            every { token.clusterAndSystem } returns "test:dev-gcp"
+            every { authContext.system } returns "test"
+            every { authContext.clusterAndSystem } returns "test:dev-gcp"
             every { oppfrisker.cacheName } returns PDL_MED_FAMILIE_CACHE.name
             every { oppfrisker.oppfrisk(any()) } returns Unit
             cache.clear(PDL_MED_FAMILIE_CACHE)

@@ -7,9 +7,9 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GEO_OG_GL
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
-import no.nav.tilgangsmaskin.felles.rest.Token
-import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
-import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
+import no.nav.tilgangsmaskin.felles.security.AuthContext
+import no.nav.tilgangsmaskin.felles.security.TokenType.CCF
+import no.nav.tilgangsmaskin.felles.security.TokenType.OBO
 import no.nav.tilgangsmaskin.felles.rest.notifikajon.MessagePublisher
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import org.slf4j.LoggerFactory.getLogger
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class EntraAnsattGruppeResolver(private val entra: EntraTjeneste,
-                                private val token: Token,
+                                private val authContext: AuthContext,
                                 private val oid: EntraOidTjeneste,
                                 private val cache: CacheOperations,
                                 private val publisher: MessagePublisher) {
@@ -25,7 +25,7 @@ class EntraAnsattGruppeResolver(private val entra: EntraTjeneste,
     private val log = getLogger(javaClass)
 
     fun grupperForAnsatt(ansattId: AnsattId) =
-        when (token.type) {
+        when (authContext.type) {
             CCF -> grupperForCC(ansattId)
             OBO -> grupperForObo(ansattId)
             else -> grupperForUautentisert(ansattId)
@@ -59,13 +59,13 @@ class EntraAnsattGruppeResolver(private val entra: EntraTjeneste,
         }
     }
 
-    private fun grupperForObo(ansattId: AnsattId) = with(token.globaleGrupper()) {
+    private fun grupperForObo(ansattId: AnsattId) = with(authContext.globaleGrupper()) {
         if (girNasjonalTilgang()) {
             this.also {
                 log.trace("OBO-flow: {} har nasjonal tilgang, slo *ikke* opp GEO-grupper i Entra", ansattId)
             }
         } else {
-            (this + entra.geoGrupper(ansattId, token.oid!!)).also {
+            (this + entra.geoGrupper(ansattId, authContext.oid!!)).also {
                 log.trace("OBO-flow: {} har ikke nasjonal tilgang, slo opp GEO-grupper i Entra", ansattId)
             }
         }

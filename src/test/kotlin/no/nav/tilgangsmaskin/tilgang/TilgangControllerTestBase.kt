@@ -6,7 +6,6 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
-import no.nav.tilgangsmaskin.felles.rest.Token
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.module.kotlin.KotlinModule
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
@@ -71,8 +70,6 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
     protected val regelTjeneste: RegelTjeneste = mockk()
 
     protected val enkeltTilgangTjeneste: EnkeltTilgangTjeneste = mockk()
-
-    protected val token: Token = mockk(relaxed = true)
 
     protected val ansattId = AnsattId("Z999999")
     protected val brukerId = "08526835670"
@@ -155,7 +152,6 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
                     .withResponseDefaults(prettyPrint())
                 )
                 .build()
-            every { token.ansattId } returns ansattId
         }
 
         afterEach {

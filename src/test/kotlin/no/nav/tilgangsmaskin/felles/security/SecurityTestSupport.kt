@@ -7,8 +7,8 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CaffeineCacheOperations
 import no.nav.tilgangsmaskin.felles.rest.notifikajon.logbook.LogbookBeanConfiguration
-import no.nav.tilgangsmaskin.felles.rest.Token.Companion.NAVIDENT
-import no.nav.tilgangsmaskin.felles.rest.Token.Companion.OID
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.NAVIDENT
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.OID
 import no.nav.tilgangsmaskin.felles.security.SecurityTestOAuth2.server
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.NAIS_CLUSTER_NAME
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController
@@ -37,7 +37,7 @@ internal object SecurityTestOAuth2 {
     val server = MockOAuth2Server().also { it.start() }
 }
 
-internal fun jwt(aud: String, ansattId: AnsattId, claims: Map<String,Any> = emptyMap(), ) = server.issueToken(
+internal fun jwt(aud: String, ansattId: AnsattId, claims: Map<String,Any> = emptyMap()) = server.issueToken(
     TEST_ISSUER_ID, TEST_SUBJECT, aud,
     mapOf(NAVIDENT to ansattId.verdi, OID to "${UUID.randomUUID()}") + claims,
 ).serialize()

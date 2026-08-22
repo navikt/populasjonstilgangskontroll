@@ -8,7 +8,7 @@ import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
 import no.nav.tilgangsmaskin.felles.ClusterAddingTimedAspectTest.TestConfig
-import no.nav.tilgangsmaskin.felles.rest.Token
+import no.nav.tilgangsmaskin.felles.security.AuthContext
 import no.nav.tilgangsmaskin.felles.rest.health.ObservabilityBeanConfig
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.context.annotation.Bean
@@ -24,12 +24,12 @@ class ClusterAddingTimedAspectTest(
 ) : BehaviorSpec() {
 
     @MockkBean
-    lateinit var token: Token
+    lateinit var authContext: AuthContext
 
     init {
         beforeEach {
-            every { token.cluster } returns "dev-gcp"
-            every { token.systemNavn } returns "my-app"
+            every { authContext.cluster } returns "dev-gcp"
+            every { authContext.systemNavn } returns "my-app"
         }
 
         Given("clusterAddingTimedAspect") {
@@ -45,8 +45,8 @@ class ClusterAddingTimedAspectTest(
             }
             When("token-verdier endres mellom kall") {
                 Then("brukes oppdaterte verdier per kall") {
-                    every { token.cluster } returns "prod-gcp"
-                    every { token.systemNavn } returns "annen-app"
+                    every { authContext.cluster } returns "prod-gcp"
+                    every { authContext.systemNavn } returns "annen-app"
                     timedService.execute()
                     registry.get("test.execute")
                         .tag("cluster", "prod-gcp")

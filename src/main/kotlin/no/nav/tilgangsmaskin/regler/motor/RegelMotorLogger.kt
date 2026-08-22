@@ -8,7 +8,7 @@ import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.felles.rest.notifikajon.Auditor
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.CONSUMER_ID
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
-import no.nav.tilgangsmaskin.felles.rest.Token
+import no.nav.tilgangsmaskin.felles.security.AuthContext
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withMDC
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class RegelMotorLogger(private val registry: MeterRegistry,
-                       private val token: Token,
+                       private val authContext: AuthContext,
                        private val teller: EvalueringTypeTeller,
                        private val auditor: Auditor) {
 
@@ -30,7 +30,7 @@ class RegelMotorLogger(private val registry: MeterRegistry,
             .description("Histogram av bulk-størrelse")
             .baseUnit("størrelse")
             .publishPercentileHistogram(true)
-            .tags("system", token.system)
+            .tags("system", authContext.system)
             .serviceLevelObjectives(1.0, 2.0, 5.0, 10.0, 20.0, 50.0, 100.0)
             .register(registry)
     }
@@ -47,7 +47,7 @@ class RegelMotorLogger(private val registry: MeterRegistry,
             teller.tell(TILGANG_AVVIST_TAG,
                 regelSett.tag(),
                 regel.tag(),
-                token.tag(),
+                authContext.tag(),
                 type.tag())
         }
 
@@ -63,7 +63,7 @@ class RegelMotorLogger(private val registry: MeterRegistry,
             teller.tell(TILGANG_AKSEPTERT_TAG,
                 regelSett.tag(),
                 INGEN_REGEL_TAG,
-                token.tag(),
+                authContext.tag(),
                 type.tag())
         }
 
@@ -87,7 +87,7 @@ class RegelMotorLogger(private val registry: MeterRegistry,
         private const val REGEL = "regel"
         val INGEN_REGEL_TAG = Tag.of(REGEL, UTILGJENGELIG)
         fun Regel.tag() = Tag.of(REGEL, kortNavn)
-        private fun Token.tag() = Tag.of(FLOW, type.name.lowercase())
+        private fun AuthContext.tag() = Tag.of(FLOW, type.name.lowercase())
         private fun EvalueringType.tag() = Tag.of(OPPSLAGTYPE, name.lowercase())
         private fun RegelSett.tag() = Tag.of(BESKRIVELSE, beskrivelse)
         private val TILGANG_AKSEPTERT_TAG = Tag.of(RESULTAT, OK)
@@ -102,4 +102,3 @@ class RegelMotorLogger(private val registry: MeterRegistry,
         private const val AVVIST = "TILGANG_AVVIST"
     }
 }
-

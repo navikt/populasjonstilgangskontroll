@@ -31,24 +31,24 @@ class SlackMessagePublisher(
     private val log = getLogger(javaClass)
 
 
-    override fun error(header: String, msg: String) = publish(SlackHeader(header, env), msg, ERROR)
+    override fun error(header: String, msg: String) = publish(SlackHeader(header, env), msg, ERROR.value)
 
-    override fun warn(header: String, msg: String) = publish(SlackHeader(header, env), msg, WARN)
+    override fun warn(header: String, msg: String) = publish(SlackHeader(header, env), msg, WARN.value)
 
-    override fun info(header: String, msg: String) = publish(SlackHeader(header, env), msg, INFO)
-
-
-     override fun publish(header: String, msg: String, vararg emojis: String) = publish(SlackHeader(header, env), msg, *emojis.map { Emoji.valueOf(it) }.toTypedArray())
+    override fun info(header: String, msg: String) = publish(SlackHeader(header, env), msg, INFO.value)
 
 
+     override fun publish(header: String, msg: String, vararg emojis: String) = publish(SlackHeader(header, env), msg, *emojis)
 
-        private fun publish(header: SlackHeader, msg: String, vararg emojis: Emoji) =
+
+
+        private fun publish(header: SlackHeader, msg: String, vararg emojis: String) =
         publish(builder().blocks(asBlocks(
             header {
                 it.text(plainText("${header.emoji.value} ${header.text}"))
             },
             section {
-                it.text(markdownText("${emojis.joinToString(" ") { e -> e.value }} $msg"))
+                it.text(markdownText("${emojis.joinToString(" ") } $msg"))
             })).build())
 
     private fun publish(payload: Payload) {

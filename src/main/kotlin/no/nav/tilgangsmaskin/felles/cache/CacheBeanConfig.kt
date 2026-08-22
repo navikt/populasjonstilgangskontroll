@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.felles.cache
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.rest.health.PingableHealthIndicator
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.interceptor.CacheErrorHandler
 import org.springframework.context.annotation.Bean
@@ -12,6 +13,7 @@ import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheWriter.nonLockingRedisCacheWriter
 import org.springframework.data.redis.config.RedisListenerConfigurer
 import org.springframework.data.redis.connection.RedisConnectionFactory
+import org.springframework.data.redis.listener.RedisMessageListenerContainer
 import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisMessageConverters
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer
@@ -26,6 +28,9 @@ import tools.jackson.module.kotlin.KotlinModule.Builder
 class CacheBeanConfig(private val cf: RedisConnectionFactory,
                       private val errorHandler: CacheErrorHandler,
                       private vararg val cfgs: CachableRestConfig) : CachingConfigurer, RedisListenerConfigurer {
+
+    private val log = getLogger(javaClass)
+
 
 
     override fun errorHandler() =
@@ -58,6 +63,15 @@ class CacheBeanConfig(private val cf: RedisConnectionFactory,
                 ResilientValkeySerializer(GenericJacksonJsonRedisSerializer(VALKEY_MAPPER)))).apply {
                 if (!cfg.cacheNulls) disableCachingNullValues()
             }
+
+    @Bean(name = ["redisMessageListenerContainer"])
+    fun redisMessageListenerContainer(cf: RedisConnectionFactory
+    ) = RedisMessageListenerContainer().apply {
+        setConnectionFactory(cf)
+        setRecoveryInterval(5_000) // retry subscription every 5s
+        maxSubscriptionRegistrationWaitingTime = 30_000
+        setErrorHandler {  log.warn("Redis listener container error", it) }
+    }
 
     companion object {
         val VALKEY_MAPPER = JsonMapper.builder().polymorphicTypeValidator(NavPolymorphicTypeValidator()).apply {

@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component
 @Component
 class SlackApplicationReadyNotifier(
     private val publisher: MessagePublisher, env: Environment ) {
+
+    private val pod = env.getProperty("hostname") ?: "unknown"
+
     private val app = env.getRequiredProperty("spring.application.name")
     private val image = env.getRequiredProperty("nais.app.image")
     private val log = getLogger(javaClass)
@@ -17,8 +20,8 @@ class SlackApplicationReadyNotifier(
 
     @EventListener(ApplicationReadyEvent::class)
     fun onApplicationReady() {
-        publisher.info("En instans av $app er klar", "Startet i  _${current.name}_ med image _${image}_").also {
-            log.info("Applikasjon klar: $app er startet i  _${current.name}_ med image _${image}_")
+        publisher.info("En instans av $app er klar", "Startet $pod i  _${current.name}_ med image _${image}_").also {
+            log.info("Applikasjon klar: $app er startet $pod i  _${current.name}_ med image _${image}_")
         }
     }
 }

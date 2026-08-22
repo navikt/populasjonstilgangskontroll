@@ -25,7 +25,7 @@ class SlackApplicationShutdownNotifierTest : BehaviorSpec({
             notifier.onApplicationShutdown()
 
             Then("publiseres en shutdown-melding til Slack") {
-                verify(exactly = 1) { publisher.info(any(), any()) }
+                verify(exactly = 1) { publisher.publish(any(), any(), any()) }
             }
         }
     }

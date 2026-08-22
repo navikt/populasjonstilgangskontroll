@@ -14,15 +14,14 @@ class SlackApplicationShutdownNotifier(
 ) {
 
     private val pod = env.getProperty("hostname") ?: "unknown"
-    private val app = env.getRequiredProperty("spring.application.name")
     private val image = env.getRequiredProperty("nais.app.image")
     private val log = getLogger(javaClass)
 
     @EventListener(ContextClosedEvent::class)
     fun onApplicationShutdown() {
-        log.info("ContextClosedEvent mottatt: $app stopper i _${current.name}_ med image _${image}_")
+        log.info("ContextClosedEvent mottatt: $pod stopper i _${current.name}_ med image _${image}_")
         runCatching {
-            publisher.info("En instans $pod av $app stenges ned", "Stopper $pod i  _${current.name}_ med image _${image}_")
+            publisher.info("En instans _${pod}_ stenges ned", "Stopper $pod i  _${current.name}_ for image _${image}_")
         }.onFailure {
             log.warn("Feilet ved sending av shutdown-notifikasjon", it)
         }

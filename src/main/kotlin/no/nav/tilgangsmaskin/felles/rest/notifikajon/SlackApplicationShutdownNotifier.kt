@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest.notifikajon
 
+import org.springframework.boot.context.event.ApplicationFailedEvent
 import org.springframework.context.event.ContextClosedEvent
 import org.springframework.context.event.EventListener
 import org.springframework.core.env.Environment
@@ -16,5 +17,13 @@ class SlackApplicationShutdownNotifier(publisher: MessagePublisher, env:Environm
             log.info("Stoppet $pod med image $image")
         }.onFailure {
             log.warn("Feilet ved sending av shutdown-notifikasjon", it)
+        }
+    @EventListener(ApplicationFailedEvent::class)
+    fun onApplicationFailed(e: ApplicationFailedEvent) =
+        runCatching {
+            publisher.error(" $pod failed", "Image _${image}_")
+            log.warn("Feil ved oppstart av  $pod med image $image",e)
+        }.onFailure {
+            log.warn("Feilet ved sending av failed-notifikasjon", it)
         }
 }

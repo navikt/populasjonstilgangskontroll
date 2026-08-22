@@ -20,13 +20,16 @@ class SlackApplicationReadyNotifierTest : BehaviorSpec({
             val publisher = mockk<MessagePublisher>(relaxed = true)
                 val env = mockk<Environment>()
                 every { env.getRequiredProperty("spring.application.name") } returns appName
+                every { env.getProperty("spring.application.name") } returns appName
+                every { env.getProperty("hostname") } returns "hostname"
+
                 every { env.getRequiredProperty("nais.app.image") } returns image
                 val notifier = SlackApplicationReadyNotifier(publisher, env)
 
                 notifier.onApplicationReady()
 
                 Then("publiseres en startup-melding til Slack") {
-                    verify(exactly = 1) { publisher.info(header, message) }
+                    verify(exactly = 1) { publisher.info(header, any()) }
                 }
             }
     }

@@ -18,8 +18,11 @@ class SlackApplicationShutdownNotifier(
 
     @EventListener(ContextClosedEvent::class)
     fun onApplicationShutdown() {
-        publisher.info("En instans av $app stenges ned", "Stopper i  _${current.name}_ med image _${image}_").also {
-            log.info("Applikasjon stenges ned: $app stopper i  _${current.name}_ med image _${image}_")
+        log.info("ContextClosedEvent mottatt: $app stopper i _${current.name}_ med image _${image}_")
+        runCatching {
+            publisher.info("En instans av $app stenges ned", "Stopper i  _${current.name}_ med image _${image}_")
+        }.onFailure {
+            log.warn("Feilet ved sending av shutdown-notifikasjon", it)
         }
     }
 }

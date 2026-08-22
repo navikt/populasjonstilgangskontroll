@@ -8,7 +8,6 @@ import com.slack.api.model.block.composition.BlockCompositions.plainText
 import com.slack.api.webhook.Payload
 import com.slack.api.webhook.Payload.builder
 import no.nav.boot.conditionals.ConditionalOnGCP
-import no.nav.tilgangsmaskin.felles.utils.LeaderAware
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
@@ -20,7 +19,7 @@ import org.springframework.http.HttpStatus.OK
 @ConditionalOnGCP
 class SlackMessagePublisher(
     @param:Value("\${slack.webhook:}") private val url: String,
-) : MessagePublisher, LeaderAware(true) {
+) : MessagePublisher {
 
     private val emoji = if (isProd) Emoji.PROD else Emoji.DEV
 
@@ -43,23 +42,17 @@ class SlackMessagePublisher(
                 it.text(markdownText("${emojis.joinToString(" ") { e -> e.value }} $msg"))
             })).build())
 
-    private fun publish(payload: Payload) =
-        somLeder {
-            if (url.isBlank()) {
-                log.info("Ingen Slack-notifikasjon")
-            }
-            else {
-                log.trace("Sender Slack-notifikasjon til {}", url)
-                with(getInstance().send(url, payload)) {
-                    if (code != OK.value()) {
-                        log.warn("Kunne ikke sende Slack-notifikasjon _($code/$message)_")
-                    }
-                    else  {
-                        log.trace("Sendte Slack-notifikasjon OK")
-                    }
-                }
+    private fun publish(payload: Payload) {
+        if (url.isBlank()) {
+            log.warn("Ingen Slack-notifikasjon: slack.webhook er tom")
+        } else {
+            val response = getInstance().send(url, payload)
+            log.info("Slack-notifikasjon respons code={} message={}", response.code, response.message)
+            if (response.code != OK.value()) {
+                log.warn("Kunne ikke sende Slack-notifikasjon _(${response.code}/${response.message})_")
             }
         }
+    }
 
     private data class SlackHeader(val text: String, val emoji: Emoji = Emoji.INFO)
 

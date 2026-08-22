@@ -47,6 +47,11 @@ repositories {
 
 
 dependencies {
+    constraints {  // TODO midlertidif
+        implementation("at.yawk.lz4:lz4-java:1.11.1")
+        testImplementation("at.yawk.lz4:lz4-java:1.11.1")
+    }
+
     // Force newer jackson-databind version (required by gradle-avro-plugin)
     //implementation("com.fasterxml.jackson.core:jackson-databind:2.22.1")
 

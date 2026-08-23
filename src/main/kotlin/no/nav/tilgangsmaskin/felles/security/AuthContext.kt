@@ -6,8 +6,10 @@ import no.nav.tilgangsmaskin.felles.security.TokenType.OBO
 import no.nav.tilgangsmaskin.felles.security.TokenType.UNAUTHENTICATED
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import org.springframework.security.core.context.SecurityContextHolder.getContext
+import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.AbstractOAuth2TokenAuthenticationToken
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.stereotype.Component
 import java.util.UUID
 
@@ -42,6 +44,7 @@ class AuthContext {
 
     private fun stringClaim(name: String) = jwt()?.claims?.get(name)?.toString()
     private fun listClaim(name: String) = (jwt()?.claims?.get(name) as? List<*>) ?: emptyList<Any>()
+     fun principal() = (getContext().authentication as? JwtAuthenticationToken)?.principal as? OAuth2AuthenticatedPrincipal
     private fun jwt() = getContext().authentication?.let { authentication ->
         when (val principal = authentication.principal) {
             is Jwt -> principal

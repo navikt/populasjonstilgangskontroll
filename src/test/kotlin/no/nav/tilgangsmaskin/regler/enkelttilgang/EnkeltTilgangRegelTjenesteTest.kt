@@ -93,7 +93,6 @@ class EnkeltTilgangRegelTjenesteTest(
     init {
 
         beforeEach {
-            every { authContext.principal() } returns null
             stubStandardMocks()
         }
 

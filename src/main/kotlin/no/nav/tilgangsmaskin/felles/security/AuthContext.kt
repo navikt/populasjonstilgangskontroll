@@ -44,7 +44,6 @@ class AuthContext {
 
     private fun stringClaim(name: String) = jwt()?.claims?.get(name)?.toString()
     private fun listClaim(name: String) = (jwt()?.claims?.get(name) as? List<*>) ?: emptyList<Any>()
-     fun principal() = (getContext().authentication as? JwtAuthenticationToken)?.principal as? OAuth2AuthenticatedPrincipal
     private fun jwt() = getContext().authentication?.let { authentication ->
         when (val principal = authentication.principal) {
             is Jwt -> principal

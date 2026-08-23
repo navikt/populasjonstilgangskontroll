@@ -58,7 +58,7 @@ class RegelMotorLogger(private val registry: MeterRegistry,
             REGELSETT to regelSett.type.beskrivelse,
             OPPSLAGTYPE to type.name
         )) {
-            log.info("Principal er ${authContext.principal()?.name ?: "uautentisert"} med system ${authContext.system} og ansattId ${authContext.ansattId?.verdi ?: "ingen"} ga tilgang for ${ansatt.ansattId} for ${bruker.oppslagId} ${konsument()}")
+            log.info("Principal er ${authContext.principal()?.name ?: "uautentisert"}")
             log.info("${regelSett.beskrivelse} ga tilgang for ${ansatt.ansattId} ${konsument()}")
             auditor.info("${regelSett.beskrivelse} ga tilgang til ${bruker.oppslagId} for ${ansatt.ansattId} ${konsument()}")
             teller.tell(TILGANG_AKSEPTERT_TAG,

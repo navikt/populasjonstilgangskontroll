@@ -51,6 +51,8 @@ abstract class RegelMotorTestBase(
             every { authContext.system } returns "test"
             every { authContext.type } returns TokenType.CCF
             every { authContext.systemNavn } returns "test"
+            every { authContext.principal() } returns null
+
             every { authContext.clusterAndSystem } returns "cluster:test"
         }
     }

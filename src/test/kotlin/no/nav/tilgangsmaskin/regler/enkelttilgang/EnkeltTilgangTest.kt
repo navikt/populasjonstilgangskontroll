@@ -78,6 +78,7 @@ internal class EnkeltTilgangTest(
 
     init {
         beforeEach {
+            every { authContext.principal() } returns null
             stubStandardMocks()
             enkeltTilgang = EnkeltTilgangTjeneste(
                 ansatte,

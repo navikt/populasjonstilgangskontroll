@@ -33,7 +33,8 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         regelTjeneste.kompletteRegler(ansattId, brukerId)
                     }
                     mockMvc.post("$PROD_BASE_PATH/komplett") {
-                        contentType = APPLICATION_JSON; content = "\"$brukerId\""
+                        contentType = APPLICATION_JSON
+                        content = "\"$brukerId\""
                     }.andExpect {
                         status {
                             isNoContent()
@@ -81,7 +82,8 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                 Then("returnerer 204 ved tilgang") {
                     justRun { regelTjeneste.kjerneregler(any(), brukerId) }
                     mockMvc.post("$PROD_BASE_PATH/kjerne") {
-                        contentType = APPLICATION_JSON; content = "\"$brukerId\""
+                        contentType = APPLICATION_JSON
+                        content = "\"$brukerId\""
                     }.andExpect {
                         status { isNoContent()
                         }
@@ -92,7 +94,8 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
             When("komplett kalles med tom brukerId") {
                 Then("returnerer 400") {
                     mockMvc.post("$PROD_BASE_PATH/komplett") {
-                        contentType = APPLICATION_JSON; content = "\"\""
+                        contentType = APPLICATION_JSON
+                        content = "\"\""
                     }.andExpect {
                         status {
                             isBadRequest()
@@ -104,7 +107,8 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
             When("komplett kalles med blank brukerId") {
                 Then("returnerer 400") {
                     mockMvc.post("$PROD_BASE_PATH/komplett") {
-                        contentType = APPLICATION_JSON; content = "\"   \""
+                        contentType = APPLICATION_JSON
+                        content = "\"   \""
                     }.andExpect {
                         status { isBadRequest()
                         }

@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.rest.ProdController
 import no.nav.tilgangsmaskin.felles.security.OAuth2RequireCCF
-import no.nav.tilgangsmaskin.felles.security.OOAuth2RequireOBO
+import no.nav.tilgangsmaskin.felles.security.OAuth2RequireOBO
 import no.nav.tilgangsmaskin.felles.security.ansattId
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withAnsattContext
 import org.slf4j.LoggerFactory.getLogger
@@ -44,7 +44,7 @@ class BulkTilgangController(
     private val log = getLogger(javaClass)
 
     @PostMapping("bulk/obo")
-    @OOAuth2RequireOBO
+    @OAuth2RequireOBO
     @BulkSwaggerApiRespons(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO)
     fun bulkOBO(
         @AuthenticationPrincipal principal: OAuth2AuthenticatedPrincipal,
@@ -52,7 +52,7 @@ class BulkTilgangController(
     ) = bulkOppslag(principal.ansattId(), specs)
 
     @PostMapping("bulk/obo/{regelType}")
-    @OOAuth2RequireOBO
+    @OAuth2RequireOBO
     @BulkSwaggerApiRespons(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO_REGELTYPE)
     fun bulkOBOForRegelType(
         @AuthenticationPrincipal principal: OAuth2AuthenticatedPrincipal,

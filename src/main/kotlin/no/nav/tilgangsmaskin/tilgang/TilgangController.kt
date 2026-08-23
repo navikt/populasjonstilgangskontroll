@@ -9,7 +9,7 @@ import no.nav.tilgangsmaskin.felles.cache.DESCRIPTION_CACHE_FLUSH
 import no.nav.tilgangsmaskin.felles.cache.SUMMARY_CACHE_FLUSH
 import no.nav.tilgangsmaskin.felles.rest.ProdController
 import no.nav.tilgangsmaskin.felles.security.OAuth2RequireCCF
-import no.nav.tilgangsmaskin.felles.security.OOAuth2RequireOBO
+import no.nav.tilgangsmaskin.felles.security.OAuth2RequireOBO
 import no.nav.tilgangsmaskin.felles.security.ansattId
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
@@ -48,7 +48,7 @@ class TilgangController(private val regelTjeneste: RegelTjeneste, private val ca
     private val log = getLogger(javaClass)
 
     @PostMapping("komplett")
-    @OOAuth2RequireOBO
+    @OAuth2RequireOBO
     @ProblemDetailApiResponse(summary = SUMMARY_KOMPLETT_OBO, description = DESCRIPTION_KOMPLETT_OBO)
     fun kompletteRegler(@AuthenticationPrincipal principal: OAuth2AuthenticatedPrincipal, @RequestBody brukerId: String) =
         enkeltOppslag(principal.ansattId(), brukerId, KOMPLETT_REGELTYPE)
@@ -60,7 +60,7 @@ class TilgangController(private val regelTjeneste: RegelTjeneste, private val ca
         enkeltOppslag(ansattId, brukerId, KOMPLETT_REGELTYPE)
 
     @PostMapping("kjerne")
-    @OOAuth2RequireOBO
+    @OAuth2RequireOBO
     @ProblemDetailApiResponse(summary = SUMMARY_KJERNE_OBO, description = DESCRIPTION_KJERNE_OBO)
     fun kjerneregler(@AuthenticationPrincipal principal: OAuth2AuthenticatedPrincipal, @RequestBody brukerId: String) =
         enkeltOppslag(principal.ansattId(), brukerId, KJERNE_REGELTYPE)
@@ -71,7 +71,7 @@ class TilgangController(private val regelTjeneste: RegelTjeneste, private val ca
     fun kjerneReglerCCF(@PathVariable ansattId: AnsattId, @RequestBody brukerId: String) =
         enkeltOppslag(ansattId, brukerId, KJERNE_REGELTYPE)
 
-    @OOAuth2RequireOBO
+    @OAuth2RequireOBO
     @DeleteMapping("cache/flush")
     @Operation(summary = SUMMARY_CACHE_FLUSH, description = DESCRIPTION_CACHE_FLUSH)
     fun flushId() = true

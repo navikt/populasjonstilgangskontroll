@@ -20,7 +20,7 @@ private const val ROLE = "ROLE_"
 const val ROLES_CLAIM = "roles"
 
 class OAuth2AuthorityAddingJwtAuthenticationConverter(
-    private val extraRoles: Set<GrantedAuthority>) : Converter<Jwt, AbstractAuthenticationToken> {
+    private val extraRoles: Set<GrantedAuthority> = emptySet()) : Converter<Jwt, AbstractAuthenticationToken> {
 
     private val delegate = JwtAuthenticationConverter()
         .andThen {

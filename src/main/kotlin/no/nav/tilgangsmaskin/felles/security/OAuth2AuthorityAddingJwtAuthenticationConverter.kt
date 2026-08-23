@@ -26,9 +26,12 @@ class OAuth2AuthorityAddingJwtAuthenticationConverter(
     private val delegate = JwtAuthenticationConverter()
         .andThen {
             val jwt = it as JwtAuthenticationToken
-            val authorities = linkedSetOf(*jwt.authorities.toTypedArray(), *extraAuthorities.toTypedArray())
-            authorities.addAll(roleAuthorities(jwt.token))
-            tokenTypeAuthority(jwt.token)?.let(authorities::add)
+            val authorities = buildSet {
+                addAll(jwt.authorities)
+                addAll(extraAuthorities)
+                addAll(roleAuthorities(jwt.token))
+                tokenTypeAuthority(jwt.token)?.let(::add)
+            }
             JwtAuthenticationToken(jwt.token, principal(jwt.token, authorities), authorities)
         }
 
@@ -51,8 +54,10 @@ class OAuth2AuthorityAddingJwtAuthenticationConverter(
             }
 
         private fun roleAuthorities(jwt: Jwt) =
-            jwt.getClaimAsStringList(ROLES_CLAIM).orEmpty().mapTo(linkedSetOf()) { role ->
-                SimpleGrantedAuthority(role.takeIf { it.startsWith(ROLE) } ?: "$ROLE$role")
+            buildSet {
+                jwt.getClaimAsStringList(ROLES_CLAIM).orEmpty().forEach { role ->
+                    add(SimpleGrantedAuthority(role.takeIf { it.startsWith(ROLE) } ?: "$ROLE$role"))
+                }
             }
     }
 }

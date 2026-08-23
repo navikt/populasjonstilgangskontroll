@@ -1,5 +1,7 @@
 package no.nav.tilgangsmaskin.felles.security
 
+import no.nav.boot.conditionals.Cluster
+import no.nav.boot.conditionals.Cluster.DEV_GCP
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP
@@ -27,6 +29,7 @@ import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.core.env.Environment
 import org.springframework.core.env.Profiles
+import org.springframework.security.core.GrantedAuthority
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer
 
 private const val ROLE = "ROLE_"
@@ -36,7 +39,9 @@ private val UNPROTECTED_ENDPOINTS = arrayOf("/$DEV/**", "/swagger-ui/**", "/v3/a
 
 @Configuration
 @EnableMethodSecurity
-class OAuth2SecurityBeanConfig {
+class OAuth2SecurityBeanConfig(env: Environment) {
+
+    private val extraRoles = env.extraRolesFor(setOf(DEV_GCP), DEV_ROLE)
     @Bean
     fun securityFilterChain(http: HttpSecurity,
                             converter: Converter<Jwt, AbstractAuthenticationToken>,
@@ -61,12 +66,8 @@ class OAuth2SecurityBeanConfig {
 
     @Bean
     @Primary
-    fun oauth2AuthorityAddingJwtAuthenticationConverter(env: Environment): Converter<Jwt, AbstractAuthenticationToken> =
-        if (env.acceptsProfiles(Profiles.of(PROD_GCP))) {
-            OAuth2AuthorityAddingJwtAuthenticationConverter()
-        } else {
-            OAuth2AuthorityAddingJwtAuthenticationConverter(setOf(SimpleGrantedAuthority(DEV_ROLE)))
-        }
+    fun oauth2AuthorityAddingJwtAuthenticationConverter(): Converter<Jwt, AbstractAuthenticationToken> =
+            OAuth2AuthorityAddingJwtAuthenticationConverter(extraRoles)
 
     @Bean
     fun securityObservationSettings()  =
@@ -112,3 +113,12 @@ class OAuth2SecurityBeanConfig {
             .logout { it.disable() }
 
 }
+
+private fun Environment.extraRolesFor(clusters: Set<Cluster>, vararg extraRoles: String) =
+    if (clusters.any { it.isActive(this) }) {
+        buildSet {
+            extraRoles.forEach { add(SimpleGrantedAuthority(it)) }
+        }
+    } else {
+        emptySet()
+    }

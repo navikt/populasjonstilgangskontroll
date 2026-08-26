@@ -84,7 +84,6 @@ class AuthContextTest : BehaviorSpec({
             Then("brukes for system, cluster, systemNavn og systemAndNs") {
                 setClaims(AZP_NAME to "dev-gcp:team:app")
                 authContext.system shouldBe "dev-gcp:team:app"
-                authContext.cluster shouldBe "dev-gcp"
                 authContext.systemNavn shouldBe "app"
                 authContext.systemAndNs shouldBe "team:app"
                 authContext.clusterAndSystem shouldBe "app:dev-gcp"
@@ -95,7 +94,6 @@ class AuthContextTest : BehaviorSpec({
             Then("returnerer utilgjengelig defaults") {
                 authContext.system shouldBe UTILGJENGELIG
                 authContext.systemNavn shouldBe UTILGJENGELIG
-                authContext.cluster shouldBe UTILGJENGELIG
                 authContext.systemAndNs shouldBe ""
                 authContext.clusterAndSystem shouldBe UTILGJENGELIG
             }

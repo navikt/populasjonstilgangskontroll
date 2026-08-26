@@ -31,7 +31,6 @@ class AuthContext {
         }
     val systemNavn get() = system.split(":").last()
     val systemAndNs get() = system.split(":").drop(1).joinToString(separator = ":")
-    val cluster get() = system.split(":").first()
     val type
         get() = when {
             erObo -> OBO

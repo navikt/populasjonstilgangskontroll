@@ -41,6 +41,11 @@
       "cluster": "prod-gcp"
     },
     {
+      "name": "familie-klage",
+      "namespace": "teamfamilie",
+      "cluster": "prod-gcp"
+    },
+    {
       "name": "familie-ba-sak",
       "namespace": "teamfamilie",
       "cluster": "prod-gcp"

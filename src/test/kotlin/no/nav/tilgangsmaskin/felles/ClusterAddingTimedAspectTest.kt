@@ -4,11 +4,9 @@ import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.longs.shouldBeGreaterThan
 import io.micrometer.core.annotation.Timed
-import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
 import io.mockk.mockkObject
-import io.mockk.mockkStatic
 import io.mockk.unmockkObject
 import no.nav.tilgangsmaskin.felles.ClusterAddingTimedAspectTest.TestConfig
 import no.nav.tilgangsmaskin.felles.security.AuthContext
@@ -25,7 +23,6 @@ import org.springframework.test.context.ContextConfiguration
 @AutoConfigureMetrics
 class ClusterAddingTimedAspectTest(
     private val registry: MeterRegistry,
-    private val aspect: TimedAspect,
     private val timedService: TimedService,
 ) : BehaviorSpec() {
 

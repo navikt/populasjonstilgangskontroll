@@ -26,6 +26,11 @@
   },
   "inbound": [
     {
+      "name":  "syk-dig-backend",
+      "namespace": "teamsykmelding",
+      "cluster": "prod-gcp"
+    },
+    {
       "name":  "pensjon-pen",
       "namespace": "pensjondeployer",
       "cluster": "prod-fss"
@@ -33,6 +38,11 @@
     {
       "name":  "sp-vilkarsproving",
       "namespace": "tbd",
+      "cluster": "prod-gcp"
+    },
+    {
+      "name": "familie-klage",
+      "namespace": "teamfamilie",
       "cluster": "prod-gcp"
     },
     {

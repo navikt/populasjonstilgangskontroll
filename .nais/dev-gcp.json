@@ -29,8 +29,18 @@
   },
   "inbound": [
     {
+      "name":  "syk-dig-backend",
+      "namespace": "teamsykmelding",
+      "cluster": "dev-gcp"
+    },
+    {
       "name":  "sp-vilkarsproving",
       "namespace": "tbd",
+      "cluster": "dev-gcp"
+    },
+    {
+      "name": "familie-klage",
+      "namespace": "teamfamilie",
       "cluster": "dev-gcp"
     },
     {

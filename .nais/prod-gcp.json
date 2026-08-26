@@ -26,6 +26,11 @@
   },
   "inbound": [
     {
+      "name":  "syk-dig-backend",
+      "namespace": "teamsykmelding",
+      "cluster": "prod-gcp"
+    },
+    {
       "name":  "pensjon-pen",
       "namespace": "pensjondeployer",
       "cluster": "prod-fss"

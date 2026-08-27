@@ -6,6 +6,8 @@ import org.springframework.dao.DataIntegrityViolationException
 import java.time.Clock
 import java.time.Instant.now
 import java.time.ZoneId.systemDefault
+import java.time.ZoneOffset
+import java.time.ZoneOffset.UTC
 
 @Repository
 class EnkeltTilgangJPAAdapter(
@@ -14,8 +16,9 @@ class EnkeltTilgangJPAAdapter(
 ) {
 
     fun enkeltTilgang(ansattId: String, enhetsnummer: String, data: EnkeltTilgangData): EnkeltTilgangEntity {
-        val expires = data.gyldigtil.atStartOfDay(systemDefault()).toInstant()
-
+        val expires = data.gyldigtil
+            .atStartOfDay(UTC)
+            .toInstant()
         repo.findByNavidAndFnrAndExpires(ansattId, data.brukerId.verdi, expires)?.let { return it }
 
         val nyEnkeltTilgang = EnkeltTilgangEntity(ansattId, data.brukerId.verdi, data.begrunnelse, enhetsnummer, expires)

@@ -5,19 +5,15 @@ import org.springframework.stereotype.Repository
 import org.springframework.dao.DataIntegrityViolationException
 import java.time.Clock
 import java.time.Instant.now
-import java.time.ZoneId.systemDefault
-import java.time.ZoneOffset
-import java.time.ZoneOffset.UTC
 
 @Repository
 class EnkeltTilgangJPAAdapter(
     private val repo: EnkeltTilgangRepository,
-    private val clock: Clock,
-) {
+    private val clock: Clock) {
 
     fun enkeltTilgang(ansattId: String, enhetsnummer: String, data: EnkeltTilgangData): EnkeltTilgangEntity {
         val expires = data.gyldigtil
-            .atStartOfDay(UTC)
+            .atStartOfDay(clock.zone)
             .toInstant()
         repo.findByNavidAndFnrAndExpires(ansattId, data.brukerId.verdi, expires)?.let { return it }
 

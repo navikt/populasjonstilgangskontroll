@@ -1,24 +1,26 @@
 package no.nav.tilgangsmaskin.felles.rest
 
 import jakarta.validation.ConstraintViolation
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON
 import org.springframework.http.ResponseEntity
-import org.springframework.validation.FieldError
-import org.springframework.validation.ObjectError
-import org.springframework.web.ErrorResponseException
-import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.context.request.WebRequest
 import org.springframework.web.method.annotation.HandlerMethodValidationException
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
 @RestControllerAdvice
-class ValidationExceptionHandler {
+class ValidationExceptionHandler : ResponseEntityExceptionHandler() {
 
-
-
-    @ExceptionHandler(HandlerMethodValidationException::class)
-    fun handleValidation(ex: HandlerMethodValidationException): ResponseEntity<Map<String, Any>> = badRequest(
-        ex.parameterValidationResults.flatMap { result ->
+    override fun handleHandlerMethodValidationException(
+        ex: HandlerMethodValidationException,
+        headers: HttpHeaders,
+        status: HttpStatusCode,
+        request: WebRequest
+    ): ResponseEntity<Any> {
+        val feil = ex.parameterValidationResults.flatMap { result ->
             result.resolvableErrors.map { error ->
                 val violation = runCatching {
                     result.unwrap(error, ConstraintViolation::class.java)
@@ -35,10 +37,8 @@ class ValidationExceptionHandler {
                 )
             }
         }
-    )
 
-    private fun badRequest(feil: List<Map<String, String>>): ResponseEntity<Map<String, Any>> =
-        ResponseEntity.status(BAD_REQUEST)
+        return ResponseEntity.status(BAD_REQUEST)
             .contentType(APPLICATION_PROBLEM_JSON)
             .body(
                 mapOf(
@@ -48,4 +48,5 @@ class ValidationExceptionHandler {
                     "feil" to feil
                 )
             )
+    }
 }

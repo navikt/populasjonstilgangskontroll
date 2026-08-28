@@ -9,6 +9,7 @@ import no.nav.tilgangsmaskin.tilgang.openapi.MSG
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 
 private const val DEV_ENKELT_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.dev.enkelt.tag.description"
 private const val DESCRIPTION_ENKELT = "${MSG}openapi.dev.enkelt.description"
@@ -29,7 +30,7 @@ class EnkeltTilgangDevController(private val enkelt: EnkeltTilgangTjeneste,
 
     @PostMapping("{ansattId}/{brukerId}")
     @Operation(summary = SUMMARY_ENKELT, description = DESCRIPTION_ENKELT)
-    fun enkelt(@PathVariable ansattId: AnsattId, @EnkeltTilgangGyldig data: EnkeltTilgangData) =
+    fun enkelt(@PathVariable ansattId: AnsattId, @EnkeltTilgangGyldig @RequestBody data: EnkeltTilgangData) =
         enkelt.registrerTilgang(ansattId, data)
 
     @GetMapping("sjekk/{ansattId}/{brukerId}")

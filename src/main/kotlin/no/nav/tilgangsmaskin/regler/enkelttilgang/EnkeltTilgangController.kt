@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.ResponseStatus
 
 private const val ENKELTTILGANG_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.tilgang.tag.description"
-private const val SUMMARY_OVERSTYR = "${MSG}openapi.tilgang.overstyr.summary"
-private const val DESCRIPTION_OVERSTYR = "${MSG}openapi.tilgang.overstyr.description"
+ const val SUMMARY_OVERSTYR = "${MSG}openapi.tilgang.overstyr.summary"
+ const val DESCRIPTION_OVERSTYR = "${MSG}openapi.tilgang.overstyr.description"
 
 
 @ProdController
@@ -25,7 +25,7 @@ class EnkeltTilgangController(private val enkelt: EnkeltTilgangTjeneste) {
 
     @PostMapping("overstyr")
     @ResponseStatus(ACCEPTED)
-    @ValideringsfeilApiResponse(summary = SUMMARY_OVERSTYR, description = DESCRIPTION_OVERSTYR)
+    @ValideringsfeilApiResponse
     fun enkeltTilgang(@AuthenticationPrincipal principal: OAuth2AuthenticatedPrincipal, @RequestBody @EnkeltTilgangGyldig data: EnkeltTilgangData) {
         enkelt.registrerTilgang(principal.ansattId(), data)
     }

@@ -23,7 +23,7 @@ fun MvcResult.assertProblemDetailBody(
     val body = mapper.readTree(content)
 
     body["status"]?.asInt() shouldBe httpStatus.value()
-    body["title"]?.asText() shouldBe (title ?: "${httpStatus.value()}")
+    body["title"]?.asString() shouldBe (title ?: "${httpStatus.value()}")
     msg?.let { body["detail"]?.asString() shouldBe it }
 
     if (fields.isNotEmpty()) {

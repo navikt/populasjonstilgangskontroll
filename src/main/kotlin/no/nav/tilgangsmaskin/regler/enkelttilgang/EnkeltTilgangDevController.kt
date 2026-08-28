@@ -6,9 +6,11 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.DevController
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
+import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 
 private const val DEV_ENKELT_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.dev.enkelt.tag.description"
 private const val DESCRIPTION_ENKELT = "${MSG}openapi.dev.enkelt.description"
@@ -27,10 +29,10 @@ private const val DESCRIPTION_GJELDENDE = "${MSG}openapi.dev.enkelt.gjeldende.de
 class EnkeltTilgangDevController(private val enkelt: EnkeltTilgangTjeneste,
                                  private val adapter: EnkeltTilgangJPAAdapter) {
 
-    @PostMapping("{ansattId}/{brukerId}")
+    @PostMapping("{ansattId}")
     @Operation(summary = SUMMARY_ENKELT, description = DESCRIPTION_ENKELT)
-    fun enkelt(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) =
-        enkelt.registrerTilgang(ansattId, EnkeltTilgangData(brukerId, "test"))
+    fun enkelt(@PathVariable ansattId: AnsattId, @Valid @RequestBody data: EnkeltTilgangData) =
+        enkelt.registrerTilgang(ansattId, data)
 
     @GetMapping("sjekk/{ansattId}/{brukerId}")
     @Operation(summary = SUMMARY_HAR, description = DESCRIPTION_HAR)

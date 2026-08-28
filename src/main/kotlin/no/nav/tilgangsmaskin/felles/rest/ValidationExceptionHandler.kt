@@ -51,7 +51,7 @@ class ValidationExceptionHandler {
         listOf(
             mapOf(
                 "felt" to "body",
-                "melding" to (ex.mostSpecificCause?.message ?: "Request body er ugyldig")
+                "melding" to (ex.mostSpecificCause.message ?: "Request body er ugyldig")
             )
         )
     )

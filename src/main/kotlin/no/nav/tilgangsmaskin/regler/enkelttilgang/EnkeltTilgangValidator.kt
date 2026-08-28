@@ -18,11 +18,11 @@ class EnkeltTilgangValidator : ConstraintValidator<EnkeltTilgangGyldig, EnkeltTi
     }
 
     override fun isValid(verdi: EnkeltTilgangData, context: ConstraintValidatorContext): Boolean {
+        context.disableDefaultConstraintViolation()
         var valid = true
         val today = now()
 
         if (!verdi.gyldigtil.isBetween(today, today.plusMonths(months))) {
-            context.disableDefaultConstraintViolation()
             context.buildConstraintViolationWithTemplate("Gyldig til må være mellom i dag og $months måneder frem i tid")
                 .addPropertyNode("gyldigtil")
                 .addConstraintViolation()
@@ -30,7 +30,6 @@ class EnkeltTilgangValidator : ConstraintValidator<EnkeltTilgangGyldig, EnkeltTi
         }
 
         if (verdi.begrunnelse.length !in min..max) {
-            context.disableDefaultConstraintViolation()
             context.buildConstraintViolationWithTemplate("Begrunnelse må være mellom $min og $max tegn")
                 .addPropertyNode("begrunnelse")
                 .addConstraintViolation()

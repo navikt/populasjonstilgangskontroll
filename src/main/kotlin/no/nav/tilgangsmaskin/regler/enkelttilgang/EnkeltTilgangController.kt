@@ -6,7 +6,7 @@ import no.nav.tilgangsmaskin.felles.rest.ProdController
 import no.nav.tilgangsmaskin.felles.security.ansattId
 import no.nav.tilgangsmaskin.regler.enkelttilgang.openapi.ValideringsfeilApiResponse
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
-import org.springframework.http.HttpStatus.ACCEPTED
+import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal
 import org.springframework.web.bind.annotation.PostMapping
@@ -24,7 +24,7 @@ private const val ENKELTTILGANG_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.tilg
 class EnkeltTilgangController(private val enkelt: EnkeltTilgangTjeneste) {
 
     @PostMapping("overstyr")
-    @ResponseStatus(ACCEPTED)
+    @ResponseStatus(NO_CONTENT)
     @ValideringsfeilApiResponse
     fun enkeltTilgang(@AuthenticationPrincipal principal: OAuth2AuthenticatedPrincipal, @RequestBody @EnkeltTilgangGyldig data: EnkeltTilgangData) {
         enkelt.registrerTilgang(principal.ansattId(), data)

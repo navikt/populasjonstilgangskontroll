@@ -167,7 +167,7 @@ spring:
       enable-statistics: true
   mvc:
     problemdetails:
-      enabled: true
+      enabled: false
   datasource:
     url: ${db.jdbc.url}
     username: ${db.username}

@@ -87,7 +87,6 @@ class DevTilgangController(
     @PostMapping("enkelttilgang/{ansattId}")
     @ResponseStatus(ACCEPTED)
     @ProblemDetailApiResponse(summary = SUMMARY_ENKELTTILGANG, description = DESCRIPTION_ENKELTTILGANG)
-    @Valid
     fun enkelttilgang(@PathVariable ansattId: AnsattId,
                       @RequestBody @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData) =
         enkeltTilgang.registrerTilgang(ansattId, data)

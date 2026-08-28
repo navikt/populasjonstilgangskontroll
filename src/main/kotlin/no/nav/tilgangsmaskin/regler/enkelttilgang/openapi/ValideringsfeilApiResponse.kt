@@ -63,4 +63,4 @@ import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
         )
     ]
 )
-annotation class ValideringsfeilApiResponse
+annotation class ValideringsfeilApiResponse(val summary: String, val description: String)

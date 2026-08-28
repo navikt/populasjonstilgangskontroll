@@ -5,6 +5,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.DevController
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
+import no.nav.tilgangsmaskin.regler.enkelttilgang.openapi.ValideringsfeilApiResponse
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -30,6 +31,7 @@ class EnkeltTilgangDevController(private val enkelt: EnkeltTilgangTjeneste,
 
     @PostMapping("{ansattId}")
     @Operation(summary = SUMMARY_ENKELT, description = DESCRIPTION_ENKELT)
+    @ValideringsfeilApiResponse
     fun enkelt(@PathVariable ansattId: AnsattId, @EnkeltTilgangGyldig @RequestBody data: EnkeltTilgangData) =
         enkelt.registrerTilgang(ansattId, data)
 

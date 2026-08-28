@@ -37,12 +37,6 @@ class ValidationExceptionHandler {
         }
     )
 
-    @ExceptionHandler(ErrorResponseException::class)
-    fun handleErrorResponse(ex: ErrorResponseException): ResponseEntity<Any> =
-        ResponseEntity.status(ex.statusCode)
-            .contentType(APPLICATION_PROBLEM_JSON)
-            .body(ex.body)
-
     private fun badRequest(feil: List<Map<String, String>>): ResponseEntity<Map<String, Any>> =
         ResponseEntity.status(BAD_REQUEST)
             .contentType(APPLICATION_PROBLEM_JSON)

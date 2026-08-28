@@ -32,7 +32,7 @@ class ValidationExceptionHandler : ResponseEntityExceptionHandler() {
                 }.getOrNull()
 
                 val field = when {
-                    violation != null -> violation.propertyPath.toString()
+                    violation != null -> violation.propertyPath.lastOrNull()?.toString() ?: "body"
                     else -> "body"
                 }
 

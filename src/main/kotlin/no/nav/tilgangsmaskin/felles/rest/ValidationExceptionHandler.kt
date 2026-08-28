@@ -6,6 +6,7 @@ import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.validation.BindException
+import org.springframework.web.ErrorResponseException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -51,10 +52,27 @@ class ValidationExceptionHandler {
         listOf(
             mapOf(
                 "felt" to "body",
-                "melding" to (ex.mostSpecificCause.message ?: "Request body er ugyldig")
+                "melding" to (ex.mostSpecificCause?.message ?: "Request body er ugyldig")
             )
         )
     )
+
+    @ExceptionHandler(ErrorResponseException::class)
+    fun handleErrorResponse(ex: ErrorResponseException): ResponseEntity<Map<String, Any>> {
+        val problemDetail = ex.body
+        if (problemDetail.status == BAD_REQUEST.value() && problemDetail.title == "Bad Request") {
+            return badRequest(
+                listOf(
+                    mapOf(
+                        "felt" to "body",
+                        "melding" to (problemDetail.detail ?: "Validation failure")
+                    )
+                )
+            )
+        }
+
+        throw ex
+    }
 
     private fun badRequest(feil: List<Map<String, String>>): ResponseEntity<Map<String, Any>> =
         ResponseEntity.status(BAD_REQUEST)

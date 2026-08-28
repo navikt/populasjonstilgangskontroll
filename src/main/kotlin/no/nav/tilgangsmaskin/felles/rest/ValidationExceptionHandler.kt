@@ -10,6 +10,7 @@ import org.springframework.validation.BindException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.method.annotation.HandlerMethodValidationException
 
 @RestControllerAdvice
 class ValidationExceptionHandler {
@@ -36,6 +37,22 @@ class ValidationExceptionHandler {
             }
         )
     }
+
+    @ExceptionHandler(HandlerMethodValidationException::class)
+    fun handleMethodValidation(ex: HandlerMethodValidationException): ResponseEntity<Map<String, Any>> = badRequest(
+        ex.allErrors.map { error ->
+            when (error) {
+                is org.springframework.validation.FieldError -> mapOf(
+                    "felt" to error.field,
+                    "melding" to (error.defaultMessage ?: "Ugyldig verdi")
+                )
+                else -> mapOf(
+                    "felt" to "body",
+                    "melding" to (error.defaultMessage ?: "Ugyldig verdi")
+                )
+            }
+        }
+    )
 
     @ExceptionHandler(ConstraintViolationException::class)
     fun handleConstraintViolation(ex: ConstraintViolationException): ResponseEntity<Map<String, Any>> = badRequest(

@@ -24,7 +24,7 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
         ),
         ApiResponse(
             responseCode = "400",
-            description = "Validering av request body feilet",
+            description = "Ugyldig verdi for ett eller flere felter",
             content = [Content(
                 mediaType = APPLICATION_PROBLEM_JSON_VALUE,
                 schema = Schema(
@@ -69,4 +69,4 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
         )
     ]
 )
-annotation class ValideringsfeilApiResponse
+annotation class    ValideringsfeilApiResponse

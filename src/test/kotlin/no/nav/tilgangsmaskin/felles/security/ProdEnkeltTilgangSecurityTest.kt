@@ -52,7 +52,7 @@ open class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private v
         )
         Given("role sjekk") {
             When("jwt har claim med tillatt role") {
-                Then("returnerer 202 for enkelttilgang") {
+                Then("returnerer 204 for enkelttilgang") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
                             setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID, mapOf(ROLES_CLAIM to listOf(ENKELT))))
@@ -61,7 +61,7 @@ open class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private v
                         content = payload
                     }.andExpect {
                         status {
-                            isAccepted()
+                            isNoContent()
                         }
                     }
 
@@ -72,7 +72,7 @@ open class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private v
             }
 
             When("jwt har claim med tillatt og ugyldig role") {
-                Then("returnerer 202 for enkelttilgang") {
+                Then("returnerer 204 for enkelttilgang") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
                             setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf(ROLES_CLAIM to listOf(ENKELT, UTILGJENGELIG))))
@@ -80,7 +80,7 @@ open class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private v
                         contentType = APPLICATION_JSON
                         content = payload
                     }.andExpect {
-                        status { isAccepted() }
+                        status { isNoContent() }
                     }
 
                     verify {

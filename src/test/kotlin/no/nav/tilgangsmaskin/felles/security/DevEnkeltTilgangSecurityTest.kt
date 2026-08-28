@@ -44,7 +44,7 @@ open class DevEnkeltTilgangSecurityTest(mockMvc: MockMvc, mapper: JsonMapper) : 
 
         Given("role enkelttilgang security chain i dev") {
             When("request har OBO-token med dev role") {
-                Then("returnerer 202 for overstyr") {
+                Then("returnerer 204 for overstyr") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
                             setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID, mapOf(ROLES_CLAIM to listOf("ROLE_DEV"))))
@@ -53,7 +53,7 @@ open class DevEnkeltTilgangSecurityTest(mockMvc: MockMvc, mapper: JsonMapper) : 
                         content = payload
                     }.andExpect {
                         status {
-                            isAccepted()
+                            isNoContent()
                         }
                     }
 

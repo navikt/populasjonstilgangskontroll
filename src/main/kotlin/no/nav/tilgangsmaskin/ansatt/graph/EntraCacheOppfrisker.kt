@@ -32,7 +32,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste,
             }.recoverCatching { e ->
                 (e as? NotFoundRestException)?.let {
                     tømOgOppfrisk(ansattId, oid, nøkkel.metode)
-                } ?: log.warn("Oppfrisking av ${nøkkel.maskert} feilet", e)
+                } ?: log.info("Oppfrisking av ${nøkkel.maskert} feilet", e)
             }.getOrThrow()
         }
     }

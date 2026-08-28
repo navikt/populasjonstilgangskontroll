@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.method.annotation.HandlerMethodValidationException
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangDevController
 
-@RestControllerAdvice
+@RestControllerAdvice(assignableTypes = [EnkeltTilgangController::class, EnkeltTilgangDevController::class])
 class ValidationExceptionHandler : ResponseEntityExceptionHandler() {
 
     override fun handleHandlerMethodValidationException(

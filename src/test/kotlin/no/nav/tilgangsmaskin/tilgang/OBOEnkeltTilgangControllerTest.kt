@@ -22,7 +22,7 @@ import org.springframework.test.web.servlet.post
 import tools.jackson.module.kotlin.readValue
 import java.time.LocalDate
 
-class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
+open class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
 
     init {
 

@@ -36,7 +36,7 @@ import java.time.LocalDate.now
 
 @SpringBootTest(classes = [SecurityTestApplication::class])
 @AutoConfigureMockMvc
-class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: JsonMapper) : BehaviorSpec() {
+open class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: JsonMapper) : BehaviorSpec() {
 
     @MockkBean
     private lateinit var regelTjeneste: RegelTjeneste

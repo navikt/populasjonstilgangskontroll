@@ -28,6 +28,7 @@ import org.springframework.restdocs.operation.preprocess.Preprocessors.modifyHea
 import org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest
 import org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse
 import org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint
+import org.springframework.restdocs.payload.JsonFieldType.ARRAY
 import org.springframework.restdocs.payload.JsonFieldType.BOOLEAN
 import org.springframework.restdocs.payload.JsonFieldType.NUMBER
 import org.springframework.restdocs.payload.JsonFieldType.STRING
@@ -39,9 +40,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetu
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
 import org.springframework.web.bind.support.WebDataBinderFactory
-import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
+import no.nav.tilgangsmaskin.felles.rest.ValidationExceptionHandler
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.method.support.ModelAndViewContainer
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -87,9 +88,6 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
         emptyList()
     )
 
-    @RestControllerAdvice
-    private class ProblemDetailExceptionHandler : ResponseEntityExceptionHandler()
-
     private inner class AuthenticationPrincipalArgumentResolver : HandlerMethodArgumentResolver {
         override fun supportsParameter(parameter: MethodParameter) =
             parameter.hasParameterAnnotation(AuthenticationPrincipal::class.java) &&
@@ -108,15 +106,19 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
 
         val problemDetailFields = relaxedResponseFields(
             fieldWithPath("title").type(STRING)
-                .description("Avvisningskode, En av: $avvisningskoder"),
-            fieldWithPath("status").type(NUMBER).description("HTTP-statuskode"),
-            fieldWithPath("instance").type(STRING).description("ansattId/brukerId"),
+                .description("Avvisningskode, En av: $avvisningskoder").optional(),
+            fieldWithPath("status").type(NUMBER).description("HTTP-statuskode").optional(),
+            fieldWithPath("detail").type(STRING).description("Beskrivelse av feilen").optional(),
+            fieldWithPath("instance").type(STRING).description("ansattId/brukerId").optional(),
             fieldWithPath("type").type(STRING).description("Link til utdypende info: $TYPE_URI").optional(),
             fieldWithPath("brukerIdent").type(STRING).description("Identen til bruker").optional(),
             fieldWithPath("navIdent").type(STRING).description("NAV-identen til den ansatte").optional(),
             fieldWithPath("begrunnelse").type(STRING).description("Menneskelesbar begrunnelse for avvisning").optional(),
             fieldWithPath("traceId").type(STRING).description("OTEL trace-ID for feilsøking").optional(),
-            fieldWithPath("kanOverstyres").type(BOOLEAN).description("Om regelen kan overstyres med enkelttilgang").optional()
+            fieldWithPath("kanOverstyres").type(BOOLEAN).description("Om regelen kan overstyres med enkelttilgang").optional(),
+            fieldWithPath("feil").type(ARRAY).description("Liste over valideringsfeil for felter").optional(),
+            fieldWithPath("feil[].felt").type(STRING).description("Feltnavn som feilet").optional(),
+            fieldWithPath("feil[].melding").type(STRING).description("Feilmelding for feltet").optional()
         )
     }
 
@@ -137,7 +139,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
                 BulkTilgangController(regelTjeneste)
             )
                 .setCustomArgumentResolvers(AuthenticationPrincipalArgumentResolver())
-                .setControllerAdvice(ProblemDetailExceptionHandler())
+                .setControllerAdvice(ValidationExceptionHandler())
                 .setValidator(validator)
                 .apply<StandaloneMockMvcBuilder>(documentationConfiguration(restDocumentation)
                     .uris()

@@ -33,7 +33,7 @@ import java.time.LocalDate.now
 @SpringBootTest(classes = [SecurityTestApplication::class])
 @AutoConfigureMockMvc
 @ActiveProfiles(PROD_GCP)
-class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private val mapper: JsonMapper) : BehaviorSpec() {
+open class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private val mapper: JsonMapper) : BehaviorSpec() {
 
     @MockkBean
     private lateinit var regelTjeneste: RegelTjeneste

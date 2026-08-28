@@ -23,7 +23,7 @@ import java.time.LocalDate.now
 
 @SpringBootTest(classes = [SecurityTestApplication::class])
 @AutoConfigureMockMvc
-class DevEnkeltTilgangSecurityTest(mockMvc: MockMvc, mapper: JsonMapper) : BehaviorSpec() {
+open class DevEnkeltTilgangSecurityTest(mockMvc: MockMvc, mapper: JsonMapper) : BehaviorSpec() {
 
 
     val dto = EnkeltTilgangData(TEST_BRUKER_ID, "En god begrunnelse", now().plusMonths(2))

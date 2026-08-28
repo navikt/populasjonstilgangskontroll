@@ -7,13 +7,16 @@ import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.core.annotation.Order
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.method.annotation.HandlerMethodValidationException
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangDevController
+import org.springframework.core.Ordered.HIGHEST_PRECEDENCE
 
 @RestControllerAdvice(assignableTypes = [EnkeltTilgangController::class, EnkeltTilgangDevController::class])
+@Order(HIGHEST_PRECEDENCE)
 class ValidationExceptionHandler : ResponseEntityExceptionHandler() {
 
     override fun handleHandlerMethodValidationException(

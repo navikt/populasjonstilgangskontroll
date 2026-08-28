@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.felles.rest
 
 import jakarta.validation.ConstraintViolationException
+import org.springframework.beans.TypeMismatchException
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON
 import org.springframework.http.ResponseEntity
@@ -52,6 +53,16 @@ class ValidationExceptionHandler {
             mapOf(
                 "felt" to "body",
                 "melding" to (ex.mostSpecificCause?.message ?: "Request body er ugyldig")
+            )
+        )
+    )
+
+    @ExceptionHandler(TypeMismatchException::class)
+    fun handleTypeMismatch(ex: TypeMismatchException): ResponseEntity<Map<String, Any>> = badRequest(
+        listOf(
+            mapOf(
+                "felt" to (ex.propertyName ?: "body"),
+                "melding" to (ex.message ?: "Ugyldig verdi")
             )
         )
     )

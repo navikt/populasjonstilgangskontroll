@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.regler.enkelttilgang
 
+import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.tilgangsmaskin.felles.security.OAuth2RequireOBO
 import no.nav.tilgangsmaskin.felles.rest.ProdController
@@ -25,6 +26,7 @@ class EnkeltTilgangController(private val enkelt: EnkeltTilgangTjeneste) {
 
     @PostMapping("overstyr")
     @ResponseStatus(NO_CONTENT)
+    @Operation(summary = SUMMARY_OVERSTYR, description = DESCRIPTION_OVERSTYR)
     @ValideringsfeilApiResponse
     fun enkeltTilgang(@AuthenticationPrincipal principal: OAuth2AuthenticatedPrincipal, @RequestBody @EnkeltTilgangGyldig data: EnkeltTilgangData) {
         enkelt.registrerTilgang(principal.ansattId(), data)

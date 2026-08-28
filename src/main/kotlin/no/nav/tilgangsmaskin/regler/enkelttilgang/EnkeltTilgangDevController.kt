@@ -28,7 +28,7 @@ private const val DESCRIPTION_GJELDENDE = "${MSG}openapi.dev.enkelt.gjeldende.de
 class EnkeltTilgangDevController(private val enkelt: EnkeltTilgangTjeneste,
                                  private val adapter: EnkeltTilgangJPAAdapter) {
 
-    @PostMapping("{ansattId}/{brukerId}")
+    @PostMapping("{ansattId}")
     @Operation(summary = SUMMARY_ENKELT, description = DESCRIPTION_ENKELT)
     fun enkelt(@PathVariable ansattId: AnsattId, @EnkeltTilgangGyldig @RequestBody data: EnkeltTilgangData) =
         enkelt.registrerTilgang(ansattId, data)

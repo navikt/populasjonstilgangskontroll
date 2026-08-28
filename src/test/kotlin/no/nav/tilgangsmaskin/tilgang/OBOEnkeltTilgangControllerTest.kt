@@ -170,14 +170,14 @@ open class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
             val request = EnkeltTilgangData(BrukerId(brukerId), "En god begrunnelse", gyldigTil)
 
             When("enkelttilgang kalles med gyldig request og OBO-token") {
-                Then("returnerer 202 og dokumenteres i rest docs") {
+                Then("returnerer 204 og dokumenteres i rest docs") {
                     every { enkeltTilgangTjeneste.registrerTilgang(ansattId, request) } returns true
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         contentType = APPLICATION_JSON
                         content = mapper.writeValueAsString(request)
                     }.andExpect {
                         status {
-                            isAccepted()
+                            isNoContent()
                         }
                     }.andDo { handle(dokumenterMedAuth("obo-enkelttilgang")) }
                 }

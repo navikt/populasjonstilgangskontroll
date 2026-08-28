@@ -29,8 +29,8 @@ class EnkeltTilgangDevController(private val enkelt: EnkeltTilgangTjeneste,
 
     @PostMapping("{ansattId}/{brukerId}")
     @Operation(summary = SUMMARY_ENKELT, description = DESCRIPTION_ENKELT)
-    fun enkelt(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) =
-        enkelt.registrerTilgang(ansattId, EnkeltTilgangData(brukerId, "test"))
+    fun enkelt(@PathVariable ansattId: AnsattId, @EnkeltTilgangGyldig data: EnkeltTilgangData) =
+        enkelt.registrerTilgang(ansattId, data)
 
     @GetMapping("sjekk/{ansattId}/{brukerId}")
     @Operation(summary = SUMMARY_HAR, description = DESCRIPTION_HAR)

@@ -23,7 +23,7 @@ private const val DESCRIPTION_GJELDENDE = "${MSG}openapi.dev.enkelt.gjeldende.de
 
 @DevController(
     value = ["/${DEV}/enkelt/"],
-    name = "DevEnkelttilgangController",
+    name = "EnkeltTilgangDevController",
     description = DEV_ENKELT_CONTROLLER_TAG_DESCRIPTION
 )
 class EnkeltTilgangDevController(private val enkelt: EnkeltTilgangTjeneste,

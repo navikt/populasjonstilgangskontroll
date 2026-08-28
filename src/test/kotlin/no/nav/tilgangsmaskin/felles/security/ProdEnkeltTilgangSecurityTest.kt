@@ -1,13 +1,12 @@
 package no.nav.tilgangsmaskin.felles.security
 
 import com.ninjasquad.springmockk.MockkBean
-import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.shouldBe
 import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.verify
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
+import no.nav.tilgangsmaskin.felles.rest.assertProblemDetailBody
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
@@ -15,19 +14,15 @@ import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON
-import org.springframework.http.ProblemDetail
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.MvcResult
 import org.springframework.test.web.servlet.post
 import tools.jackson.databind.json.JsonMapper
-import tools.jackson.module.kotlin.readValue
 import java.time.LocalDate.now
 
 @SpringBootTest(classes = [SecurityTestApplication::class])
@@ -100,7 +95,7 @@ class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private val ma
                     }.andExpect {
                         status { isForbidden() }
                         content { contentType(APPLICATION_PROBLEM_JSON) }
-                    }.andReturn().withBody(FORBIDDEN, "Access Denied")
+                    }.andReturn().assertProblemDetailBody(mapper, FORBIDDEN, "Access Denied")
                 }
             }
 
@@ -119,19 +114,12 @@ class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private val ma
                         content {
                             contentType(APPLICATION_PROBLEM_JSON)
                         }
-                    }.andReturn().withBody(FORBIDDEN, "Access Denied")
+                    }.andReturn().assertProblemDetailBody(mapper, FORBIDDEN, "Access Denied")
                 }
             }
 
         }
     }
-
-    private fun MvcResult.withBody(httpStatus: HttpStatus, msg: String? = null) =
-        assertSoftly(mapper.readValue<ProblemDetail>(response.contentAsByteArray)) {
-            status shouldBe httpStatus.value()
-            title shouldBe "${httpStatus.value()}"
-            msg?.let { detail shouldBe it }
-        }
 
     companion object {
         @JvmStatic

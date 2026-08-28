@@ -3,7 +3,9 @@ package no.nav.tilgangsmaskin.felles.rest
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
+import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import jakarta.validation.ConstraintValidatorContext
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
@@ -13,8 +15,8 @@ import java.time.LocalDate.now
 
 class EnkeltTilgangValidatorTest : BehaviorSpec({
 
-    val ctx = mockk<ConstraintValidatorContext>(relaxed = true)
     val validator = EnkeltTilgangValidator()
+    val ctx = mockk<ConstraintValidatorContext>(relaxed = true)
 
     val gyldigBegrunnelse = "En gyldig begrunnelse på minst 10 tegn"
     val gyldigDato = now().plusMonths(1)
@@ -44,8 +46,17 @@ class EnkeltTilgangValidatorTest : BehaviorSpec({
         }
 
         When("dato er mer enn 3 måneder frem i tid") {
-            Then("er ugyldig") {
+            Then("er ugyldig og har en feltspesifikk feilmelding") {
+                val ctx = mockk<ConstraintValidatorContext>(relaxed = true)
+                val violationBuilder = mockk<ConstraintValidatorContext.ConstraintViolationBuilder>(relaxed = true)
+                val nodeBuilder = mockk<ConstraintValidatorContext.ConstraintViolationBuilder.NodeBuilderCustomizableContext>(relaxed = true)
+                every { ctx.buildConstraintViolationWithTemplate(any()) } returns violationBuilder
+                every { violationBuilder.addPropertyNode(any()) } returns nodeBuilder
+
                 validator.isValid(data(gyldigBegrunnelse, now().plusMonths(4)), ctx) shouldBe false
+
+                verify { ctx.buildConstraintViolationWithTemplate(match { it.contains("Gyldig til-dato") }) }
+                verify { violationBuilder.addPropertyNode("gyldigtil") }
             }
         }
 
@@ -74,8 +85,17 @@ class EnkeltTilgangValidatorTest : BehaviorSpec({
         }
 
         When("begrunnelse er på 9 tegn") {
-            Then("er ugyldig") {
+            Then("er ugyldig og har en feltspesifikk feilmelding") {
+                val ctx = mockk<ConstraintValidatorContext>(relaxed = true)
+                val violationBuilder = mockk<ConstraintValidatorContext.ConstraintViolationBuilder>(relaxed = true)
+                val nodeBuilder = mockk<ConstraintValidatorContext.ConstraintViolationBuilder.NodeBuilderCustomizableContext>(relaxed = true)
+                every { ctx.buildConstraintViolationWithTemplate(any()) } returns violationBuilder
+                every { violationBuilder.addPropertyNode(any()) } returns nodeBuilder
+
                 validator.isValid(data("123456789"), ctx) shouldBe false
+
+                verify { ctx.buildConstraintViolationWithTemplate(match { it.contains("Begrunnelse") }) }
+                verify { violationBuilder.addPropertyNode("begrunnelse") }
             }
         }
 

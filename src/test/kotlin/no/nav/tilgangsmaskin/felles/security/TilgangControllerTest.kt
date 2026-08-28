@@ -1,37 +1,32 @@
 package no.nav.tilgangsmaskin.felles.security
 
 import com.ninjasquad.springmockk.MockkBean
-import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.verify
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
+import no.nav.tilgangsmaskin.felles.rest.assertProblemDetailBody
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.APP
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.IDTYP
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
-import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
+import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.tilgang.openapi.AggregertBulkRespons
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON
-import org.springframework.http.ProblemDetail
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.MvcResult
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import tools.jackson.databind.json.JsonMapper
-import tools.jackson.module.kotlin.readValue
 import java.time.LocalDate.now
 
 @SpringBootTest(classes = [SecurityTestApplication::class])
@@ -65,7 +60,7 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                         content {
                             contentType(APPLICATION_PROBLEM_JSON)
                         }
-                    }.andReturn().withBody(UNAUTHORIZED, MANGLER_BEARER_TOKEN)
+                    }.andReturn().assertProblemDetailBody(mapper, UNAUTHORIZED, MANGLER_BEARER_TOKEN)
                 }
             }
             When("request har gyldig oauth2-token") {
@@ -103,7 +98,7 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                         content {
                             contentType(APPLICATION_PROBLEM_JSON)
                         }
-                    }.andReturn().withBody(UNAUTHORIZED, MANGLER_BEARER_TOKEN)
+                    }.andReturn().assertProblemDetailBody(mapper, UNAUTHORIZED, MANGLER_BEARER_TOKEN)
                 }
             }
         }
@@ -124,7 +119,7 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                         content {
                             contentType(APPLICATION_PROBLEM_JSON)
                         }
-                    }.andReturn().withBody(FORBIDDEN, "Access Denied")
+                    }.andReturn().assertProblemDetailBody(mapper, FORBIDDEN, "Access Denied")
                 }
 
                 Then("returnerer 403 for bulk") {
@@ -141,7 +136,7 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                         content {
                             contentType(APPLICATION_PROBLEM_JSON)
                         }
-                    }.andReturn().withBody(FORBIDDEN, "Access Denied")
+                    }.andReturn().assertProblemDetailBody(mapper, FORBIDDEN, "Access Denied")
                 }
 
                 Then("returnerer 403 for overstyr") {
@@ -159,7 +154,7 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                         content {
                             contentType(APPLICATION_PROBLEM_JSON)
                         }
-                    }.andReturn().withBody(FORBIDDEN, "Access Denied")
+                    }.andReturn().assertProblemDetailBody(mapper, FORBIDDEN, "Access Denied")
                 }
             }
         }
@@ -180,7 +175,7 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                         content {
                             contentType(APPLICATION_PROBLEM_JSON)
                         }
-                    }.andReturn().withBody(FORBIDDEN, "Access Denied")
+                    }.andReturn().assertProblemDetailBody(mapper, FORBIDDEN, "Access Denied")
                 }
 
                 Then("returnerer 403 for bulk CCF-endepunkt") {
@@ -197,7 +192,7 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
                         content {
                             contentType(APPLICATION_PROBLEM_JSON)
                         }
-                    }.andReturn().withBody(FORBIDDEN, "Access Denied")
+                    }.andReturn().assertProblemDetailBody(mapper, FORBIDDEN, "Access Denied")
                 }
             }
         }
@@ -214,13 +209,6 @@ class TilgangControllerTest(private val mockMvc: MockMvc, private val mapper: Js
             }
         }
     }
-
-    private fun MvcResult.withBody(httpStatus: HttpStatus, msg: String? = null) =
-        assertSoftly(mapper.readValue<ProblemDetail>(response.contentAsByteArray)) {
-            status shouldBe httpStatus.value()
-            title shouldBe "${httpStatus.value()}"
-            msg?.let { detail shouldBe it }
-        }
 
     companion object {
         @JvmStatic

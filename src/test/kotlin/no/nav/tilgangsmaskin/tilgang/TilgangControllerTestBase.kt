@@ -6,9 +6,8 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
+import no.nav.tilgangsmaskin.felles.rest.ValidationExceptionHandler
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.NAVIDENT
-import tools.jackson.databind.json.JsonMapper
-import tools.jackson.module.kotlin.KotlinModule
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
@@ -16,11 +15,11 @@ import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata.Companion.TYPE_URI
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
+import org.springframework.core.MethodParameter
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpHeaders.HOST
 import org.springframework.http.ProblemDetail
 import org.springframework.http.converter.json.ProblemDetailJacksonMixin
-import org.springframework.core.MethodParameter
 import org.springframework.restdocs.ManualRestDocumentation
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
@@ -28,25 +27,26 @@ import org.springframework.restdocs.operation.preprocess.Preprocessors.modifyHea
 import org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest
 import org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse
 import org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint
+import org.springframework.restdocs.payload.JsonFieldType.ARRAY
 import org.springframework.restdocs.payload.JsonFieldType.BOOLEAN
 import org.springframework.restdocs.payload.JsonFieldType.NUMBER
 import org.springframework.restdocs.payload.JsonFieldType.STRING
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.payload.PayloadDocumentation.relaxedResponseFields
 import org.springframework.restdocs.snippet.Snippet
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.oauth2.core.DefaultOAuth2AuthenticatedPrincipal
+import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
 import org.springframework.web.bind.support.WebDataBinderFactory
-import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.NativeWebRequest
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.method.support.ModelAndViewContainer
-import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.security.oauth2.core.DefaultOAuth2AuthenticatedPrincipal
-import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.KotlinModule
 
 abstract class TilgangControllerTestBase : BehaviorSpec() {
 
@@ -87,9 +87,6 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
         emptyList()
     )
 
-    @RestControllerAdvice
-    private class ProblemDetailExceptionHandler : ResponseEntityExceptionHandler()
-
     private inner class AuthenticationPrincipalArgumentResolver : HandlerMethodArgumentResolver {
         override fun supportsParameter(parameter: MethodParameter) =
             parameter.hasParameterAnnotation(AuthenticationPrincipal::class.java) &&
@@ -108,15 +105,19 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
 
         val problemDetailFields = relaxedResponseFields(
             fieldWithPath("title").type(STRING)
-                .description("Avvisningskode, En av: $avvisningskoder"),
+                .description("Avvisningskode, En av: $avvisningskoder").optional(),
             fieldWithPath("status").type(NUMBER).description("HTTP-statuskode"),
-            fieldWithPath("instance").type(STRING).description("ansattId/brukerId"),
+            fieldWithPath("detail").type(STRING).description("Detaljert informasjon om feilen").optional(),
+            fieldWithPath("instance").type(STRING).description("ansattId/brukerId").optional(),
             fieldWithPath("type").type(STRING).description("Link til utdypende info: $TYPE_URI").optional(),
             fieldWithPath("brukerIdent").type(STRING).description("Identen til bruker").optional(),
             fieldWithPath("navIdent").type(STRING).description("NAV-identen til den ansatte").optional(),
             fieldWithPath("begrunnelse").type(STRING).description("Menneskelesbar begrunnelse for avvisning").optional(),
             fieldWithPath("traceId").type(STRING).description("OTEL trace-ID for feilsøking").optional(),
-            fieldWithPath("kanOverstyres").type(BOOLEAN).description("Om regelen kan overstyres med enkelttilgang").optional()
+            fieldWithPath("kanOverstyres").type(BOOLEAN).description("Om regelen kan overstyres med enkelttilgang").optional(),
+            fieldWithPath("feil").type(ARRAY).description("Valideringsfeil per felt").optional(),
+            fieldWithPath("feil[].felt").type(STRING).description("Feltnavn som feilet valideringen").optional(),
+            fieldWithPath("feil[].melding").type(STRING).description("Feilmelding for feltet").optional()
         )
     }
 
@@ -137,7 +138,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
                 BulkTilgangController(regelTjeneste)
             )
                 .setCustomArgumentResolvers(AuthenticationPrincipalArgumentResolver())
-                .setControllerAdvice(ProblemDetailExceptionHandler())
+                .setControllerAdvice(ValidationExceptionHandler())
                 .setValidator(validator)
                 .apply<StandaloneMockMvcBuilder>(documentationConfiguration(restDocumentation)
                     .uris()

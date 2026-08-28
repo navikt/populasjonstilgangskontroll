@@ -17,9 +17,31 @@ class EnkeltTilgangValidator : ConstraintValidator<EnkeltTilgangGyldig, EnkeltTi
         max = ann.max
     }
 
-    override fun isValid(verdi: EnkeltTilgangData, context: ConstraintValidatorContext) =
+    override fun isValid(verdi: EnkeltTilgangData, context: ConstraintValidatorContext): Boolean {
+        var valid = true
+
         with(now()) {
-            verdi.gyldigtil.isBetween(now(), plusMonths(months)) &&
-                    verdi.begrunnelse.length in min..max
+            if (!verdi.gyldigtil.isBetween(now(), plusMonths(months))) {
+                context.disableDefaultConstraintViolation()
+                context.buildConstraintViolationWithTemplate(
+                    "Gyldig til-dato må være fra ${now().toString()} og maks ${plusMonths(months).toString()}"
+                )
+                    .addPropertyNode("gyldigtil")
+                    .addConstraintViolation()
+                valid = false
+            }
+
+            if (verdi.begrunnelse.length !in min..max) {
+                context.disableDefaultConstraintViolation()
+                context.buildConstraintViolationWithTemplate(
+                    "Begrunnelse må være mellom $min og $max tegn"
+                )
+                    .addPropertyNode("begrunnelse")
+                    .addConstraintViolation()
+                valid = false
+            }
         }
+
+        return valid
+    }
 }

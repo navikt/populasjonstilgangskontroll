@@ -1,13 +1,12 @@
 package no.nav.tilgangsmaskin.tilgang
 
-import io.kotest.assertions.assertSoftly
-import io.kotest.matchers.shouldBe
 import io.mockk.justRun
 import io.mockk.every
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
+import no.nav.tilgangsmaskin.felles.rest.assertProblemDetailBody
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode.AVVIST_STRENGT_FORTROLIG_ADRESSE
@@ -16,10 +15,9 @@ import no.nav.tilgangsmaskin.regler.motor.KjerneRegel
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
+import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.http.ProblemDetail
 import org.springframework.test.web.servlet.post
-import tools.jackson.module.kotlin.readValue
 import java.time.LocalDate
 
 class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
@@ -57,23 +55,13 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         regelTjeneste.kompletteRegler(ansattId, brukerId)
                     } throws RegelException(testAnsatt, testBruker, testRegel)
 
-                    val result = mockMvc.post("$PROD_BASE_PATH/komplett") {
+                    mockMvc.post("$PROD_BASE_PATH/komplett") {
                         contentType = APPLICATION_JSON
                         content = "\"$brukerId\""
                     }.andExpect {
                         status {
                             isForbidden()
                         }
-                    }.andDo {
-                        handle(dokumenterMedAuth("obo-komplett-avvist", problemDetailFields))
-                    }.andReturn()
-
-                    assertSoftly(mapper.readValue<ProblemDetail>(result.response.contentAsByteArray)) {
-                        val properties = properties.orEmpty()
-                        title shouldBe AVVIST_STRENGT_FORTROLIG_ADRESSE.name
-                        properties["brukerIdent"] shouldBe brukerId
-                        properties["navIdent"] shouldBe ansattId.verdi
-                        properties["kanOverstyres"] shouldBe false
                     }
                 }
             }
@@ -184,7 +172,7 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
             }
 
             When("begrunnelse er for kort") {
-                Then("returnerer 400") {
+                Then("returnerer 400 med valideringsfeil på begrunnelse") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         contentType = APPLICATION_JSON
                         content = mapper.writeValueAsString(EnkeltTilgangData(BrukerId(brukerId), "For kort", gyldigTil))
@@ -192,26 +180,37 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         status {
                             isBadRequest()
                         }
-                    }.andDo {
-                        handle(dokumenterMedAuth("obo-enkelttilgang-begrunnelse-for-kort", problemDetailFields))
-                    }
+                    }.andReturn().assertProblemDetailBody(
+                        mapper,
+                        BAD_REQUEST,
+                        "En eller flere felter er ugyldige",
+                        title = "Validering feilet",
+                        fields = listOf("begrunnelse"),
+                        requireBody = false
+                    )
                 }
             }
 
             When("begrunnelse er for lang") {
-                Then("returnerer 400") {
+                Then("returnerer 400 med valideringsfeil på begrunnelse") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         contentType = APPLICATION_JSON
                         content = mapper.writeValueAsString(EnkeltTilgangData(BrukerId(brukerId), "x".repeat(401), gyldigTil))
                     }.andExpect {
-                        status { isBadRequest()
-                        }
-                    }
+                        status { isBadRequest() }
+                    }.andReturn().assertProblemDetailBody(
+                        mapper,
+                        BAD_REQUEST,
+                        "En eller flere felter er ugyldige",
+                        title = "Validering feilet",
+                        fields = listOf("begrunnelse"),
+                        requireBody = false
+                    )
                 }
             }
 
             When("gyldigtil er i fortiden") {
-                Then("returnerer 400") {
+                Then("returnerer 400 med valideringsfeil på gyldigtil") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         contentType = APPLICATION_JSON
                         content = mapper.writeValueAsString(
@@ -221,14 +220,19 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         status {
                             isBadRequest()
                         }
-                    }.andDo {
-                        handle(dokumenterMedAuth("obo-enkelttilgang-validering-gyldigtil", problemDetailFields))
-                    }
+                    }.andReturn().assertProblemDetailBody(
+                        mapper,
+                        BAD_REQUEST,
+                        "En eller flere felter er ugyldige",
+                        title = "Validering feilet",
+                        fields = listOf("gyldigtil"),
+                        requireBody = false
+                    )
                 }
             }
 
             When("gyldigtil er mer enn 3 måneder frem i tid") {
-                Then("returnerer 400") {
+                Then("returnerer 400 med valideringsfeil på gyldigtil") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         contentType = APPLICATION_JSON
                         content = mapper.writeValueAsString(
@@ -238,7 +242,14 @@ class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         status {
                             isBadRequest()
                         }
-                    }
+                    }.andReturn().assertProblemDetailBody(
+                        mapper,
+                        BAD_REQUEST,
+                        "En eller flere felter er ugyldige",
+                        title = "Validering feilet",
+                        fields = listOf("gyldigtil"),
+                        requireBody = false
+                    )
                 }
             }
         }

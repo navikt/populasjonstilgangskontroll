@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.felles.utils.cluster
 
-internal object ClusterConstants {
+object ClusterConstants {
     internal const val LOCAL = "local"
     internal const val GCP = "gcp"
     internal const val TEST = "test"

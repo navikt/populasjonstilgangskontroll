@@ -51,7 +51,7 @@ import java.time.LocalDate
 @Import(TimeBeanConfig::class)
 @EnableAutoConfiguration
 @ComponentScan("no.nav.tilgangsmaskin.regler.motor")
-internal class EnkeltTilgangTest(
+class EnkeltTilgangTest(
     private val motor: RegelMotor,
     private val registry: MeterRegistry,
     private val adapter: EnkeltTilgangJPAAdapter,

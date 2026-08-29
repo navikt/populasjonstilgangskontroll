@@ -16,9 +16,20 @@ import org.slf4j.LoggerFactory.getLogger
 import org.slf4j.MDC
 import org.springframework.stereotype.Component
 
+
+private const val REGEL = "regel"
+private const val FLOW = "flow"
+private const val BESKRIVELSE = "type"
+private const val OPPSLAGTYPE = "oppslagtype"
+private const val REGELSETT = "regelsett"
+private const val RESULTAT = "resultat"
+private const val BESLUTNING = "beslutning"
+private const val OK = "TILGANG_OK"
+private const val AVVIST = "TILGANG_AVVIST"
+
 @Component
 class RegelMotorLogger(private val registry: MeterRegistry,
-                       private val authContext: AuthContext,
+                       private val ctx: AuthContext,
                        private val teller: EvalueringTypeTeller,
                        private val auditor: Auditor) {
 
@@ -30,7 +41,7 @@ class RegelMotorLogger(private val registry: MeterRegistry,
             .description("Histogram av bulk-størrelse")
             .baseUnit("størrelse")
             .publishPercentileHistogram(true)
-            .tags("system", authContext.system)
+            .tags("system", ctx.system)
             .serviceLevelObjectives(1.0, 2.0, 5.0, 10.0, 20.0, 50.0, 100.0)
             .register(registry)
     }
@@ -47,7 +58,7 @@ class RegelMotorLogger(private val registry: MeterRegistry,
             teller.tell(TILGANG_AVVIST_TAG,
                 regelSett.tag(),
                 regel.tag(),
-                authContext.tag(),
+                ctx.tag(),
                 type.tag())
         }
 
@@ -63,14 +74,16 @@ class RegelMotorLogger(private val registry: MeterRegistry,
             teller.tell(TILGANG_AKSEPTERT_TAG,
                 regelSett.tag(),
                 INGEN_REGEL_TAG,
-                authContext.tag(),
+                ctx.tag(),
                 type.tag())
         }
 
 
-    fun trace(message: String) = log.trace(message)
+    fun trace(message: String) =
+        log.trace(message)
 
-    fun tellBulkSize(size: Int) = bulkHistogram.record(size.toDouble())
+    fun tellBulkSize(size: Int) =
+        bulkHistogram.record(size.toDouble())
     fun godkjent(ansatt: Ansatt, bruker: Bruker, regel: Regel, type: EvalueringType) {
         log.trace("Evaluert regel '{}' OK for {} for {} og {} {}",
             regel.kortNavn,
@@ -84,7 +97,6 @@ class RegelMotorLogger(private val registry: MeterRegistry,
         private fun konsument(): String =
             MDC.get(CONSUMER_ID)?.let { "for konsument $it" } ?: "(for uautentisert konsument)"
 
-        private const val REGEL = "regel"
         val INGEN_REGEL_TAG = Tag.of(REGEL, UTILGJENGELIG)
         fun Regel.tag() = Tag.of(REGEL, kortNavn)
         private fun AuthContext.tag() = Tag.of(FLOW, type.name.lowercase())
@@ -92,13 +104,6 @@ class RegelMotorLogger(private val registry: MeterRegistry,
         private fun RegelSett.tag() = Tag.of(BESKRIVELSE, beskrivelse)
         private val TILGANG_AKSEPTERT_TAG = Tag.of(RESULTAT, OK)
         private val TILGANG_AVVIST_TAG = Tag.of(RESULTAT, AVVIST)
-        private const val FLOW = "flow"
-        private const val BESKRIVELSE = "type"
-        private const val OPPSLAGTYPE = "oppslagtype"
-        private const val REGELSETT = "regelsett"
-        private const val RESULTAT = "resultat"
-        private const val BESLUTNING = "beslutning"
-        private const val OK = "TILGANG_OK"
-        private const val AVVIST = "TILGANG_AVVIST"
+
     }
 }

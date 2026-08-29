@@ -36,12 +36,12 @@ jobs:
       actions: read           # zizmor leser workflow-metadata via GH API
     steps:
       - name: Sjekker ut kode
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Installer zizmor
-        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
 
       - name: Kjør zizmor
         run: uvx zizmor --format sarif . > zizmor.sarif

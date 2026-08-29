@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.tilgangsmaskin.felles.security.OAuth2RequireOBO
 import no.nav.tilgangsmaskin.felles.rest.ProdController
 import no.nav.tilgangsmaskin.felles.security.ansattId
-import no.nav.tilgangsmaskin.regler.enkelttilgang.openapi.ValideringsfeilApiResponse
+import no.nav.tilgangsmaskin.regler.enkelttilgang.openapi.EnkeltTilgangApiResponse
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 
 private const val ENKELTTILGANG_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.tilgang.tag.description"
  const val SUMMARY_OVERSTYR = "${MSG}openapi.tilgang.overstyr.summary"
- const val DESCRIPTION_OVERSTYR = "${MSG}openapi.tilgang.overstyr.description"
+ const val DESCRIPTION_ENKELTTILGANG = "${MSG}openapi.tilgang.overstyr.description"
 
 
 @ProdController
@@ -26,8 +26,8 @@ class EnkeltTilgangController(private val enkelt: EnkeltTilgangTjeneste) {
 
     @PostMapping("overstyr")
     @ResponseStatus(NO_CONTENT)
-    @Operation(summary = SUMMARY_OVERSTYR, description = DESCRIPTION_OVERSTYR)
-    @ValideringsfeilApiResponse
+    @Operation(summary = SUMMARY_OVERSTYR, description = DESCRIPTION_ENKELTTILGANG)
+    @EnkeltTilgangApiResponse
     fun enkeltTilgang(@AuthenticationPrincipal principal: OAuth2AuthenticatedPrincipal, @RequestBody @EnkeltTilgangGyldig data: EnkeltTilgangData) {
         enkelt.registrerTilgang(principal.ansattId(), data)
     }

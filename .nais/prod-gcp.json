@@ -10,7 +10,8 @@
     "nasjonal": "ebdddf06-dc5b-45ef-9dad-850894b935f9",
     "utland": "bb308252-d600-4e5c-bc53-bbd2bb8a29ba",
     "dead" : "995d6ab0-c557-4ae5-af7a-064b8c9585ce",
-    "support": "dbe2f9e7-956e-429d-b70f-5a0c134eab47"
+    "support": "dbe2f9e7-956e-429d-b70f-5a0c134eab47",
+    "enkelttilgang": "d64ba0c3-b193-486b-b506-87251212f112"
   },
   "db": {
     "poolsize": "6",

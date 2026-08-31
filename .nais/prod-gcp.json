@@ -169,14 +169,12 @@
     {
       "name": "gosys",
       "namespace": "isa",
-      "cluster": "prod-fss",
-      "role": "ENKELT"
+      "cluster": "prod-fss"
     },
     {
       "name": "gosys-backend",
       "namespace": "isa",
-      "cluster": "prod-gcp",
-      "role": "ENKELT"
+      "cluster": "prod-gcp"
     },
     {
       "name": "tilgang",
@@ -191,8 +189,7 @@
     {
       "name": "gosys-oppgavebehandling-api",
       "namespace": "oppgavehandtering",
-      "cluster": "prod-gcp",
-      "role": "ENKELT"
+      "cluster": "prod-gcp"
     },
     {
       "name": "repr-fullmakt",
@@ -247,8 +244,7 @@
     {
       "name": "histark-core-api",
       "namespace": "histark",
-      "cluster": "prod-fss",
-      "role": "ENKELT"
+      "cluster": "prod-fss"
     },
     {
       "name": "klage-lookup",

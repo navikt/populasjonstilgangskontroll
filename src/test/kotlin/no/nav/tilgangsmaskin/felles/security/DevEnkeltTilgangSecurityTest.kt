@@ -50,11 +50,11 @@ class DevEnkeltTilgangSecurityTest(mockMvc: MockMvc, mapper: JsonMapper) : Behav
         }
 
         Given("role enkelttilgang security chain i dev") {
-            When("request har OBO-token med dev role") {
-                Then("returnerer 202 for overstyr") {
+            When("request har OBO-token uten rolle enkelttilgang") {
+                Then("returnerer likevel 202 for overstyr") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
-                            setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID, mapOf("roles" to listOf("ROLE_DEV"))))
+                            setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID))
                         }
                         contentType = APPLICATION_JSON
                         content = payload

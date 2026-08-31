@@ -30,7 +30,7 @@ class OAuth2SecurityBeanConfig {
 
     @Bean
     fun securityFilterChain(http: HttpSecurity,
-                            converter: OAuth2EnkeltRoleAddingJwtAuthenticationConverter,
+                            converter: OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter,
                             deniedHandler: AccessDeniedHandler,
                             entryPoint: AuthenticationEntryPoint) =
         http.authorizeHttpRequests { requests ->

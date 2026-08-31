@@ -43,10 +43,8 @@ class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(
     override fun convert(jwt: Jwt): AbstractAuthenticationToken =
         delegate.convert(jwt) ?: throw IllegalArgumentException("JWT konvertering feilet for token med claims: ${jwt.claims}")
 
-    private fun shouldAddEnkeltRole(jwt: Jwt): Boolean {
-        val roles = jwt.getClaimAsStringList(ROLES_CLAIM).orEmpty()
-        return !isProd || gruppeEnkeltTilgang in roles
-    }
+    private fun shouldAddEnkeltRole(jwt: Jwt)  =
+        !isProd || gruppeEnkeltTilgang in jwt.getClaimAsStringList(ROLES_CLAIM).orEmpty()
 
     private fun principal(jwt: Jwt, authorities: Set<GrantedAuthority>) =
         DefaultOAuth2AuthenticatedPrincipal(

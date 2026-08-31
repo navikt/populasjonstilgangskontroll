@@ -1,19 +1,13 @@
 package no.nav.tilgangsmaskin.felles.security
 
-import no.nav.boot.conditionals.Cluster
-import no.nav.boot.conditionals.Cluster.DEV_GCP
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Primary
-import org.springframework.core.convert.converter.Converter
-import org.springframework.security.authentication.AbstractAuthenticationToken
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.http.SessionCreationPolicy.STATELESS
 import org.springframework.security.config.observation.SecurityObservationSettings
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.OAuth2AuthorizationFailureHandler
 import org.springframework.security.oauth2.client.OAuth2AuthorizationSuccessHandler
@@ -23,29 +17,24 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpRequestInterceptor.authorizationFailureHandler
 import org.springframework.security.oauth2.client.web.client.support.OAuth2RestClientHttpServiceGroupConfigurer.from
-import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.access.AccessDeniedHandler
-import org.springframework.core.env.Environment
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer
 
-private const val ROLE = "ROLE_"
-private const val DEV_ROLE = "$ROLE$DEV"
 const val ENKELT = "ENKELT"
 private val UNPROTECTED_ENDPOINTS = arrayOf("/$DEV/**", "/swagger-ui/**", "/v3/api-docs/**", "/monitoring/**")
 
 @Configuration
 @EnableMethodSecurity
-class OAuth2SecurityBeanConfig(env: Environment) {
+class OAuth2SecurityBeanConfig {
 
-    private val extraRoles = env.extraRolesForClusters(setOf(DEV_GCP), DEV_ROLE)
     @Bean
     fun securityFilterChain(http: HttpSecurity,
-                            converter: Converter<Jwt, AbstractAuthenticationToken>,
+                            converter: OAuth2EnkeltRoleAddingJwtAuthenticationConverter,
                             deniedHandler: AccessDeniedHandler,
                             entryPoint: AuthenticationEntryPoint) =
         http.authorizeHttpRequests { requests ->
-            requests.requestMatchers( "$PROD_BASE_PATH/overstyr").hasAnyRole(ENKELT, DEV)
+            requests.requestMatchers( "$PROD_BASE_PATH/overstyr").hasRole(ENKELT)
             requests.requestMatchers( *UNPROTECTED_ENDPOINTS).permitAll()
             requests.anyRequest().authenticated()
         }
@@ -60,11 +49,6 @@ class OAuth2SecurityBeanConfig(env: Environment) {
             }
             .stateless()
             .build()
-
-    @Bean
-    @Primary
-    fun oauth2AuthorityAddingJwtAuthenticationConverter(): Converter<Jwt, AbstractAuthenticationToken> =
-            OAuth2AuthorityAddingJwtAuthenticationConverter(extraRoles)
 
     @Bean
     fun securityObservationSettings()  =
@@ -108,14 +92,4 @@ class OAuth2SecurityBeanConfig(env: Environment) {
             .formLogin { it.disable() }
             .httpBasic { it.disable() }
             .logout { it.disable() }
-
 }
-
-private fun Environment.extraRolesForClusters(clusters: Set<Cluster>, vararg extraRoles: String) =
-    if (clusters.any { it.isActive(this) }) {
-        buildSet {
-            extraRoles.forEach { add(SimpleGrantedAuthority(it)) }
-        }
-    } else {
-        emptySet()
-    }

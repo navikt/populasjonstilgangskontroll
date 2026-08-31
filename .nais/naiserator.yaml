@@ -125,6 +125,8 @@ spec:
       value: '{{grupper.nasjonal}}'
     - name: GRUPPE_UTLAND
       value: '{{grupper.utland}}'
+    - name: GRUPPE_ENKELTTILGANG
+      value: '{{grupper.enkelttilgang}}'
     - name: DB_POOLSIZE
       value: '{{db.poolsize}}'
     - name: JDK_JAVA_OPTIONS

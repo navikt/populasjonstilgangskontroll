@@ -29,6 +29,7 @@ import org.springframework.test.web.servlet.post
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.module.kotlin.readValue
 import java.time.LocalDate.now
+import java.util.UUID
 
 @SpringBootTest(classes = [SecurityTestApplication::class])
 @AutoConfigureMockMvc
@@ -55,7 +56,7 @@ open class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private v
                 Then("returnerer 204 for enkelttilgang") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
-                            setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID, mapOf(ROLES_CLAIM to listOf(ENKELT))))
+                            setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID, mapOf("roles" to listOf(OID_ENKELT))))
                         }
                         contentType = APPLICATION_JSON
                         content = payload
@@ -75,7 +76,7 @@ open class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private v
                 Then("returnerer 204 for enkelttilgang") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
-                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf(ROLES_CLAIM to listOf(ENKELT, UTILGJENGELIG))))
+                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf("roles" to listOf(OID_ENKELT, UTILGJENGELIG))))
                         }
                         contentType = APPLICATION_JSON
                         content = payload
@@ -93,7 +94,7 @@ open class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private v
                 Then("avvises med 403 for enkelttilgang") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
-                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf(ROLES_CLAIM to listOf(UTILGJENGELIG))))
+                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf("roles" to listOf(UTILGJENGELIG))))
                         }
                         contentType = APPLICATION_JSON
                         content = payload
@@ -134,10 +135,12 @@ open class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private v
         }
 
     companion object {
+        private val OID_ENKELT = UUID.randomUUID().toString()
         @JvmStatic
         @DynamicPropertySource
         fun setProperties(registry: DynamicPropertyRegistry) {
             registry.setProperties(PROD_GCP)
+            registry.add("gruppe.enkelttilgang") { OID_ENKELT }
         }
     }
 }

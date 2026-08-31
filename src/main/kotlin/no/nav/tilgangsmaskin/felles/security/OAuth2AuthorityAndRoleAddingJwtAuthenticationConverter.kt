@@ -4,11 +4,9 @@ import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.APP
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.IDTYP
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.NAVIDENT
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.OID
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.convert.converter.Converter
-import org.springframework.core.env.Environment
-import org.springframework.core.env.Profiles
 import org.springframework.security.authentication.AbstractAuthenticationToken
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -27,7 +25,6 @@ const val ROLES_CLAIM = "roles"
 
 @Component
 class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(
-    private val env: Environment,
     @Value($$"${gruppe.enkelttilgang:}") private val gruppeEnkeltTilgang: String) : Converter<Jwt, AbstractAuthenticationToken> {
 
     private val delegate = JwtAuthenticationConverter()
@@ -48,7 +45,6 @@ class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(
 
     private fun shouldAddEnkeltRole(jwt: Jwt): Boolean {
         val roles = jwt.getClaimAsStringList(ROLES_CLAIM).orEmpty()
-        val isProd = env.acceptsProfiles(Profiles.of(PROD_GCP))
         return !isProd || gruppeEnkeltTilgang in roles
     }
 

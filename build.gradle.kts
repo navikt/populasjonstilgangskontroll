@@ -11,7 +11,6 @@ version = "1.0.1"
 
 plugins {
     jacoco
-    alias(libs.plugins.avro)
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.allopen)
     alias(libs.plugins.kotlin.spring)
@@ -59,9 +58,7 @@ dependencies {
         testImplementation("at.yawk.lz4:lz4-java:1.11.1")
     }
 
-    // Force newer jackson-databind version (required by gradle-avro-plugin)
-    //implementation("com.fasterxml.jackson.core:jackson-databind:2.22.1")
-    //implementation("no.nav.pdl.libs:contract-pdl-avro:18")
+    implementation("no.nav.pdl.libs:contract-pdl-avro:18")
     implementation(libs.boot.conditionals)
     implementation(libs.bundles.observability)
     implementation(libs.slack)

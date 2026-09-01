@@ -77,7 +77,6 @@ observability = ["opentelemetry-instrumentation-annotations", "opentelemetry-log
 
 [plugins]
 asciidoctor = { id = "org.asciidoctor.jvm.convert", version.ref = "asciidoctor" }
-avro = { id = "com.github.davidmc24.gradle.plugin.avro", version.ref = "avro-plugin" }
 cyclonedx = { id = "org.cyclonedx.bom", version.ref = "cyclonedx" }
 kotest = { id = "io.kotest", version.ref = "kotest" }
 kotlin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }

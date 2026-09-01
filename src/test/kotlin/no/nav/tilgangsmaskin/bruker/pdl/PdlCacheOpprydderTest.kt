@@ -27,7 +27,17 @@ class PdlCacheOpprydderTest : BehaviorSpec({
 
     fun hendelse(identer: List<String>, endringstype: Endringstype = OPPRETTET,
         gradering: Adressebeskyttelse? = null) =
-        Personhendelse("hendelse-id", identer, "PDL", Instant.now(), "PDL_HENDELSE", endringstype, null, gradering, null)
+        Personhendelse.newBuilder()
+            .setHendelseId("hendelse-id")
+            .setPersonidenter(identer)
+            .setMaster("PDL")
+            .setOpprettet(Instant.now())
+            .setOpplysningstype("PDL_HENDELSE")
+            .setEndringstype(endringstype)
+            .setTidligereHendelseId(null)
+            .setAdressebeskyttelse(gradering)
+            .setNavn(null)
+            .build()
 
     beforeEach {
         every { client.delete(any(), any()) } returns true

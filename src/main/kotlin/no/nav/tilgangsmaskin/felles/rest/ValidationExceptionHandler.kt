@@ -15,7 +15,7 @@ import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangDevController
 import org.springframework.core.Ordered.HIGHEST_PRECEDENCE
 
-@RestControllerAdvice(assignableTypes = [EnkeltTilgangController::class, EnkeltTilgangDevController::class])
+@RestControllerAdvice(basePackageClasses = [EnkeltTilgangController::class, EnkeltTilgangDevController::class])
 //@Order(HIGHEST_PRECEDENCE)
 class ValidationExceptionHandler : ResponseEntityExceptionHandler() {
 

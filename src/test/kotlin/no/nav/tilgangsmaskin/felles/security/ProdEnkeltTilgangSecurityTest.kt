@@ -100,7 +100,7 @@ open class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private v
                     }.andExpect {
                         status { isForbidden() }
                         content { contentType(APPLICATION_PROBLEM_JSON) }
-                    }.andReturn().withBody(FORBIDDEN, MANGLER_ROLLE)
+                    }.andReturn().withBody(FORBIDDEN, "Access Denied")
                 }
             }
 
@@ -115,7 +115,7 @@ open class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private v
                     }.andExpect {
                         status { isForbidden() }
                         content { contentType(APPLICATION_PROBLEM_JSON) }
-                    }.andReturn().withBody(FORBIDDEN, MANGLER_ROLLE)
+                    }.andReturn().withBody(FORBIDDEN, "Access Denied")
                 }
             }
         }

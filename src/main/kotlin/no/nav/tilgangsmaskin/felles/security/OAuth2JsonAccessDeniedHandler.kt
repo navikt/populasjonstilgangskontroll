@@ -3,14 +3,11 @@ package no.nav.tilgangsmaskin.felles.security
 import tools.jackson.databind.json.JsonMapper
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.stereotype.Component
-
-private const val OVERSTYR_PATH = "$PROD_BASE_PATH/overstyr"
 
 @Component
 class OAuth2JsonAccessDeniedHandler(private val mapper: JsonMapper) : AccessDeniedHandler {
@@ -18,14 +15,6 @@ class OAuth2JsonAccessDeniedHandler(private val mapper: JsonMapper) : AccessDeni
         with(res) {
             status = FORBIDDEN.value()
             contentType = APPLICATION_PROBLEM_JSON_VALUE
-            val detail = if (req.requestURI.endsWith(OVERSTYR_PATH)) {
-                MANGLER_ROLLE
-            } else {
-                e.message ?: "Access Denied"
-            }
-            mapper.writeValue(writer, securityProblemDetail(FORBIDDEN, detail))
+            mapper.writeValue(writer, securityProblemDetail(FORBIDDEN, e.message ?: "Access Denied"))
         }
 }
-
-
-const val MANGLER_ROLLE = "Du må være medlem av gruppen 0000-GA-enkelttilgang for å kunne gi deg selv tilgang til en bruker"

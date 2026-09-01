@@ -6,11 +6,6 @@ import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.HandlerMethodValidationException
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatusCode
-import org.springframework.http.ResponseEntity
-import org.springframework.web.context.request.WebRequest
-import org.springframework.web.method.annotation.HandlerMethodValidationException
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangDevController
 import org.springframework.http.ResponseEntity.status

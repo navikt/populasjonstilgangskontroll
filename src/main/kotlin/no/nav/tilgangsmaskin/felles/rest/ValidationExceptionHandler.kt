@@ -1,20 +1,26 @@
 package no.nav.tilgangsmaskin.felles.rest
 
+import jakarta.validation.ConstraintViolation
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.HandlerMethodValidationException
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatusCode
+import org.springframework.http.ResponseEntity
+import org.springframework.web.context.request.WebRequest
+import org.springframework.web.method.annotation.HandlerMethodValidationException
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangDevController
+import org.springframework.http.ResponseEntity.status
 
 @RestControllerAdvice(assignableTypes = [EnkeltTilgangController::class, EnkeltTilgangDevController::class])
 class ValidationExceptionHandler {
 
     @ExceptionHandler(HandlerMethodValidationException::class)
-    fun handleHandlerMethodValidationException(ex: HandlerMethodValidationException): ResponseEntity<Any> {
-        return ResponseEntity.status(BAD_REQUEST)
+    fun handleHandlerMethodValidationException(ex: HandlerMethodValidationException) =
+        status(BAD_REQUEST)
             .contentType(APPLICATION_PROBLEM_JSON)
             .body(
                 mapOf(
@@ -23,13 +29,21 @@ class ValidationExceptionHandler {
                     "detail" to "En eller flere felter er ugyldige",
                     "feil" to ex.parameterValidationResults.flatMap { result ->
                         result.resolvableErrors.map { error ->
+                            val violation = runCatching {
+                                result.unwrap(error, ConstraintViolation::class.java)
+                            }.getOrNull()
+
+                            val field = when {
+                                violation != null -> violation.propertyPath.lastOrNull()?.toString() ?: "body"
+                                else -> "body"
+                            }
+
                             mapOf(
-                                "felt" to "body",
-                                "melding" to (error.defaultMessage ?: "Ugyldig verdi")
+                                "felt" to field,
+                                "melding" to (violation?.message ?: error.defaultMessage ?: "Ugyldig verdi")
                             )
                         }
                     }
                 )
             )
-    }
 }

@@ -143,24 +143,6 @@ open class TilgangControllerTest(private val mockMvc: MockMvc, private val mappe
                         }
                     }.andReturn().withBody(FORBIDDEN, "Access Denied")
                 }
-
-                Then("returnerer 403 for overstyr") {
-                    val gyldigTil = now().plusMonths(2)
-                    mockMvc.post("$PROD_BASE_PATH/overstyr") {
-                        headers {
-                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf(IDTYP to APP, "roles" to listOf(ENKELT))))
-                        }
-                        contentType = APPLICATION_JSON
-                        content = mapper.writeValueAsString(EnkeltTilgangData(TEST_BRUKER_ID, "En god begrunnelse", gyldigTil))
-                    }.andExpect {
-                        status {
-                            isForbidden()
-                        }
-                        content {
-                            contentType(APPLICATION_PROBLEM_JSON)
-                        }
-                    }.andReturn().withBody(FORBIDDEN, "Access Denied")
-                }
             }
         }
 

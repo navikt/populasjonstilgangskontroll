@@ -41,7 +41,7 @@ class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(private val env: En
             tokenTypeAuthority(jwt.token)?.let(authorities::add)
             if (shouldAddEnkeltRole(jwt.token.getClaimAsStringList(ROLES_CLAIM))) {
                 authorities += SimpleGrantedAuthority(ENKELT_ROLE)
-                log.info("La til rolle $ENKELT_ROLE for token")
+                log.info("La til rolle $ENKELT_ROLE")
             }
             JwtAuthenticationToken(jwt.token, principal(jwt.token, authorities), authorities)
         }

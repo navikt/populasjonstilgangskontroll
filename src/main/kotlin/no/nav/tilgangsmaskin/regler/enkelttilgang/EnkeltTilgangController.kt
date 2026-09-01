@@ -10,9 +10,11 @@ import no.nav.tilgangsmaskin.tilgang.openapi.MSG
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal
+import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.ResponseStatus
+import org.springframework.web.method.annotation.HandlerMethodValidationException
 
 private const val ENKELTTILGANG_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.tilgang.tag.description"
  const val SUMMARY_ENKELTTILGANG = "${MSG}openapi.tilgang.enkelttilgang.summary"
@@ -31,4 +33,7 @@ class EnkeltTilgangController(private val enkelt: EnkeltTilgangTjeneste) {
     fun enkeltTilgang(@AuthenticationPrincipal principal: OAuth2AuthenticatedPrincipal, @RequestBody @EnkeltTilgangGyldig data: EnkeltTilgangData) {
         enkelt.registrerTilgang(principal.ansattId(), data)
     }
+
+    @ExceptionHandler(HandlerMethodValidationException::class)
+    fun handleValidation(ex: HandlerMethodValidationException) = valideringsfeilRespons(ex)
 }

@@ -8,4 +8,4 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
 @Target(CLASS, FUNCTION)
 @Retention(RUNTIME)
 @PreAuthorize("hasAuthority('$OBO_AUTHORITY') and hasRole('$ENKELT')")
-annotation class OAuth2RequireOBOAndEnkelt
+annotation class RequireOAuth2OBOAndEnkelt

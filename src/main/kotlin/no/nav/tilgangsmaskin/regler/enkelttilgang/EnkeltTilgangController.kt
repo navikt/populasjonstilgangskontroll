@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import no.nav.tilgangsmaskin.felles.security.OAuth2RequireOBOAndEnkelt
+import no.nav.tilgangsmaskin.felles.security.RequireOAuth2OBOAndEnkelt
 import no.nav.tilgangsmaskin.felles.rest.ProdController
 import no.nav.tilgangsmaskin.felles.security.ansattId
 import no.nav.tilgangsmaskin.regler.enkelttilgang.openapi.EnkeltTilgangApiResponse
@@ -22,7 +22,7 @@ private const val ENKELTTILGANG_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.tilg
 
 
 @ProdController
-@OAuth2RequireOBOAndEnkelt
+@RequireOAuth2OBOAndEnkelt
 @Tag(name = "EnkeltTilgangController", description = ENKELTTILGANG_CONTROLLER_TAG_DESCRIPTION)
 class EnkeltTilgangController(private val enkelt: EnkeltTilgangTjeneste) {
 

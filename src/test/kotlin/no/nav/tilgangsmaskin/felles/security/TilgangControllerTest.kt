@@ -8,8 +8,8 @@ import io.mockk.every
 import io.mockk.justRun
 import io.mockk.verify
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
-import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.APP
-import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.IDTYP
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.CLIENT_CREDENTIALS
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.ROLES
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
@@ -113,7 +113,7 @@ open class TilgangControllerTest(private val mockMvc: MockMvc, private val mappe
                 Then("returnerer 403 for komplett") {
                     mockMvc.post("$PROD_BASE_PATH/komplett") {
                         headers {
-                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf(IDTYP to APP)))
+                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf(ROLES to listOf(CLIENT_CREDENTIALS))))
                         }
                         contentType = APPLICATION_JSON
                         content = mapper.writeValueAsString(TEST_BRUKER_ID)
@@ -130,7 +130,7 @@ open class TilgangControllerTest(private val mockMvc: MockMvc, private val mappe
                 Then("returnerer 403 for bulk") {
                     mockMvc.post("$PROD_BASE_PATH/bulk/obo") {
                         headers {
-                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf(IDTYP to APP)))
+                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf(ROLES to listOf(CLIENT_CREDENTIALS))))
                         }
                         contentType = APPLICATION_JSON
                         content = mapper.writeValueAsString(setOf(BrukerIdOgRegelsett(TEST_BRUKER_ID.verdi)))
@@ -148,7 +148,7 @@ open class TilgangControllerTest(private val mockMvc: MockMvc, private val mappe
                     val gyldigTil = now().plusMonths(2)
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
-                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf(IDTYP to APP, "roles" to listOf(ENKELT))))
+                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf(ROLES to listOf(CLIENT_CREDENTIALS,ENKELT))))
                         }
                         contentType = APPLICATION_JSON
                         content = mapper.writeValueAsString(EnkeltTilgangData(TEST_BRUKER_ID, "En god begrunnelse", gyldigTil))

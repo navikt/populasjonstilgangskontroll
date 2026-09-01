@@ -5,11 +5,11 @@ import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.security.AuthContext
-import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.APP
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.AZP_NAME
-import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.IDTYP
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.CLIENT_CREDENTIALS
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.NAVIDENT
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.OID
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.ROLES
 import no.nav.tilgangsmaskin.felles.security.TokenType.CCF
 import no.nav.tilgangsmaskin.felles.security.TokenType.OBO
 import no.nav.tilgangsmaskin.felles.security.TokenType.UNAUTHENTICATED
@@ -43,7 +43,7 @@ class AuthContextTest : BehaviorSpec({
     Given("type er CCF") {
         When("idtyp er app") {
             Then("returnerer CCF") {
-                setClaims(IDTYP to APP)
+                setClaims(ROLES to listOf(CLIENT_CREDENTIALS))
                 authContext.type shouldBe CCF
             }
         }

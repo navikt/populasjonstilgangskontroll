@@ -58,7 +58,7 @@ dependencies {
         testImplementation("at.yawk.lz4:lz4-java:1.11.1")
     }
 
-    implementation("no.nav.pdl.libs:contract-pdl-avro:18")
+    implementation(libs.contract.pdl.avro)
     implementation(libs.boot.conditionals)
     implementation(libs.bundles.observability)
     implementation(libs.slack)

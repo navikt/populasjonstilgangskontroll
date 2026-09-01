@@ -8,6 +8,7 @@ import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.verify
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.ROLES
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
@@ -56,7 +57,7 @@ open class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private v
                 Then("returnerer 204 for enkelttilgang") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
-                            setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID, mapOf(ROLES_CLAIM to listOf(OID_ENKELT))))
+                            setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID, mapOf(ROLES to listOf(OID_ENKELT))))
                         }
                         contentType = APPLICATION_JSON
                         content = payload
@@ -76,7 +77,7 @@ open class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private v
                 Then("returnerer 204 for enkelttilgang") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
-                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf(ROLES_CLAIM to listOf(OID_ENKELT, UTILGJENGELIG))))
+                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf(ROLES to listOf(OID_ENKELT, UTILGJENGELIG))))
                         }
                         contentType = APPLICATION_JSON
                         content = payload
@@ -93,7 +94,7 @@ open class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private v
                 Then("avvises med 403 med spesifikk melding om manglende ENKELT-rolle") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
-                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf(ROLES_CLAIM to listOf(UTILGJENGELIG))))
+                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf(ROLES to listOf(UTILGJENGELIG))))
                         }
                         contentType = APPLICATION_JSON
                         content = payload

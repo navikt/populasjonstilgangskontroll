@@ -6,10 +6,8 @@ import no.nav.tilgangsmaskin.felles.security.TokenType.OBO
 import no.nav.tilgangsmaskin.felles.security.TokenType.UNAUTHENTICATED
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import org.springframework.security.core.context.SecurityContextHolder.getContext
-import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.AbstractOAuth2TokenAuthenticationToken
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.stereotype.Component
 import java.util.UUID
 
@@ -38,7 +36,7 @@ class AuthContext {
             else -> UNAUTHENTICATED
         }
 
-    private val erCC get() = stringClaim(IDTYP) == APP
+    private val erCC get() = listClaim(ROLES).contains(CLIENT_CREDENTIALS)
     private val erObo get() = !erCC && oid != null
 
     private fun stringClaim(name: String) = jwt()?.claims?.get(name)?.toString()
@@ -51,10 +49,10 @@ class AuthContext {
     }
 
     companion object {
+        const val CLIENT_CREDENTIALS = "access_as_application"
         const val GROUPS = "groups"
-        const val APP = "app"
+        const val ROLES = "roles"
         const val OID = "oid"
-        const val IDTYP = "idtyp"
         const val AZP_NAME = "azp_name"
         const val NAVIDENT = "NAVident"
     }

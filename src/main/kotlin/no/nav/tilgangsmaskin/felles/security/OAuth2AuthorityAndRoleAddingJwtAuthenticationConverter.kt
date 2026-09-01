@@ -1,9 +1,9 @@
 package no.nav.tilgangsmaskin.felles.security
 
-import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.APP
-import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.IDTYP
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.CLIENT_CREDENTIALS
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.NAVIDENT
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.OID
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.ROLES
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP_PROFILE
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
@@ -23,7 +23,6 @@ const val TOKEN_TYPE_AUTHORITY_PREFIX = "TOKEN_"
 const val OBO_AUTHORITY = "${TOKEN_TYPE_AUTHORITY_PREFIX}OBO"
 const val CCF_AUTHORITY = "${TOKEN_TYPE_AUTHORITY_PREFIX}CCF"
 private const val ROLE = "ROLE_"
-const val ROLES_CLAIM = "roles"
 
 @Component
 class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(private val env: Environment,
@@ -39,7 +38,7 @@ class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(private val env: En
             authorities += jwt.authorities
             authorities += roleAuthorities(jwt.token)
             tokenTypeAuthority(jwt.token)?.let(authorities::add)
-            if (shouldAddEnkeltRole(jwt.token.getClaimAsStringList(ROLES_CLAIM))) {
+            if (shouldAddEnkeltRole(jwt.token.getClaimAsStringList(ROLES))) {
                 authorities += SimpleGrantedAuthority(ENKELT_ROLE)
                 log.info("La til rolle $ENKELT_ROLE")
             }
@@ -61,14 +60,14 @@ class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(private val env: En
 
     private fun tokenTypeAuthority(jwt: Jwt) =
         when {
-            jwt.getClaimAsString(IDTYP) == APP -> SimpleGrantedAuthority(CCF_AUTHORITY)
+            jwt.getClaimAsStringList(ROLES).orEmpty().contains(CLIENT_CREDENTIALS) -> SimpleGrantedAuthority(CCF_AUTHORITY)
             jwt.getClaimAsString(OID) != null -> SimpleGrantedAuthority(OBO_AUTHORITY)
             else -> null
         }
 
     private fun roleAuthorities(jwt: Jwt) =
         buildSet {
-            jwt.getClaimAsStringList(ROLES_CLAIM).orEmpty().forEach { role ->
+            jwt.getClaimAsStringList(ROLES).orEmpty().forEach { role ->
                 add(SimpleGrantedAuthority(role.takeIf { it.startsWith(ROLE) } ?: "$ROLE$role"))
             }
         }

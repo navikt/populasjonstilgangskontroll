@@ -4,6 +4,7 @@ avro-plugin = "1.9.1"
 boot-conditionals = "6.0.7"
 commons-pool2 = "2.13.1"
 confluent = "8.3.1"
+contract-pdl-avro = "18"
 cyclonedx = "3.4.1"
 kotlin = "2.4.0"
 kotest = "6.2.3"
@@ -24,6 +25,7 @@ boot-conditionals = { module = "no.nav.boot:boot-conditionals", version.ref = "b
 caffeine = { module = "com.github.ben-manes.caffeine:caffeine" }
 commons-pool2 = { module = "org.apache.commons:commons-pool2", version.ref = "commons-pool2" }
 confluent-kafka-avro-serializer = { module = "io.confluent:kafka-avro-serializer", version.ref = "confluent" }
+contract-pdl-avro = { module = "no.nav.pdl.libs:contract-pdl-avro", version.ref = "contract-pdl-avro" }
 flyway-database-postgresql = { module = "org.flywaydb:flyway-database-postgresql" }
 hibernate-micrometer = { module = "org.hibernate.orm:hibernate-micrometer" }
 jackson-module-kotlin = { module = "tools.jackson.module:jackson-module-kotlin" }

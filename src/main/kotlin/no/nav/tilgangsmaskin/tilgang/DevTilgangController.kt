@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.tilgang
 
 import io.swagger.v3.oas.annotations.Operation
 import jakarta.transaction.Transactional
-import jakarta.validation.Valid
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData
 import no.nav.tilgangsmaskin.ansatt.nom.NomJPAAdapter
@@ -14,8 +13,6 @@ import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.felles.rest.DevController
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
-import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
-import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangGyldig
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
 import no.nav.tilgangsmaskin.tilgang.openapi.ProblemDetailApiResponse
@@ -82,15 +79,6 @@ class DevTilgangController(
     @Operation(summary = SUMMARY_NOM_FNR, description = DESCRIPTION_NOM_FNR)
     fun nomFnr(@PathVariable ansattId: AnsattId) =
         nom.fnrForAnsatt(ansattId.verdi)
-
-
-    @PostMapping("enkelttilgang/{ansattId}")
-    @ResponseStatus(ACCEPTED)
-    @ProblemDetailApiResponse(summary = SUMMARY_ENKELTTILGANG, description = DESCRIPTION_ENKELTTILGANG)
-    @Valid
-    fun enkelttilgang(@PathVariable ansattId: AnsattId,
-                      @RequestBody @Valid @EnkeltTilgangGyldig data: EnkeltTilgangData) =
-        enkeltTilgang.registrerTilgang(ansattId, data)
 
     @PostMapping("enkelttilganger/{ansattId}")
     @ResponseStatus(ACCEPTED)

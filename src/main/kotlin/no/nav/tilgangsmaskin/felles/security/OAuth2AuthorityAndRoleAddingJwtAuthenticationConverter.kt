@@ -57,7 +57,7 @@ class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(
             jwt.subject ?: jwt.getClaimAsString(NAVIDENT) ?: "unknown",
             jwt.claims,
             authorities
-        )
+        ).also { log.info("Principal satt til ${it.name} med authorities: ${it.authorities}") }
 
     private fun tokenTypeAuthority(jwt: Jwt) =
         when {

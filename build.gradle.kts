@@ -46,7 +46,7 @@ repositories {
         url = uri("https://maven.pkg.github.com/navikt/pdl")
         credentials {
             username = "x-access-token"
-            password = providers.environmentVariable("GITHUB_TOKEN").orElse(providers.gradleProperty("gpr.token")).orNull
+            password = providers.environmentVariable("READER_TOKEN").orElse(providers.gradleProperty("gpr.token")).orNull
         }
     }
 }

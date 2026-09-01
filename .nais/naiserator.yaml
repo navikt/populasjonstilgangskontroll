@@ -48,10 +48,14 @@ spec:
     path: /monitoring/prometheus
   readiness:
     path: /monitoring/health/readiness
+    periodSeconds: 10
+    failureThreshold: 15
     initialDelay: 30
   liveness:
     path: /monitoring/health/liveness
     initialDelay: 30
+    periodSeconds: 10
+    failureThreshold: 15
   port: 8080
   replicas:
     max: {{replica.max}}

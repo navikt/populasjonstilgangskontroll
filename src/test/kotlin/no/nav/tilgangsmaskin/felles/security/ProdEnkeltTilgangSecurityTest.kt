@@ -56,7 +56,7 @@ open class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private v
                 Then("returnerer 204 for enkelttilgang") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
-                            setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID, mapOf("roles" to listOf(OID_ENKELT))))
+                            setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID, mapOf(ROLES_CLAIM to listOf(OID_ENKELT))))
                         }
                         contentType = APPLICATION_JSON
                         content = payload
@@ -76,7 +76,7 @@ open class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private v
                 Then("returnerer 204 for enkelttilgang") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
-                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf("roles" to listOf(OID_ENKELT, UTILGJENGELIG))))
+                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf(ROLES_CLAIM to listOf(OID_ENKELT, UTILGJENGELIG))))
                         }
                         contentType = APPLICATION_JSON
                         content = payload
@@ -89,41 +89,35 @@ open class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private v
                     }
                 }
             }
-/*
             When("jwt har claim med ugyldig role") {
-                Then("avvises med 403 for enkelttilgang") {
+                Then("avvises med 403 med spesifikk melding om manglende ENKELT-rolle") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
-                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf("roles" to listOf(UTILGJENGELIG))))
+                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf(ROLES_CLAIM to listOf(UTILGJENGELIG))))
                         }
                         contentType = APPLICATION_JSON
                         content = payload
                     }.andExpect {
                         status { isForbidden() }
                         content { contentType(APPLICATION_PROBLEM_JSON) }
-                    }.andReturn().withBody(FORBIDDEN, "Access Denied")
+                    }.andReturn().withBody(FORBIDDEN, MANGLER_ROLLE)
                 }
             }
 
             When("jwt har claim uten role") {
-                Then("avvises med 403 for enkelttilgang") {
+                Then("avvises med 403 med spesifikk melding om manglende ENKELT-rolle") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
-                            setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID))
+                            setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID))
                         }
                         contentType = APPLICATION_JSON
                         content = payload
                     }.andExpect {
-                        status {
-                            isForbidden()
-                        }
-                        content {
-                            contentType(APPLICATION_PROBLEM_JSON)
-                        }
-                    }.andReturn().withBody(FORBIDDEN, "Access Denied")
+                        status { isForbidden() }
+                        content { contentType(APPLICATION_PROBLEM_JSON) }
+                    }.andReturn().withBody(FORBIDDEN, MANGLER_ROLLE)
                 }
             }
-*/
         }
     }
 

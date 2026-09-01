@@ -19,10 +19,13 @@ class OAuth2JsonAccessDeniedHandler(private val mapper: JsonMapper) : AccessDeni
             status = FORBIDDEN.value()
             contentType = APPLICATION_PROBLEM_JSON_VALUE
             val detail = if (req.requestURI.endsWith(OVERSTYR_PATH)) {
-                "Du må være medlem av gruppen 0000-GA-enkelttilgang for å kunne gi deg selv tilgang til en bruker"
+                MANGLER_ROLLE
             } else {
                 e.message ?: "Access Denied"
             }
             mapper.writeValue(writer, securityProblemDetail(FORBIDDEN, detail))
         }
 }
+
+
+const val MANGLER_ROLLE = "Du må være medlem av gruppen 0000-GA-enkelttilgang for å kunne gi deg selv tilgang til en bruker"

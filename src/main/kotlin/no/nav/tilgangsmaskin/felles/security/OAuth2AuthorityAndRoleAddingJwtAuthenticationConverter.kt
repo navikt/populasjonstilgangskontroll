@@ -4,10 +4,12 @@ import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.APP
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.IDTYP
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.NAVIDENT
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.OID
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.convert.converter.Converter
+import org.springframework.core.env.Environment
+import org.springframework.core.env.Profiles
 import org.springframework.security.authentication.AbstractAuthenticationToken
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -16,7 +18,6 @@ import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.stereotype.Component
-import kotlin.math.E
 
 private const val ENKELT_ROLE = "ROLE_ENKELT"
 const val TOKEN_TYPE_AUTHORITY_PREFIX = "TOKEN_"
@@ -26,7 +27,7 @@ private const val ROLE = "ROLE_"
 const val ROLES_CLAIM = "roles"
 
 @Component
-class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(
+class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(private val env: Environment,
     @Value($$"${gruppe.enkelttilgang:}") private val gruppeEnkeltTilgang: String) : Converter<Jwt, AbstractAuthenticationToken> {
 
     private val log = getLogger(javaClass)
@@ -50,7 +51,7 @@ class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(
         delegate.convert(jwt) ?: throw IllegalArgumentException("JWT konvertering feilet for token med claims: ${jwt.claims}")
 
     private fun shouldAddEnkeltRole(roles: List<String>?)  =
-        !isProd || gruppeEnkeltTilgang in roles.orEmpty()
+        !env.acceptsProfiles(Profiles.of(PROD_GCP)) || gruppeEnkeltTilgang in roles.orEmpty()
 
     private fun principal(jwt: Jwt, authorities: Set<GrantedAuthority>) =
         DefaultOAuth2AuthenticatedPrincipal(

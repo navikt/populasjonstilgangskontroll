@@ -31,7 +31,6 @@ const val TEST_AUDIENCE = "test-audience"
 const val INVALID_AUDIENCE = "invalid-audience"
 const val ISSUER_URI_PROPERTY = "spring.security.oauth2.resourceserver.jwt.issuer-uri"
 const val AUDIENCES_PROPERTY = "spring.security.oauth2.resourceserver.jwt.audiences"
-private val BRUKER_ID_REGEX = Regex("""(?<!\d)\d{11}(?!\d)""")
 
 object SecurityTestOAuth2 {
     val server = MockOAuth2Server().also { it.start() }

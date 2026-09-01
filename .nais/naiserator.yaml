@@ -46,6 +46,11 @@ spec:
   prometheus:
     enabled: true
     path: /monitoring/prometheus
+  startup:
+    path: /monitoring/health/liveness
+    initialDelay: 30
+    periodSeconds: 5
+    failureThreshold: 30
   readiness:
     path: /monitoring/health/readiness
     periodSeconds: 10

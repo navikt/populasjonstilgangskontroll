@@ -4,12 +4,11 @@ import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.APP
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.IDTYP
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.NAVIDENT
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.OID
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP_PROFILE
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.convert.converter.Converter
 import org.springframework.core.env.Environment
-import org.springframework.core.env.Profiles
 import org.springframework.security.authentication.AbstractAuthenticationToken
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -51,7 +50,7 @@ class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(private val env: En
         delegate.convert(jwt) ?: throw IllegalArgumentException("JWT konvertering feilet for token med claims: ${jwt.claims}")
 
     private fun shouldAddEnkeltRole(roles: List<String>?)  =
-        !env.acceptsProfiles(Profiles.of(PROD_GCP)) || gruppeEnkeltTilgang in roles.orEmpty()
+        !env.acceptsProfiles(PROD_GCP_PROFILE) || gruppeEnkeltTilgang in roles.orEmpty()
 
     private fun principal(jwt: Jwt, authorities: Set<GrantedAuthority>) =
         DefaultOAuth2AuthenticatedPrincipal(

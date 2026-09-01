@@ -44,9 +44,7 @@ import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.ErrorResponseException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON
-import no.nav.tilgangsmaskin.felles.rest.ValidationExceptionHandler
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.method.support.ModelAndViewContainer
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -152,7 +150,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
                 BulkTilgangController(regelTjeneste)
             )
                 .setCustomArgumentResolvers(AuthenticationPrincipalArgumentResolver())
-                .setControllerAdvice(ValidationExceptionHandler(), ErrorResponseAdvice())
+                .setControllerAdvice(ErrorResponseAdvice())
                 .setValidator(validator)
                 .apply<StandaloneMockMvcBuilder>(documentationConfiguration(restDocumentation)
                     .uris()

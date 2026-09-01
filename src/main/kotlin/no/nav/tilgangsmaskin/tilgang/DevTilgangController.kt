@@ -37,8 +37,6 @@ private const val SUMMARY_KOBLING = "${MSG}openapi.dev.tilgang.kobling.summary"
 private const val DESCRIPTION_KOBLING = "${MSG}openapi.dev.tilgang.kobling.description"
 private const val SUMMARY_NOM_FNR = "${MSG}openapi.dev.tilgang.nom.fnr.summary"
 private const val DESCRIPTION_NOM_FNR = "${MSG}openapi.dev.tilgang.nom.fnr.description"
-private const val SUMMARY_ENKELTTILGANG = "${MSG}openapi.dev.tilgang.enkelttilgang.summary"
-private const val DESCRIPTION_ENKELTTILGANG = "${MSG}openapi.dev.tilgang.enkelttilgang.description"
 private const val SUMMARY_HENT_ENKELTTILGANGER = "${MSG}openapi.dev.tilgang.enkelttilganger.summary"
 private const val DESCRIPTION_HENT_ENKELTTILGANGER = "${MSG}openapi.dev.tilgang.enkelttilganger.description"
 

@@ -5,6 +5,7 @@ import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.IDTYP
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.NAVIDENT
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.OID
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.convert.converter.Converter
 import org.springframework.security.authentication.AbstractAuthenticationToken
@@ -15,6 +16,7 @@ import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.stereotype.Component
+import kotlin.math.E
 
 private const val ENKELT_ROLE = "ROLE_ENKELT"
 const val TOKEN_TYPE_AUTHORITY_PREFIX = "TOKEN_"
@@ -27,6 +29,9 @@ const val ROLES_CLAIM = "roles"
 class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(
     @Value($$"${gruppe.enkelttilgang:}") private val gruppeEnkeltTilgang: String) : Converter<Jwt, AbstractAuthenticationToken> {
 
+    private val log = getLogger(javaClass)
+
+
     private val delegate = JwtAuthenticationConverter()
         .andThen {
             val jwt = it as JwtAuthenticationToken
@@ -34,8 +39,9 @@ class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(
             authorities += jwt.authorities
             authorities += roleAuthorities(jwt.token)
             tokenTypeAuthority(jwt.token)?.let(authorities::add)
-            if (shouldAddEnkeltRole(jwt.token)) {
+            if (shouldAddEnkeltRole(jwt.token.getClaimAsStringList(ROLES_CLAIM))) {
                 authorities += SimpleGrantedAuthority(ENKELT_ROLE)
+                log.info("La til rolle $ENKELT_ROLE for token")
             }
             JwtAuthenticationToken(jwt.token, principal(jwt.token, authorities), authorities)
         }
@@ -43,8 +49,8 @@ class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(
     override fun convert(jwt: Jwt): AbstractAuthenticationToken =
         delegate.convert(jwt) ?: throw IllegalArgumentException("JWT konvertering feilet for token med claims: ${jwt.claims}")
 
-    private fun shouldAddEnkeltRole(jwt: Jwt)  =
-        !isProd || gruppeEnkeltTilgang in jwt.getClaimAsStringList(ROLES_CLAIM).orEmpty()
+    private fun shouldAddEnkeltRole(roles: List<String>?)  =
+        !isProd || gruppeEnkeltTilgang in roles.orEmpty()
 
     private fun principal(jwt: Jwt, authorities: Set<GrantedAuthority>) =
         DefaultOAuth2AuthenticatedPrincipal(

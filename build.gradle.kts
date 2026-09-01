@@ -47,7 +47,7 @@ repositories {
 
 
 dependencies {
-    constraints {  // TODO midlertidif
+    constraints {  // TODO midlertidig
         implementation("at.yawk.lz4:lz4-java:1.11.1")
         testImplementation("at.yawk.lz4:lz4-java:1.11.1")
     }

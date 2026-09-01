@@ -43,6 +43,13 @@ repositories {
     maven {
         url = uri("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
     }
+    maven {
+        url = uri("https://maven.pkg.github.com/navikt/pdl")
+        credentials {
+            username = "x-access-token"
+            password = providers.environmentVariable("READER_TOKEN").orElse(providers.gradleProperty("gpr.token")).orNull
+        }
+    }
 }
 
 
@@ -54,7 +61,7 @@ dependencies {
 
     // Force newer jackson-databind version (required by gradle-avro-plugin)
     //implementation("com.fasterxml.jackson.core:jackson-databind:2.22.1")
-
+    implementation("no.nav.pdl.libs:contract-pdl-avro:18")
     implementation(libs.boot.conditionals)
     implementation(libs.bundles.observability)
     implementation(libs.slack)

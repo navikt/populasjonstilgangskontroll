@@ -4,7 +4,8 @@ import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
-import no.nav.tilgangsmaskin.felles.rest.Token
+import no.nav.tilgangsmaskin.felles.security.AuthContext
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 import org.springframework.boot.actuate.endpoint.SanitizableData.SANITIZED_VALUE
 import org.springframework.boot.actuate.endpoint.SanitizingFunction
 import org.springframework.context.annotation.Bean
@@ -25,19 +26,19 @@ class ObservabilityBeanConfig {
     }
 
     @Bean
-    fun clusterAddingTimedAspect(meterRegistry: MeterRegistry, token: Token) =
+    fun clusterAddingTimedAspect(meterRegistry: MeterRegistry, authContext: AuthContext) =
         TimedAspect(
             meterRegistry,
             Function { pjp ->
                 Tags.of(
                     "cluster",
-                    token.cluster,
+                    ClusterUtils.current.clusterName,
                     "class",
                     pjp.target.javaClass.simpleName,
                     "method",
                     pjp.signature.name,
                     "client",
-                    token.systemNavn
+                    authContext.systemNavn
                 )
             }
         )

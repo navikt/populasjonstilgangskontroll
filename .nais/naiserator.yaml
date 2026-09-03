@@ -53,14 +53,10 @@ spec:
     failureThreshold: 30
   readiness:
     path: /monitoring/health/readiness
-    periodSeconds: 10
-    failureThreshold: 15
     initialDelay: 30
   liveness:
     path: /monitoring/health/liveness
     initialDelay: 30
-    periodSeconds: 10
-    failureThreshold: 15
   port: 8080
   replicas:
     max: {{replica.max}}
@@ -134,6 +130,8 @@ spec:
       value: '{{grupper.nasjonal}}'
     - name: GRUPPE_UTLAND
       value: '{{grupper.utland}}'
+    - name: GRUPPE_ENKELTTILGANG
+      value: '{{grupper.enkelttilgang}}'
     - name: DB_POOLSIZE
       value: '{{db.poolsize}}'
     - name: JDK_JAVA_OPTIONS

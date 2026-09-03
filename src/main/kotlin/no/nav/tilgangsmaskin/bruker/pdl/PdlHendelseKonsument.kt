@@ -29,7 +29,7 @@ class PdlHendelseKonsument(private val client: CacheOperations,
         val endringsType = hendelse.endringstype?.name ?: UTILGJENGELIG
         PDL_CACHES.forEach { cache ->
             hendelse.personidenter.forEach { id ->
-                slett(cache, id, gradering, endringsType)
+                slett(cache, id.toString(), gradering, endringsType)
             }
         }
     }

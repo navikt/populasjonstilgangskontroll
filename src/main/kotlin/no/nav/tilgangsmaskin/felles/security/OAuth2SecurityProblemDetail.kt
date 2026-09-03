@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.regler.motor.RegelMetadata.Companion.TYPE_URI
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail.forStatusAndDetail
 
-internal fun securityProblemDetail(status: HttpStatus, detail: String) =
+fun securityProblemDetail(status: HttpStatus, detail: String) =
     forStatusAndDetail(status, detail).apply {
         type = TYPE_URI
         title = "${status.value()}"

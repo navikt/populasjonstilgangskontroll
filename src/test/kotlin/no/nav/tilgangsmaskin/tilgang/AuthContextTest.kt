@@ -4,15 +4,15 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.felles.rest.Token
-import no.nav.tilgangsmaskin.felles.rest.Token.Companion.APP
-import no.nav.tilgangsmaskin.felles.rest.Token.Companion.AZP_NAME
-import no.nav.tilgangsmaskin.felles.rest.Token.Companion.IDTYP
-import no.nav.tilgangsmaskin.felles.rest.Token.Companion.NAVIDENT
-import no.nav.tilgangsmaskin.felles.rest.Token.Companion.OID
-import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
-import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
-import no.nav.tilgangsmaskin.felles.rest.TokenType.UNAUTHENTICATED
+import no.nav.tilgangsmaskin.felles.security.AuthContext
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.AZP_NAME
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.CLIENT_CREDENTIALS
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.NAVIDENT
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.OID
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.ROLES
+import no.nav.tilgangsmaskin.felles.security.TokenType.CCF
+import no.nav.tilgangsmaskin.felles.security.TokenType.OBO
+import no.nav.tilgangsmaskin.felles.security.TokenType.UNAUTHENTICATED
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.jwt.Jwt
@@ -20,8 +20,8 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import java.time.Instant
 import java.util.*
 
-class TokenTest : BehaviorSpec({
-    val token = Token()
+class AuthContextTest : BehaviorSpec({
+    val authContext = AuthContext()
     val oid = UUID.randomUUID()
     fun setClaims(vararg claims: Pair<String, Any>) {
         val now = Instant.now()
@@ -43,8 +43,8 @@ class TokenTest : BehaviorSpec({
     Given("type er CCF") {
         When("idtyp er app") {
             Then("returnerer CCF") {
-                setClaims(IDTYP to APP)
-                token.type shouldBe CCF
+                setClaims(ROLES to listOf(CLIENT_CREDENTIALS))
+                authContext.type shouldBe CCF
             }
         }
     }
@@ -52,15 +52,15 @@ class TokenTest : BehaviorSpec({
     Given("type er OBO") {
         When("oid finnes og idtyp ikke er app") {
             Then("returnerer OBO") {
-                setClaims(OID to oid.toString())
-                token.type shouldBe OBO
+                setClaims(OID to "$oid")
+                authContext.type shouldBe OBO
             }
         }
     }
 
     Given("ingen auth i security context") {
         Then("returnerer UNAUTHENTICATED") {
-            token.type shouldBe UNAUTHENTICATED
+            authContext.type shouldBe UNAUTHENTICATED
         }
     }
 
@@ -68,13 +68,13 @@ class TokenTest : BehaviorSpec({
         When("NAVident finnes") {
             Then("returnerer AnsattId") {
                 setClaims(NAVIDENT to "Z999999")
-                token.ansattId shouldBe AnsattId("Z999999")
+                authContext.ansattId shouldBe AnsattId("Z999999")
             }
         }
 
         When("NAVident mangler") {
             Then("returnerer null") {
-                token.ansattId shouldBe null
+                authContext.ansattId shouldBe null
             }
         }
     }
@@ -83,21 +83,19 @@ class TokenTest : BehaviorSpec({
         When("azp_name finnes") {
             Then("brukes for system, cluster, systemNavn og systemAndNs") {
                 setClaims(AZP_NAME to "dev-gcp:team:app")
-                token.system shouldBe "dev-gcp:team:app"
-                token.cluster shouldBe "dev-gcp"
-                token.systemNavn shouldBe "app"
-                token.systemAndNs shouldBe "team:app"
-                token.clusterAndSystem shouldBe "app:dev-gcp"
+                authContext.system shouldBe "dev-gcp:team:app"
+                authContext.systemNavn shouldBe "app"
+                authContext.systemAndNs shouldBe "team:app"
+                authContext.clusterAndSystem shouldBe "app:dev-gcp"
             }
         }
 
         When("azp_name mangler") {
             Then("returnerer utilgjengelig defaults") {
-                token.system shouldBe UTILGJENGELIG
-                token.systemNavn shouldBe UTILGJENGELIG
-                token.cluster shouldBe UTILGJENGELIG
-                token.systemAndNs shouldBe ""
-                token.clusterAndSystem shouldBe UTILGJENGELIG
+                authContext.system shouldBe UTILGJENGELIG
+                authContext.systemNavn shouldBe UTILGJENGELIG
+                authContext.systemAndNs shouldBe ""
+                authContext.clusterAndSystem shouldBe UTILGJENGELIG
             }
         }
     }
@@ -107,15 +105,15 @@ class TokenTest : BehaviorSpec({
             Then("returnerer set av UUIDs") {
                 val gruppeId = UUID.randomUUID()
                 setClaims("groups" to listOf(gruppeId.toString()))
-                token.globaleGruppeIds shouldBe setOf(gruppeId)
+                authContext.globaleGruppeIds shouldBe setOf(gruppeId)
             }
         }
 
         When("groups mangler eller er ugyldige") {
             Then("returnerer tomt sett") {
-                token.globaleGruppeIds.shouldBeEmpty()
+                authContext.globaleGruppeIds.shouldBeEmpty()
                 setClaims("groups" to listOf("ikke-en-uuid"))
-                token.globaleGruppeIds.shouldBeEmpty()
+                authContext.globaleGruppeIds.shouldBeEmpty()
             }
         }
     }

@@ -4,12 +4,16 @@ import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.longs.shouldBeGreaterThan
 import io.micrometer.core.annotation.Timed
-import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
+import io.mockk.mockkObject
+import io.mockk.unmockkObject
 import no.nav.tilgangsmaskin.felles.ClusterAddingTimedAspectTest.TestConfig
-import no.nav.tilgangsmaskin.felles.rest.Token
+import no.nav.tilgangsmaskin.felles.security.AuthContext
 import no.nav.tilgangsmaskin.felles.rest.health.ObservabilityBeanConfig
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.DEV_GCP_CLUSTER
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.PROD_GCP_CLUSTER
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -19,19 +23,22 @@ import org.springframework.test.context.ContextConfiguration
 @AutoConfigureMetrics
 class ClusterAddingTimedAspectTest(
     private val registry: MeterRegistry,
-    private val aspect: TimedAspect,
     private val timedService: TimedService,
 ) : BehaviorSpec() {
 
     @MockkBean
-    lateinit var token: Token
+    lateinit var authContext: AuthContext
 
     init {
         beforeEach {
-            every { token.cluster } returns "dev-gcp"
-            every { token.systemNavn } returns "my-app"
+            mockkObject(ClusterUtils)
+            every { ClusterUtils.current } returns DEV_GCP_CLUSTER
+            every { authContext.systemNavn } returns "my-app"
         }
 
+        afterEach {
+            unmockkObject(ClusterUtils.Companion)
+        }
         Given("clusterAddingTimedAspect") {
             When("tjeneste kalles") {
                 Then("registreres timer med cluster-, method- og client-tagg fra token") {
@@ -45,8 +52,8 @@ class ClusterAddingTimedAspectTest(
             }
             When("token-verdier endres mellom kall") {
                 Then("brukes oppdaterte verdier per kall") {
-                    every { token.cluster } returns "prod-gcp"
-                    every { token.systemNavn } returns "annen-app"
+                    every { authContext.systemNavn } returns "annen-app"
+                    every { ClusterUtils.current } returns PROD_GCP_CLUSTER
                     timedService.execute()
                     registry.get("test.execute")
                         .tag("cluster", "prod-gcp")

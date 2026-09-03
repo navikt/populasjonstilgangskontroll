@@ -55,7 +55,7 @@ annotation class ProblemDetailApiResponse(
 )
 
 @Schema(description = "Problem Detail")
-internal data class ProblemSwaggerDetailResponse(
+data class ProblemSwaggerDetailResponse(
     val type: URI,
     val title: AvvisningsKode,
     val status: Int,

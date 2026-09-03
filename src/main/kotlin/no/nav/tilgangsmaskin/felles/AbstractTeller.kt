@@ -4,11 +4,11 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tag
 import io.micrometer.core.instrument.Tags
-import no.nav.tilgangsmaskin.felles.rest.Token
+import no.nav.tilgangsmaskin.felles.security.AuthContext
 
 abstract class AbstractTeller(
     private val registry: MeterRegistry,
-    private val token: Token,
+    private val authContext: AuthContext,
     private val navn: String,
     private val beskrivelse: String) {
 
@@ -19,8 +19,8 @@ abstract class AbstractTeller(
         Counter.builder(navn)
             .description(beskrivelse)
             .tags(tags
-                .and("system", token.system)
-                .and("clustersystem", token.clusterAndSystem))
+                .and("system", authContext.system)
+                .and("clustersystem", authContext.clusterAndSystem))
             .register(registry)
             .increment(n.toDouble())
 }

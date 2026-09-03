@@ -5,9 +5,9 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.rest.ProdController
-import no.nav.tilgangsmaskin.felles.rest.Token
 import no.nav.tilgangsmaskin.felles.security.OAuth2RequireCCF
-import no.nav.tilgangsmaskin.felles.security.OOAuth2RequireOBO
+import no.nav.tilgangsmaskin.felles.security.OAuth2RequireOBO
+import no.nav.tilgangsmaskin.felles.security.ansattId
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withAnsattContext
 import org.slf4j.LoggerFactory.getLogger
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
@@ -19,6 +19,8 @@ import no.nav.tilgangsmaskin.tilgang.openapi.MSG
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.CONTENT_TOO_LARGE
 import org.springframework.http.HttpStatus.MULTI_STATUS
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -37,26 +39,28 @@ private const val MAX = 1000
 @ResponseStatus(MULTI_STATUS)
 @Tag(name = "BulkTilgangController", description = BULK_TILGANG_CONTROLLER_TAG_DESCRIPTION)
 class BulkTilgangController(
-    private val regelTjeneste: RegelTjeneste,
-    private val token: Token) {
+    private val regelTjeneste: RegelTjeneste) {
 
     private val log = getLogger(javaClass)
 
     @PostMapping("bulk/obo")
-    @OOAuth2RequireOBO
+    @OAuth2RequireOBO
     @BulkSwaggerApiRespons(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO)
-    fun bulkOBO(@RequestBody @Valid specs: Set<@Valid BrukerIdOgRegelsett>) =
-        bulkOppslag(token.requiredAnsattId, specs)
+    fun bulkOBO(
+        @AuthenticationPrincipal principal: OAuth2AuthenticatedPrincipal,
+        @RequestBody @Valid specs: Set<@Valid BrukerIdOgRegelsett>
+    ) = bulkOppslag(principal.ansattId(), specs)
 
     @PostMapping("bulk/obo/{regelType}")
-    @OOAuth2RequireOBO
+    @OAuth2RequireOBO
     @BulkSwaggerApiRespons(summary = SUMMARY_BULK, description = DESCRIPTION_BULK_OBO_REGELTYPE)
     fun bulkOBOForRegelType(
+        @AuthenticationPrincipal principal: OAuth2AuthenticatedPrincipal,
         @PathVariable regelType: RegelType,
         @RequestBody @Valid brukerIds: Set<@NotBlank(message = "brukerId kan ikke være tom") String>
     ) =
         bulkOppslag(
-            token.requiredAnsattId,
+            principal.ansattId(),
             brukerIds.mapTo(mutableSetOf()) { BrukerIdOgRegelsett(it, regelType) }
         )
 

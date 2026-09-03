@@ -1,0 +1,74 @@
+package no.nav.tilgangsmaskin.felles.security
+
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.CLIENT_CREDENTIALS
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.NAVIDENT
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.OID
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.ROLES
+import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP_PROFILE
+import org.slf4j.LoggerFactory.getLogger
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.convert.converter.Converter
+import org.springframework.core.env.Environment
+import org.springframework.security.authentication.AbstractAuthenticationToken
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.oauth2.core.DefaultOAuth2AuthenticatedPrincipal
+import org.springframework.security.oauth2.jwt.Jwt
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
+import org.springframework.stereotype.Component
+
+private const val ENKELT_ROLE = "ROLE_ENKELT"
+const val TOKEN_TYPE_AUTHORITY_PREFIX = "TOKEN_"
+const val OBO_AUTHORITY = "${TOKEN_TYPE_AUTHORITY_PREFIX}OBO"
+const val CCF_AUTHORITY = "${TOKEN_TYPE_AUTHORITY_PREFIX}CCF"
+private const val ROLE = "ROLE_"
+
+@Component
+class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(private val env: Environment,
+    @Value($$"${gruppe.enkelttilgang:}") private val gruppeEnkeltTilgang: String) : Converter<Jwt, AbstractAuthenticationToken> {
+
+    private val log = getLogger(javaClass)
+
+
+    private val delegate = JwtAuthenticationConverter()
+        .andThen {
+            val jwt = it as JwtAuthenticationToken
+            val authorities = linkedSetOf<GrantedAuthority>()
+            authorities += jwt.authorities
+            authorities += roleAuthorities(jwt.token)
+            tokenTypeAuthority(jwt.token)?.let(authorities::add)
+            if (shouldAddEnkeltRole(jwt.token.getClaimAsStringList(ROLES))) {
+                authorities += SimpleGrantedAuthority(ENKELT_ROLE)
+                log.info("La til rolle $ENKELT_ROLE")
+            }
+            JwtAuthenticationToken(jwt.token, principal(jwt.token, authorities), authorities)
+        }
+
+    override fun convert(jwt: Jwt): AbstractAuthenticationToken =
+        delegate.convert(jwt) ?: throw IllegalArgumentException("JWT konvertering feilet for token med claims: ${jwt.claims}")
+
+    private fun shouldAddEnkeltRole(roles: List<String>?)  =
+        !env.acceptsProfiles(PROD_GCP_PROFILE) || gruppeEnkeltTilgang in roles.orEmpty()
+
+    private fun principal(jwt: Jwt, authorities: Set<GrantedAuthority>) =
+        DefaultOAuth2AuthenticatedPrincipal(
+            jwt.subject ?: jwt.getClaimAsString(NAVIDENT) ?: "unknown",
+            jwt.claims,
+            authorities
+        ).also { log.info("Principal satt til ${it.name} med authorities: ${it.authorities}") }
+
+    private fun tokenTypeAuthority(jwt: Jwt) =
+        when {
+            jwt.getClaimAsStringList(ROLES).orEmpty().contains(CLIENT_CREDENTIALS) -> SimpleGrantedAuthority(CCF_AUTHORITY)
+            jwt.getClaimAsString(OID) != null -> SimpleGrantedAuthority(OBO_AUTHORITY)
+            else -> null
+        }
+
+    private fun roleAuthorities(jwt: Jwt) =
+        buildSet {
+            jwt.getClaimAsStringList(ROLES).orEmpty().forEach { role ->
+                add(SimpleGrantedAuthority(role.takeIf { it.startsWith(ROLE) } ?: "$ROLE$role"))
+            }
+        }
+}

@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.web.method.HandlerMethod
 import java.util.Locale.*
 
-internal const val MSG = "msg:"
+const val MSG = "msg:"
 
 @Configuration
 @NoCoverageAnalysis

@@ -13,21 +13,31 @@ import no.nav.person.pdl.leesah.adressebeskyttelse.Adressebeskyttelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering.FORTROLIG
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL_CACHES
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
-import no.nav.tilgangsmaskin.felles.rest.Token
+import no.nav.tilgangsmaskin.felles.security.AuthContext
 import java.time.Instant
 
 class PdlCacheOpprydderTest : BehaviorSpec({
 
-    val token = mockk<Token>().also {
+    val authContext = mockk<AuthContext>().also {
         every { it.system } returns "test"
         every { it.clusterAndSystem } returns "test:dev-gcp"
     }
     val client = mockk<CacheOperations>()
-    val opprydder = PdlHendelseKonsument(client, PdlCacheTømmerTeller(SimpleMeterRegistry(), token))
+    val opprydder = PdlHendelseKonsument(client, PdlCacheTømmerTeller(SimpleMeterRegistry(), authContext))
 
     fun hendelse(identer: List<String>, endringstype: Endringstype = OPPRETTET,
         gradering: Adressebeskyttelse? = null) =
-        Personhendelse("hendelse-id", identer, "PDL", Instant.now(), "PDL_HENDELSE", endringstype, null, gradering, null)
+        Personhendelse.newBuilder()
+            .setHendelseId("hendelse-id")
+            .setPersonidenter(identer)
+            .setMaster("PDL")
+            .setOpprettet(Instant.now())
+            .setOpplysningstype("PDL_HENDELSE")
+            .setEndringstype(endringstype)
+            .setTidligereHendelseId(null)
+            .setAdressebeskyttelse(gradering)
+            .setNavn(null)
+            .build()
 
     beforeEach {
         every { client.delete(any(), any()) } returns true

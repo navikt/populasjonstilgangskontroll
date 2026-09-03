@@ -7,8 +7,8 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CaffeineCacheOperations
 import no.nav.tilgangsmaskin.felles.rest.notifikajon.logbook.LogbookBeanConfiguration
-import no.nav.tilgangsmaskin.felles.rest.Token.Companion.NAVIDENT
-import no.nav.tilgangsmaskin.felles.rest.Token.Companion.OID
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.NAVIDENT
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.OID
 import no.nav.tilgangsmaskin.felles.security.SecurityTestOAuth2.server
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.NAIS_CLUSTER_NAME
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController
@@ -23,26 +23,25 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.context.DynamicPropertyRegistry
 import java.util.UUID
 
-internal val TEST_ANSATT_ID = AnsattId("Z999999")
-internal val TEST_BRUKER_ID = BrukerId("08526835670")
-internal const val TEST_ISSUER_ID = "azuread"
-internal const val TEST_SUBJECT = "subject"
-internal const val TEST_AUDIENCE = "test-audience"
-internal const val INVALID_AUDIENCE = "invalid-audience"
-internal const val ISSUER_URI_PROPERTY = "spring.security.oauth2.resourceserver.jwt.issuer-uri"
-internal const val AUDIENCES_PROPERTY = "spring.security.oauth2.resourceserver.jwt.audiences"
-private val BRUKER_ID_REGEX = Regex("""(?<!\d)\d{11}(?!\d)""")
+val TEST_ANSATT_ID = AnsattId("Z999999")
+val TEST_BRUKER_ID = BrukerId("08526835670")
+const val TEST_ISSUER_ID = "azuread"
+const val TEST_SUBJECT = "subject"
+const val TEST_AUDIENCE = "test-audience"
+const val INVALID_AUDIENCE = "invalid-audience"
+const val ISSUER_URI_PROPERTY = "spring.security.oauth2.resourceserver.jwt.issuer-uri"
+const val AUDIENCES_PROPERTY = "spring.security.oauth2.resourceserver.jwt.audiences"
 
-internal object SecurityTestOAuth2 {
+object SecurityTestOAuth2 {
     val server = MockOAuth2Server().also { it.start() }
 }
 
-internal fun jwt(aud: String, ansattId: AnsattId, claims: Map<String,Any> = emptyMap(), ) = server.issueToken(
+fun jwt(aud: String, ansattId: AnsattId, claims: Map<String,Any> = emptyMap()) = server.issueToken(
     TEST_ISSUER_ID, TEST_SUBJECT, aud,
     mapOf(NAVIDENT to ansattId.verdi, OID to "${UUID.randomUUID()}") + claims,
 ).serialize()
 
-internal fun DynamicPropertyRegistry.setProperties(clusterName: String? = null) {
+fun DynamicPropertyRegistry.setProperties(clusterName: String? = null) {
     add(ISSUER_URI_PROPERTY, server.issuerUrl(TEST_ISSUER_ID)::toString)
     add(AUDIENCES_PROPERTY, TEST_AUDIENCE::toString)
     clusterName?.let { add(NAIS_CLUSTER_NAME) { it } }

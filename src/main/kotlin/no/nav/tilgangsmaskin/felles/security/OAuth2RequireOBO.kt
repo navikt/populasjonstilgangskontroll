@@ -7,5 +7,5 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
 
 @Target(CLASS, FUNCTION)
 @Retention(RUNTIME)
-@PreAuthorize("hasAuthority('$CCF_AUTHORITY')")
-annotation class OAuth2RequireCCF
+@PreAuthorize("hasAuthority('$OBO_AUTHORITY')")
+annotation class OAuth2RequireOBO

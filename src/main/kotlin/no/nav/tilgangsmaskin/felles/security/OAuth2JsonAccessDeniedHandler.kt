@@ -15,6 +15,6 @@ class OAuth2JsonAccessDeniedHandler(private val mapper: JsonMapper) : AccessDeni
         with(res) {
             status = FORBIDDEN.value()
             contentType = APPLICATION_PROBLEM_JSON_VALUE
-            mapper.writeValue(writer, securityProblemDetail(FORBIDDEN, e.message ?: "Access denied"))
+            mapper.writeValue(writer, securityProblemDetail(FORBIDDEN, e.message ?: "Access Denied"))
         }
 }

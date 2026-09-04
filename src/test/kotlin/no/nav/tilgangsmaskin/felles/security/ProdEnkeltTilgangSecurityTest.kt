@@ -97,7 +97,7 @@ class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private val ma
                     }
                 }
             }
-
+/* Uttkommentert for midlertidig dekativing av enkelt-rolle i prod
             When("jwt har claim med ugyldig role") {
                 Then("avvises med 403 for enkelttilgang") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
@@ -130,7 +130,7 @@ class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private val ma
                         }
                     }.andReturn().withBody(FORBIDDEN, "Access Denied")
                 }
-            }
+            }*/
 
         }
     }

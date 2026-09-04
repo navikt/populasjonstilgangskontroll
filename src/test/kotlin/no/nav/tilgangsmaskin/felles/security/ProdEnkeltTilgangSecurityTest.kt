@@ -97,9 +97,9 @@ class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private val ma
                     }
                 }
             }
-/* Uttkommentert for midlertidig dekativing av enkelt-rolle i prod
+/* Uttkommentert for midlertidig dekativing av enkelt-rolle i prod */
             When("jwt har claim med ugyldig role") {
-                Then("avvises med 403 for enkelttilgang") {
+                xThen("avvises med 403 for enkelttilgang") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
                             setBearerAuth(jwt(TEST_AUDIENCE, TEST_ANSATT_ID, mapOf("roles" to listOf(UTILGJENGELIG))))
@@ -114,7 +114,7 @@ class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private val ma
             }
 
             When("jwt har claim uten role") {
-                Then("avvises med 403 for enkelttilgang") {
+                xThen("avvises med 403 for enkelttilgang") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
                             setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID))
@@ -130,7 +130,7 @@ class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private val ma
                         }
                     }.andReturn().withBody(FORBIDDEN, "Access Denied")
                 }
-            }*/
+            }
 
         }
     }

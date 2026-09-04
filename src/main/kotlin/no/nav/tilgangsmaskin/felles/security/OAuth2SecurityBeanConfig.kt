@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.felles.security
 
-import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
+//import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.NOT_PROD_GCP
 import org.springframework.beans.factory.ObjectProvider
@@ -44,7 +44,7 @@ class OAuth2SecurityBeanConfig {
                             deniedHandler: AccessDeniedHandler,
                             entryPoint: AuthenticationEntryPoint) =
         http.authorizeHttpRequests { requests ->
-            requests.requestMatchers( "$PROD_BASE_PATH/overstyr").hasAnyRole(ENKELT, DEV)
+            //requests.requestMatchers( "$PROD_BASE_PATH/overstyr").hasAnyRole(ENKELT, DEV)
             requests.requestMatchers( *UNPROTECTED_ENDPOINTS).permitAll()
             requests.anyRequest().authenticated()
         }

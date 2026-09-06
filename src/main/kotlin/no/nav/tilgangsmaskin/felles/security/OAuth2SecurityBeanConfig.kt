@@ -34,6 +34,7 @@ class OAuth2SecurityBeanConfig {
                             deniedHandler: AccessDeniedHandler,
                             entryPoint: AuthenticationEntryPoint) =
         http.authorizeHttpRequests { requests ->
+            requests.requestMatchers( "$PROD_BASE_PATH/overstyr").hasRole(ENKELT)
             requests.requestMatchers( *UNPROTECTED_ENDPOINTS).permitAll()
             requests.anyRequest().authenticated()
         }
@@ -64,6 +65,7 @@ class OAuth2SecurityBeanConfig {
                 }
             }
         }
+
 
     @Bean
     fun oauth2AuthorizationFailureHandler(service: OAuth2AuthorizedClientService) =

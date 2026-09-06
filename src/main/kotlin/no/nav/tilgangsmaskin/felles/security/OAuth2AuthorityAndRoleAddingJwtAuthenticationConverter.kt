@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.stereotype.Component
+import java.util.UUID
 
 private const val ENKELT_ROLE = "ROLE_ENKELT"
 const val TOKEN_TYPE_AUTHORITY_PREFIX = "TOKEN_"
@@ -26,7 +27,7 @@ private const val ROLE = "ROLE_"
 
 @Component
 class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(private val env: Environment,
-    @Value($$"${gruppe.enkelttilgang:}") private val gruppeEnkeltTilgang: String) : Converter<Jwt, AbstractAuthenticationToken> {
+    @Value($$"${gruppe.enkelttilgang:}") private val gruppeEnkeltTilgang: UUID) : Converter<Jwt, AbstractAuthenticationToken> {
 
     private val log = getLogger(javaClass)
 
@@ -49,7 +50,7 @@ class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(private val env: En
         delegate.convert(jwt) ?: throw IllegalArgumentException("JWT konvertering feilet for token med claims: ${jwt.claims}")
 
     private fun shouldAddEnkeltRole(roles: List<String>?)  =
-        !env.acceptsProfiles(PROD_GCP_PROFILE) || gruppeEnkeltTilgang in roles.orEmpty()
+        !env.acceptsProfiles(PROD_GCP_PROFILE) || "$gruppeEnkeltTilgang" in roles.orEmpty()
 
     private fun principal(jwt: Jwt, authorities: Set<GrantedAuthority>) =
         DefaultOAuth2AuthenticatedPrincipal(

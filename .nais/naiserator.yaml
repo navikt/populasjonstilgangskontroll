@@ -80,6 +80,7 @@ spec:
           - id: {{grupper.fortrolig}}
           - id: {{grupper.strengt}}
           - id: {{grupper.dead}}
+          - id: {{grupper.enkelttilgang}}
   accessPolicy:
     outbound:
       rules:
@@ -116,6 +117,8 @@ spec:
       value: {{pdlgraph}}
     - name: PDLPIP
       value: {{pdlpip}}
+    - name: GRUPPE_ENKELTTILGANG
+      value: '{{grupper.enkelttilgang}}'
     - name: GRUPPE_DEAD
       value: '{{grupper.dead}}'
     - name: GRUPPE_STRENGT

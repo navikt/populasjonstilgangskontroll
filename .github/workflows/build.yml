@@ -84,7 +84,7 @@ jobs:
       - name: Test og bygg
         run: ./gradlew --warning-mode all test jacocoTestReport asciidoctor cyclonedxBom bootJar
         env:
-          PDL_STUFF: ${{ secrets.PDL_STUFF }}
+          READER_TOKEN: ${{ secrets.READER_TOKEN }}
 
       - name: Bygg og push Docker-image
         id: docker-push

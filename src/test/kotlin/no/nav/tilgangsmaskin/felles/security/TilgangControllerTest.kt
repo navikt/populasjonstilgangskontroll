@@ -33,6 +33,7 @@ import org.springframework.test.web.servlet.post
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.module.kotlin.readValue
 import java.time.LocalDate.now
+import java.util.UUID
 
 @SpringBootTest(classes = [SecurityTestApplication::class])
 @AutoConfigureMockMvc
@@ -227,6 +228,7 @@ open class TilgangControllerTest(private val mockMvc: MockMvc, private val mappe
         @DynamicPropertySource
         fun setProperties(registry: DynamicPropertyRegistry) {
             registry.setProperties(PROD_GCP)
+            registry.add("gruppe.enkelttilgang") { UUID.randomUUID() }
         }
     }
 }

@@ -20,10 +20,11 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.post
 import tools.jackson.databind.json.JsonMapper
 import java.time.LocalDate.now
+import java.util.UUID
 
 @SpringBootTest(classes = [SecurityTestApplication::class])
 @AutoConfigureMockMvc
-open class DevEnkeltTilgangSecurityTest(mockMvc: MockMvc, mapper: JsonMapper) : BehaviorSpec() {
+open class DevEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private val mapper: JsonMapper) : BehaviorSpec() {
 
 
     val dto = EnkeltTilgangData(TEST_BRUKER_ID, "En god begrunnelse", now().plusMonths(2))
@@ -70,6 +71,7 @@ open class DevEnkeltTilgangSecurityTest(mockMvc: MockMvc, mapper: JsonMapper) : 
         @DynamicPropertySource
         fun setProperties(registry: DynamicPropertyRegistry) {
             registry.setProperties(DEV_GCP)
+            registry.add("gruppe.enkelttilgang") { UUID.randomUUID() }
         }
     }
 }

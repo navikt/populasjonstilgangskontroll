@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
 import no.nav.tilgangsmaskin.felles.security.RequireOAuth2OBOAndEnkelt
 import no.nav.tilgangsmaskin.felles.rest.ProdController
 import no.nav.tilgangsmaskin.felles.security.ansattId
@@ -13,7 +14,9 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.method.annotation.HandlerMethodValidationException
 
 private const val ENKELTTILGANG_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.tilgang.tag.description"
@@ -21,7 +24,8 @@ private const val ENKELTTILGANG_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.tilg
  const val DESCRIPTION_ENKELTTILGANG = "${MSG}openapi.tilgang.enkelttilgang.description"
 
 
-@ProdController
+@RestController
+@RequestMapping(PROD_BASE_PATH)
 @RequireOAuth2OBOAndEnkelt
 @Tag(name = "EnkeltTilgangController", description = ENKELTTILGANG_CONTROLLER_TAG_DESCRIPTION)
 class EnkeltTilgangController(private val enkelt: EnkeltTilgangTjeneste) {

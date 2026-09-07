@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.felles.security
 
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.CLIENT_CREDENTIALS
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.GROUPS
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.NAVIDENT
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.OID
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.ROLES
@@ -38,7 +39,7 @@ class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(private val env: En
                 addAll(jwt.authorities)
                 addAll(roller(jwt.token))
                 tokenTypeAuthority(jwt.token)?.let(::add)
-                if (shouldAddEnkeltRole(jwt.token.getClaimAsStringList(ROLES))) add(SimpleGrantedAuthority(ENKELT_ROLE))
+                if (shouldAddEnkeltRole(jwt.token.getClaimAsStringList(GROUPS))) add(SimpleGrantedAuthority(ENKELT_ROLE))
             }
             JwtAuthenticationToken(jwt.token, principal(jwt.token, authorities), authorities)
         }
@@ -46,8 +47,8 @@ class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(private val env: En
     override fun convert(jwt: Jwt)  =
         delegate.convert(jwt) ?: error("JWT konvertering feilet for token med claims: ${jwt.claims}")
 
-    private fun shouldAddEnkeltRole(roles: List<String>?)  =
-        !env.acceptsProfiles(PROD_GCP_PROFILE) || "$gruppeEnkeltTilgang" in roles.orEmpty()
+    private fun shouldAddEnkeltRole(groups: List<String>?)  =
+        !env.acceptsProfiles(PROD_GCP_PROFILE) || "$gruppeEnkeltTilgang" in groups.orEmpty()
 
     private fun principal(jwt: Jwt, authorities: Set<GrantedAuthority>) =
         DefaultOAuth2AuthenticatedPrincipal(

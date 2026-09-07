@@ -8,5 +8,5 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
 
 @Target(CLASS, FUNCTION)
 @Retention(RUNTIME)
-@PreAuthorize("hasAuthority('$CLIENT_CREDENTIALS')")
+@PreAuthorize("hasRole('$CLIENT_CREDENTIALS')")
 annotation class OAuth2RequireCCF

@@ -17,6 +17,7 @@ import no.nav.tilgangsmaskin.regler.motor.RegelMotorLogger.Companion.tag
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Clock
 import java.time.Instant
 
 
@@ -30,6 +31,7 @@ class EnkeltTilgangTjeneste(
     private val adapter: EnkeltTilgangJPAAdapter,
     private val motor: RegelMotor,
     private val proxy: EntraProxyTjeneste,
+    private val clock: Clock,
     private val teller: EnkeltTilgangTeller) {
 
     private val log = getLogger(javaClass)
@@ -40,7 +42,7 @@ class EnkeltTilgangTjeneste(
     fun harTilgang(ansattId: AnsattId, brukerId: BrukerId) =
         gjeldendeEnkeltTilgang(ansattId, brukerId)
             ?.also {
-                log.trace("Enkelttilgang er gyldig i {} til for {} og {}", it.diffFromNow(), ansattId, brukerId)
+                log.trace("Enkelttilgang er gyldig i {} til for {} og {}", it.diffFromNow(clock), ansattId, brukerId)
             } != null
 
 

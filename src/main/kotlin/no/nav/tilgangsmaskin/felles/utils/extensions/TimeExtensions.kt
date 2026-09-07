@@ -32,16 +32,16 @@ object TimeExtensions {
     val IMORGEN get() = LocalDate.now().plusDays(1)
     val IGÅR get() = LocalDate.now().minusDays(1)
 
-    fun Instant.isBeforeNow(clock: Clock = systemDefaultZone()) =
+    fun Instant.isBeforeNow(clock: Clock) =
         isBefore(now(clock))
 
-    fun Instant.diffFromNow(clock: Clock = systemDefaultZone()) =
+    fun Instant.diffFromNow(clock: Clock ) =
         between(now(clock), this).toKotlinDuration().format()
 
     fun LocalDate.toInstant(zone: ZoneId = systemDefault()) =
         atStartOfDay(zone).toInstant()
 
-    fun LocalDate.månederSidenIdag(clock: Clock = systemDefaultZone()): Int {
+    fun LocalDate.månederSidenIdag(clock: Clock): Int {
         val today = LocalDate.now(clock)
         require(!isAfter(today)) { "Datoen $this er etter dagens dato $today" }
         val p = Period.between(this, today)
@@ -49,7 +49,7 @@ object TimeExtensions {
         return (p.years * 12 + p.months + rundetOpp).coerceAtLeast(1)
     }
 
-    fun LocalDate.intervallSiden(clock: Clock = systemDefaultZone()) =
+    fun LocalDate.intervallSiden(clock: Clock) =
         when (månederSidenIdag(clock)) {
             in 0..6 -> MND_0_6
             in 7..12 -> MND_7_12

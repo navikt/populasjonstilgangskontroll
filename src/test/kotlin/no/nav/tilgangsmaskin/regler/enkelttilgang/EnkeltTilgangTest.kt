@@ -41,6 +41,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ContextConfiguration
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.time.Clock
 import java.time.LocalDate
 
 @DataJpaTest
@@ -85,6 +86,7 @@ class EnkeltTilgangTest(
                 adapter,
                 motor,
                 proxy,
+                Clock.systemUTC(),
                 EnkeltTilgangTeller(registry, authContext),
             )
         }

@@ -48,7 +48,7 @@ class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(private val env: En
         delegate.convert(jwt) ?: error("JWT konvertering feilet for token med claims: ${jwt.claims}")
 
     private fun shouldAddEnkeltRole(groups: List<String>?)  =
-       /* !env.acceptsProfiles(PROD_GCP_PROFILE) ||*/ "$gruppeEnkeltTilgang" in groups.orEmpty()
+        !env.acceptsProfiles(PROD_GCP_PROFILE) || "$gruppeEnkeltTilgang" in groups.orEmpty()
 
     private fun principal(jwt: Jwt, authorities: Set<GrantedAuthority>) =
         DefaultOAuth2AuthenticatedPrincipal(

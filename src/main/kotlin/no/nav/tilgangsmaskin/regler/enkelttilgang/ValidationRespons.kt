@@ -1,11 +1,14 @@
 package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import jakarta.validation.ConstraintViolation
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON
 import org.springframework.http.ResponseEntity
 import org.springframework.http.ResponseEntity.status
 import org.springframework.web.method.annotation.HandlerMethodValidationException
+
+private val log = getLogger("no.nav.tilgangsmaskin.regler.enkelttilgang.ValidationRespons")
 
 fun valideringsfeilRespons(ex: HandlerMethodValidationException): ResponseEntity<Any> =
     status(BAD_REQUEST)
@@ -21,15 +24,14 @@ fun valideringsfeilRespons(ex: HandlerMethodValidationException): ResponseEntity
                             result.unwrap(error, ConstraintViolation::class.java)
                         }.getOrNull()
 
+
                         val field = when {
                             violation != null -> violation.propertyPath.lastOrNull()?.toString() ?: "body"
                             else -> "body"
                         }
-
-                        mapOf(
-                            "felt" to field,
-                            "melding" to (violation?.message ?: error.defaultMessage ?: "Ugyldig verdi")
-                        )
+                        val msg = (violation?.message ?: error.defaultMessage ?: "Ugyldig verdi")
+                        log.info("Enkelttilgang avvist. $msg")
+                        mapOf("felt" to field, "melding" to msg)
                     }
                 }
             )

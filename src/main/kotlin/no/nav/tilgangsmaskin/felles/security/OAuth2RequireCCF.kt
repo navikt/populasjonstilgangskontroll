@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.security
 
+import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.CLIENT_CREDENTIALS
 import org.springframework.security.access.prepost.PreAuthorize
 import kotlin.annotation.AnnotationRetention.RUNTIME
 import kotlin.annotation.AnnotationTarget.CLASS
@@ -7,5 +8,5 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
 
 @Target(CLASS, FUNCTION)
 @Retention(RUNTIME)
-@PreAuthorize("hasAuthority('$CCF_AUTHORITY')")
+@PreAuthorize("hasAuthority('$CLIENT_CREDENTIALS')")
 annotation class OAuth2RequireCCF

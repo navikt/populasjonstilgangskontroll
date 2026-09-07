@@ -12,7 +12,7 @@ class EnkeltTilgangJPAAdapter(
     private val clock: Clock) {
 
     fun enkeltTilgang(ansattId: String, enhetsnummer: String, data: EnkeltTilgangData): EnkeltTilgangEntity {
-        val expires = data.gyldigtil
+        val expires = data.gyldigtil.plusDays(1)
             .atStartOfDay(clock.zone)
             .toInstant()
         repo.findByNavidAndFnrAndExpires(ansattId, data.brukerId.verdi, expires)?.let { return it }

@@ -9,6 +9,7 @@ import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.diffFromNow
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
@@ -17,6 +18,7 @@ import no.nav.tilgangsmaskin.regler.motor.RegelMotorLogger.Companion.tag
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Clock
 import java.time.Instant
 
 
@@ -30,6 +32,7 @@ class EnkeltTilgangTjeneste(
     private val adapter: EnkeltTilgangJPAAdapter,
     private val motor: RegelMotor,
     private val proxy: EntraProxyTjeneste,
+    private val clock: Clock,
     private val teller: EnkeltTilgangTeller) {
 
     private val log = getLogger(javaClass)
@@ -40,7 +43,7 @@ class EnkeltTilgangTjeneste(
     fun harTilgang(ansattId: AnsattId, brukerId: BrukerId) =
         gjeldendeEnkeltTilgang(ansattId, brukerId)
             ?.also {
-                log.trace("Enkelttilgang er gyldig i {} til for {} og {}", it.diffFromNow(), ansattId, brukerId)
+                log.trace("Enkelttilgang er gyldig i {} til for {} og {}", it.diffFromNow(clock), ansattId, brukerId)
             } != null
 
 
@@ -51,7 +54,7 @@ class EnkeltTilgangTjeneste(
                 bruker.medNærmesteFamilie(data.brukerId.verdi))
             adapter.enkeltTilgang(ansattId.verdi, enhetFor(ansattId), data)
             teller.tell(INGEN_REGEL_TAG, ENKELTTILGANG_GITT)
-            log.info("Enkelttilgang til og med ${data.gyldigtil} ble registrert for $ansattId og ${data.brukerId}")
+            log.info("Enkelttilgang OK. $ansattId har fått tilgang til ${data.brukerId} til og med ${data.gyldigtil}")
             true
         }.onFailure { e ->
             when (e) {

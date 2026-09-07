@@ -5,7 +5,6 @@ import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
-import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
@@ -32,8 +31,6 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                 BrukerIdOgRegelsett(brukerId, KOMPLETT_REGELTYPE),
                 BrukerIdOgRegelsett(avvistBrukerId, KOMPLETT_REGELTYPE)
             )
-
-            beforeEach { every { token.type } returns CCF }
 
             When("bulk/ccf kalles med gyldige specs") {
                 Then("returnerer 207 med mix av godkjente og avviste") {

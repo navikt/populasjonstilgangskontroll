@@ -23,11 +23,11 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
-import no.nav.tilgangsmaskin.felles.rest.Token
-import no.nav.tilgangsmaskin.felles.rest.TokenType
-import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
-import no.nav.tilgangsmaskin.felles.rest.TokenType.UNAUTHENTICATED
 import no.nav.tilgangsmaskin.felles.rest.notifikajon.MessagePublisher
+import no.nav.tilgangsmaskin.felles.security.AuthContext
+import no.nav.tilgangsmaskin.felles.security.TokenType
+import no.nav.tilgangsmaskin.felles.security.TokenType.CCF
+import no.nav.tilgangsmaskin.felles.security.TokenType.UNAUTHENTICATED
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import java.net.URI
@@ -38,7 +38,7 @@ class AnsattGruppeResolverTest : BehaviorSpec({
 
     val publisher = object: MessagePublisher {}
     val entra       = mockk<EntraTjeneste>()
-    val token       = mockk<Token>()
+    val authContext = mockk<AuthContext>()
     val oidTjeneste = mockk<EntraOidTjeneste>()
     val cache       = mockk<CacheOperations>(relaxed = true)
 
@@ -46,19 +46,19 @@ class AnsattGruppeResolverTest : BehaviorSpec({
     val oid       = UUID.randomUUID()
     val geoGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-GEO_1234")
 
-    val resolver = EntraAnsattGruppeResolver(entra, token, oidTjeneste, cache, publisher)
+    val resolver = EntraAnsattGruppeResolver(entra, authContext, oidTjeneste, cache, publisher)
 
     beforeEach {
         every { oidTjeneste.oid(ansattId) } returns oid
     }
 
     Given("CC-flow") {
-        beforeEach { every { token.type } returns CCF }
+        beforeEach { every { authContext.type } returns CCF }
 
         When("token inneholder kjente og ukjente gruppe-IDer") {
-            Then("Token.globaleGrupper returnerer kun kjente EntraGrupper") {
-                every { token.globaleGruppeIds } returns setOf(NASJONAL.id, FORTROLIG.id, STRENGT_FORTROLIG.id, oid)
-                token.globaleGrupper() shouldContainExactlyInAnyOrder setOf(
+            Then("AuthContext.globaleGrupper returnerer kun kjente EntraGrupper") {
+                every { authContext.globaleGruppeIds } returns setOf(NASJONAL.id, FORTROLIG.id, STRENGT_FORTROLIG.id, oid)
+                authContext.globaleGrupper() shouldContainExactlyInAnyOrder setOf(
                     EntraGruppe(NASJONAL.id, NASJONAL.name),
                     EntraGruppe(FORTROLIG.id, FORTROLIG.name),
                     EntraGruppe(STRENGT_FORTROLIG.id, STRENGT_FORTROLIG.name)
@@ -67,16 +67,16 @@ class AnsattGruppeResolverTest : BehaviorSpec({
         }
 
         When("ingen av token-gruppeIDene er kjente") {
-            Then("Token.globaleGrupper returnerer tomt sett") {
-                every { token.globaleGruppeIds } returns setOf(UUID.randomUUID(), UUID.randomUUID())
-                token.globaleGrupper().shouldBeEmpty()
+            Then("AuthContext.globaleGrupper returnerer tomt sett") {
+                every { authContext.globaleGruppeIds } returns setOf(UUID.randomUUID(), UUID.randomUUID())
+                authContext.globaleGrupper().shouldBeEmpty()
             }
         }
 
         When("token ikke har noen gruppe-IDer") {
-            Then("Token.globaleGrupper returnerer tomt sett") {
-                every { token.globaleGruppeIds } returns emptySet()
-                token.globaleGrupper().shouldBeEmpty()
+            Then("AuthContext.globaleGrupper returnerer tomt sett") {
+                every { authContext.globaleGruppeIds } returns emptySet()
+                authContext.globaleGrupper().shouldBeEmpty()
             }
         }
 
@@ -120,13 +120,13 @@ class AnsattGruppeResolverTest : BehaviorSpec({
 
     Given("OBO-flow") {
         beforeEach {
-            every { token.type } returns TokenType.OBO
-            every { token.oid }   returns oid
+            every { authContext.type } returns TokenType.OBO
+            every { authContext.oid } returns oid
         }
 
         When("ansatt har nasjonal tilgang") {
             Then("returneres kun globale grupper uten Entra-oppslag") {
-                every { token.globaleGruppeIds } returns setOf(NASJONAL.id)
+                every { authContext.globaleGruppeIds } returns setOf(NASJONAL.id)
                 assertSoftly {
                     resolver.grupperForAnsatt(ansattId) shouldBe setOf(EntraGruppe(NASJONAL.id, NASJONAL.name))
                     verify(exactly = 0) { entra.geoGrupper(any(), any()) }
@@ -137,7 +137,7 @@ class AnsattGruppeResolverTest : BehaviorSpec({
 
         When("ansatt ikke har nasjonal tilgang") {
             Then("slås opp GEO-grupper i Entra") {
-                every { token.globaleGruppeIds } returns emptySet()
+                every { authContext.globaleGruppeIds } returns emptySet()
                 every { entra.geoGrupper(ansattId, oid) } returns setOf(geoGruppe)
                 assertSoftly {
                     resolver.grupperForAnsatt(ansattId) shouldContainExactlyInAnyOrder setOf(geoGruppe)
@@ -149,7 +149,7 @@ class AnsattGruppeResolverTest : BehaviorSpec({
 
         When("ansatt har fortrolig-gruppe i token") {
             Then("kombineres globale grupper fra token med GEO-grupper fra Entra") {
-                every { token.globaleGruppeIds } returns setOf(FORTROLIG.id)
+                every { authContext.globaleGruppeIds } returns setOf(FORTROLIG.id)
                 every { entra.geoGrupper(ansattId, oid) } returns setOf(geoGruppe)
                 resolver.grupperForAnsatt(ansattId) shouldContainExactlyInAnyOrder
                     setOf(EntraGruppe(FORTROLIG.id, FORTROLIG.name), geoGruppe)
@@ -159,7 +159,7 @@ class AnsattGruppeResolverTest : BehaviorSpec({
 
     Given("uautentisert") {
         beforeEach {
-            every { token.type } returns UNAUTHENTICATED
+            every { authContext.type } returns UNAUTHENTICATED
         }
 
         When("miljø er dev/test") {

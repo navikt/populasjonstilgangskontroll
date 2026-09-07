@@ -7,8 +7,6 @@ import io.mockk.every
 import io.mockk.verify
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
-import no.nav.tilgangsmaskin.felles.rest.Token
-import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV_GCP
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
@@ -22,10 +20,11 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.post
 import tools.jackson.databind.json.JsonMapper
 import java.time.LocalDate.now
+import java.util.UUID
 
 @SpringBootTest(classes = [SecurityTestApplication::class])
 @AutoConfigureMockMvc
-class DevEnkeltTilgangSecurityTest(mockMvc: MockMvc, mapper: JsonMapper) : BehaviorSpec() {
+open class DevEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private val mapper: JsonMapper) : BehaviorSpec() {
 
 
     val dto = EnkeltTilgangData(TEST_BRUKER_ID, "En god begrunnelse", now().plusMonths(2))
@@ -38,29 +37,24 @@ class DevEnkeltTilgangSecurityTest(mockMvc: MockMvc, mapper: JsonMapper) : Behav
     @MockkBean
     private lateinit var enkelt: EnkeltTilgangTjeneste
 
-    @MockkBean
-    private lateinit var token: Token
-
     init {
         beforeEach {
-            clearMocks(token, regel, enkelt, answers = false)
-             every { token.type } returns OBO
-             every { token.requiredAnsattId } returns TEST_ANSATT_ID
+            clearMocks(regel, enkelt, answers = false)
              every { enkelt.registrerTilgang(TEST_ANSATT_ID, dto) } returns true
         }
 
         Given("role enkelttilgang security chain i dev") {
-            When("request har OBO-token med dev role") {
-                Then("returnerer 202 for overstyr") {
+            When("request har OBO-token uten rolle enkelttilgang") {
+                Then("returnerer likevel 204 for overstyr") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {
-                            setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID, mapOf("roles" to listOf("ROLE_DEV"))))
+                            setBearerAuth(jwt(TEST_AUDIENCE,TEST_ANSATT_ID))
                         }
                         contentType = APPLICATION_JSON
                         content = payload
                     }.andExpect {
                         status {
-                            isAccepted()
+                            isNoContent()
                         }
                     }
 
@@ -77,6 +71,7 @@ class DevEnkeltTilgangSecurityTest(mockMvc: MockMvc, mapper: JsonMapper) : Behav
         @DynamicPropertySource
         fun setProperties(registry: DynamicPropertyRegistry) {
             registry.setProperties(DEV_GCP)
+            registry.add("gruppe.enkelttilgang") { UUID.randomUUID() }
         }
     }
 }

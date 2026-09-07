@@ -20,7 +20,7 @@ import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.getMany
 import no.nav.tilgangsmaskin.felles.cache.getOne
-import no.nav.tilgangsmaskin.felles.rest.Token
+import no.nav.tilgangsmaskin.felles.security.AuthContext
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
@@ -48,7 +48,7 @@ class OppfølgingTjenesteTest(
     @TestConfiguration
     class OppfølgingTestConfig : CacheTestConfig(OPPFØLGING)
 
-    @MockkBean private lateinit var token: Token
+    @MockkBean private lateinit var authContext: AuthContext
 
     init {
         beforeEach {

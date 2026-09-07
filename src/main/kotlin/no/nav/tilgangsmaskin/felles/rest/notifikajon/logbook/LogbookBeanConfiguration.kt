@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.felles.rest.notifikajon.logbook
 
-import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.springframework.context.annotation.Bean
@@ -18,7 +17,6 @@ import tools.jackson.databind.json.JsonMapper
 private val BRUKER_ID_REGEX = Regex("""(?<!\d)\d{11}(?!\d)""")
 
 @Configuration
-@ConditionalOnNotProd
 @NoCoverageAnalysis
 class LogbookBeanConfiguration {
 
@@ -29,7 +27,7 @@ class LogbookBeanConfiguration {
     @Bean
     fun logbook(formatter: LogbookPrettyPrintingFormatter, jwtClaimsExtractor: AttributeExtractor) =
         Logbook.builder()
-            .strategy(LogbookStatusAtLeastExcluding(BAD_REQUEST,NOT_FOUND))
+            .strategy(LogbookStatusAtLeastExcluding(NOT_FOUND))
             .bodyFilter { _, body ->
                 BRUKER_ID_REGEX.replace(body) { m -> m.value.maskFnr()
                 }

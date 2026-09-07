@@ -4,15 +4,15 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.OSLO
 import org.zalando.logbook.HttpRequest
 import java.util.Date
 
-internal fun Map<String, Any>.withTimestampsInCurrentTimezone() =
+fun Map<String, Any>.withTimestampsInCurrentTimezone() =
     mapValues {
         (_, value) -> (value as? Date)?.toInstant()?.atZone(OSLO) ?: value
     }
 
-internal fun String.shouldIgnoreGraphQlIntrospectionQuery() =
+fun String.shouldIgnoreGraphQlIntrospectionQuery() =
     GRAPHQL_INTROSPECTION_QUERY_BODY.matches(this)
 
-internal fun HttpRequest.shouldIgnoreGraphQlIntrospectionQuery() =
+fun HttpRequest.shouldIgnoreGraphQlIntrospectionQuery() =
     bodyAsString.shouldIgnoreGraphQlIntrospectionQuery()
 
 private val GRAPHQL_INTROSPECTION_QUERY_BODY =

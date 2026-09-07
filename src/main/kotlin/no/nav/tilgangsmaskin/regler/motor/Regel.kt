@@ -12,14 +12,19 @@ import kotlin.annotation.AnnotationTarget.CLASS
 interface Regel {
     fun evaluer(ansatt: Ansatt, bruker: Bruker): Boolean
     val metadata: RegelMetadata
-    val kode get() = metadata.kode
-    val kortNavn get() = metadata.kortNavn
-    val begrunnelse get() = metadata.begrunnelse
-    val erOverstyrbar get() = this is OverstyrbarRegel
-    fun godtaHvis(predikat: () -> Boolean) = predikat.invoke()
+    val kode: String
+        get() = metadata.kode
+    val kortNavn: String
+        get() = metadata.kortNavn
+    val begrunnelse: String
+        get() = metadata.begrunnelse
+    val erOverstyrbar: Boolean
+        get() = this is OverstyrbarRegel
+    fun godtaHvis(predikat: () -> Boolean) = predikat()
     fun avvisHvis(predikat: () -> Boolean) = !godtaHvis(predikat)
 
-    val log get() = getLogger(javaClass)
+    val log: org.slf4j.Logger
+        get() = getLogger(javaClass)
 
 }
 

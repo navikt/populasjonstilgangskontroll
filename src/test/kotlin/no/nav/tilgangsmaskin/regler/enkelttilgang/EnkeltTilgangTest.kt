@@ -25,8 +25,8 @@ import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.felles.rest.notifikajon.LocalAuditor
 import no.nav.tilgangsmaskin.felles.TimeBeanConfig
 import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
-import no.nav.tilgangsmaskin.felles.rest.Token
-import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
+import no.nav.tilgangsmaskin.felles.security.AuthContext
+import no.nav.tilgangsmaskin.felles.security.TokenType.CCF
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IGÅR
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
@@ -41,6 +41,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ContextConfiguration
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.time.Clock
 import java.time.LocalDate
 
 @DataJpaTest
@@ -51,7 +52,7 @@ import java.time.LocalDate
 @Import(TimeBeanConfig::class)
 @EnableAutoConfiguration
 @ComponentScan("no.nav.tilgangsmaskin.regler.motor")
-internal class EnkeltTilgangTest(
+class EnkeltTilgangTest(
     private val motor: RegelMotor,
     private val registry: MeterRegistry,
     private val adapter: EnkeltTilgangJPAAdapter,
@@ -69,7 +70,7 @@ internal class EnkeltTilgangTest(
     @MockkBean
     lateinit var proxy: EntraProxyTjeneste
     @MockkBean
-    lateinit var token: Token
+    lateinit var authContext: AuthContext
     @MockkBean
     lateinit var oppfølging: OppfølgingTjeneste
     private val ansatte: AnsattTjeneste = mockk()
@@ -85,7 +86,8 @@ internal class EnkeltTilgangTest(
                 adapter,
                 motor,
                 proxy,
-                EnkeltTilgangTeller(registry, token),
+                Clock.systemUTC(),
+                EnkeltTilgangTeller(registry, authContext),
             )
         }
 
@@ -302,11 +304,11 @@ internal class EnkeltTilgangTest(
     private fun stubStandardMocks() {
         every { nom.fnrForAnsatt(any()) } returns vanligBrukerId
         every { vergemål.alle(any()) } returns emptySet()
-        every { token.type } returns CCF
-        every { token.system } returns "test"
-        every { token.ansattId } returns ansattId
-        every { token.systemNavn } returns "test"
-        every { token.clusterAndSystem } returns "cluster:test"
+        every { authContext.type } returns CCF
+        every { authContext.system } returns "test"
+        every { authContext.ansattId } returns ansattId
+        every { authContext.systemNavn } returns "test"
+        every { authContext.clusterAndSystem } returns "cluster:test"
         every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), "Testenhet")
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
     }

@@ -4,7 +4,18 @@
 # https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
 
 version: 2
+registries:
+  pdl:
+    type: maven-repository
+    url: https://maven.pkg.github.com/navikt/pdl
+    username: x-access-token
+    password: ${{ secrets.PDL_STUFF }}
 updates:
+  - package-ecosystem: maven
+    directory: "/"
+    schedule:
+      interval: "daily"
+    registry: pdl
   - package-ecosystem: github-actions
     directory: "/"
     schedule:

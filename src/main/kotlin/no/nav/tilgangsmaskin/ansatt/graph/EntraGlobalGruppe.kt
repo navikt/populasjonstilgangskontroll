@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
-import no.nav.tilgangsmaskin.felles.rest.Token
+import no.nav.tilgangsmaskin.felles.security.AuthContext
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.AVDØD_MER_ENN_ETT_ÅR
 import java.util.*
@@ -29,7 +29,7 @@ enum class EntraGlobalGruppe(val property: String, val metadata: GruppeMetadata)
         fun setIDs(grupper: Map<String, UUID>) =
             entries.forEach { it.id = checkNotNull(grupper[it.property]) { "Mangler id for ${it.property}" } }
 
-        fun Token.globaleGrupper() : Set<EntraGruppe> =
+        fun AuthContext.globaleGrupper() : Set<EntraGruppe> =
             globaleGruppeIds.intersect(uuids()).mapTo(mutableSetOf()) { uuid ->
                 EntraGruppe(uuid, navnFor(uuid))
             }

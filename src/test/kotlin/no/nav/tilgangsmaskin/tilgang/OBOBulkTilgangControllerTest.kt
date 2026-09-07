@@ -4,7 +4,6 @@ import io.mockk.every
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerId.Companion.BRUKERID_LENGTH
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
-import no.nav.tilgangsmaskin.felles.rest.TokenType.OBO
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
@@ -26,12 +25,6 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
 
             val specs = setOf(BrukerIdOgRegelsett(brukerId, KOMPLETT_REGELTYPE))
             val respons = AggregertBulkRespons(ansattId, setOf(ok(brukerId)))
-
-            beforeEach {
-                every {
-                    token.type
-                } returns OBO
-            }
 
             When("bulk/obo kalles med gyldige specs") {
                 Then("returnerer 207 med resultater") {
@@ -162,8 +155,6 @@ class OBOBulkTilgangControllerTest : TilgangControllerTestBase() {
                 BrukerIdOgRegelsett(annenBrukerId, KJERNE_REGELTYPE)
             )
             val respons = AggregertBulkRespons(ansattId, setOf(ok(brukerId), ok(annenBrukerId)))
-
-            beforeEach { every { token.type } returns OBO }
 
             When("bulk/obo/{regelType} kalles med KJERNE_REGELTYPE") {
                 Then("returnerer 207 med resultater for gitt regeltype") {

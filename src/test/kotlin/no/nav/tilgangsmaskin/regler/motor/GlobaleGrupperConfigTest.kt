@@ -13,7 +13,7 @@ import java.util.*
 
 @SpringBootTest(classes = [TestConfig::class])
 @TestPropertySource(locations = ["classpath:test.properties"])
-class GlobaleGrupperConfigTest(
+open class GlobaleGrupperConfigTest(
     private val cfg: GlobaleGrupperConfig,
 ) : BehaviorSpec() {
 

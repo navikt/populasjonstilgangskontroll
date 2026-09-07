@@ -1,9 +1,7 @@
 package no.nav.tilgangsmaskin.tilgang
 
-import io.mockk.every
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
 import io.mockk.justRun
-import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.post
 
@@ -12,9 +10,6 @@ class CCFEnkeltTilgangControllerTest : TilgangControllerTestBase() {
     init {
 
         Given("CCF enkeltoppslag") {
-
-            beforeEach { every { token.type } returns CCF }
-
             When("komplett kalles med CCF-token") {
                 Then("returnerer 204 ved tilgang") {
                     justRun { regelTjeneste.kompletteRegler(ansattId, brukerId) }
@@ -35,7 +30,8 @@ class CCFEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                 Then("returnerer 204 ved tilgang") {
                     justRun { regelTjeneste.kjerneregler(ansattId, brukerId) }
                     mockMvc.post("$PROD_BASE_PATH/ccf/kjerne/${ansattId.verdi}") {
-                        contentType = APPLICATION_JSON; content = "\"$brukerId\""
+                        contentType = APPLICATION_JSON
+                        content = "\"$brukerId\""
                     }.andExpect {
                         status {
                             isNoContent()

@@ -8,6 +8,7 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.felles.security.AuthContext
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.CONSUMER_ID
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import org.slf4j.MDC
@@ -16,16 +17,16 @@ import org.springframework.mock.web.MockHttpServletResponse
 
 class ConsumerAwareHandlerInterceptorTest : BehaviorSpec({
 
-    val token = mockk<Token>()
+    val authContext = mockk<AuthContext>()
     lateinit var registry: SimpleMeterRegistry
     lateinit var interceptor: ConsumerAwareHandlerInterceptor
 
     beforeEach {
         registry = SimpleMeterRegistry()
-        interceptor = ConsumerAwareHandlerInterceptor(token, registry)
-        every { token.systemAndNs } returns "tilgangsmaskin:my-app"
-        every { token.systemNavn } returns "my-app"
-        every { token.ansattId } returns null
+        interceptor = ConsumerAwareHandlerInterceptor(authContext, registry)
+        every { authContext.systemAndNs } returns "tilgangsmaskin:my-app"
+        every { authContext.systemNavn } returns "my-app"
+        every { authContext.ansattId } returns null
         MDC.clear()
     }
 
@@ -46,7 +47,7 @@ class ConsumerAwareHandlerInterceptorTest : BehaviorSpec({
 
         When("token har ansattId (OBO)") {
             Then("settes userId fra tokenet") {
-                every { token.ansattId } returns AnsattId("Z999999")
+                every { authContext.ansattId } returns AnsattId("Z999999")
                 interceptor.preHandle(MockHttpServletRequest(), MockHttpServletResponse(), Any())
                 MDC.get(USER_ID) shouldBe "Z999999"
             }
@@ -63,7 +64,7 @@ class ConsumerAwareHandlerInterceptorTest : BehaviorSpec({
     Given("afterCompletion") {
         When("request er ferdig") {
             Then("ryddes både consumerId og userId fra MDC") {
-                every { token.ansattId } returns AnsattId("Z999999")
+                every { authContext.ansattId } returns AnsattId("Z999999")
                 val request = MockHttpServletRequest()
                 val response = MockHttpServletResponse()
                 interceptor.preHandle(request, response, Any())

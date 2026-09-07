@@ -9,7 +9,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlIdenter.PdlIdent.PdlIde
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlIdenter.PdlIdent.PdlIdentGruppe.FOLKEREGISTERIDENT
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipRespons.PdlPerson
 
-internal object PdlPersonMapperTestFixture {
+object PdlPersonMapperTestFixture {
     const val BRUKER_ID = "08526835670"
     const val AKTOR_ID = "1234567890123"
     val BARN = BrukerId("01010112345")

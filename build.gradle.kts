@@ -11,7 +11,6 @@ version = "1.0.1"
 
 plugins {
     jacoco
-    alias(libs.plugins.avro)
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.allopen)
     alias(libs.plugins.kotlin.spring)
@@ -43,18 +42,23 @@ repositories {
     maven {
         url = uri("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
     }
+    maven {
+        url = uri("https://maven.pkg.github.com/navikt/pdl")
+        credentials {
+            username = "x-access-token"
+            password = providers.environmentVariable("PDL_STUFF").orElse(providers.gradleProperty("gpr.token")).orNull
+        }
+    }
 }
 
 
 dependencies {
-    constraints {  // TODO midlertidif
+    constraints {  // TODO midlertidig
         implementation("at.yawk.lz4:lz4-java:1.11.1")
         testImplementation("at.yawk.lz4:lz4-java:1.11.1")
     }
 
-    // Force newer jackson-databind version (required by gradle-avro-plugin)
-    //implementation("com.fasterxml.jackson.core:jackson-databind:2.22.1")
-
+    implementation(libs.contract.pdl.avro)
     implementation(libs.boot.conditionals)
     implementation(libs.bundles.observability)
     implementation(libs.slack)

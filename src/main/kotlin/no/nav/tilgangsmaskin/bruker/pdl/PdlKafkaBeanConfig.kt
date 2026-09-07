@@ -60,7 +60,7 @@ class PdlKafkaBeanConfig {
             override fun formatEvent(event: Personhendelse) =
                 "gradering=${event.adressebeskyttelse?.gradering ?: "UGRADERT"}, " +
                         "endringstype=${event.endringstype}, " +
-                        "identer=${event.personidenter.map { it.maskFnr() }}"
+                        "identer=${event.personidenter.map { it.toString().maskFnr() }}"
         }
 
     companion object {

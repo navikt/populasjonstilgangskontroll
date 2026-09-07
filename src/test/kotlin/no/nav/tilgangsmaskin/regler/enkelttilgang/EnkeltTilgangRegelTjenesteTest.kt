@@ -29,8 +29,8 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.felles.rest.notifikajon.LocalAuditor
 import no.nav.tilgangsmaskin.felles.TimeBeanConfig
-import no.nav.tilgangsmaskin.felles.rest.Token
-import no.nav.tilgangsmaskin.felles.rest.TokenType.CCF
+import no.nav.tilgangsmaskin.felles.security.AuthContext
+import no.nav.tilgangsmaskin.felles.security.TokenType.CCF
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IGÅR
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
@@ -78,7 +78,7 @@ class EnkeltTilgangRegelTjenesteTest(
     private lateinit var nom: NomTjeneste
 
     @MockkBean
-    private lateinit var token: Token
+    private lateinit var authContext: AuthContext
     @MockkBean
     lateinit var oppfølging: OppfølgingTjeneste
     @MockkBean
@@ -266,11 +266,11 @@ class EnkeltTilgangRegelTjenesteTest(
         every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), "Testenhet")
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
         every { oppfølging.enhetFor(Identifikator(vanligBrukerId.verdi)) } returns Enhetsnummer("1234")
-        every { token.system } returns "test"
-        every { token.ansattId } returns ansattId
-        every { token.clusterAndSystem } returns "cluster:test"
-        every { token.systemNavn } returns "test"
-        every { token.type } returns CCF
+        every { authContext.system } returns "test"
+        every { authContext.ansattId } returns ansattId
+        every { authContext.clusterAndSystem } returns "cluster:test"
+        every { authContext.systemNavn } returns "test"
+        every { authContext.type } returns CCF
     }
 
     private fun vanligBruker(brukerId: BrukerId) = BrukerBuilder(brukerId).build()

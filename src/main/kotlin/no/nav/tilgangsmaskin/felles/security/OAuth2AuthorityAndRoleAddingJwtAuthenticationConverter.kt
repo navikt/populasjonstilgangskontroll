@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component
 import java.util.UUID
 
 private const val ENKELT_ROLE = "ROLE_ENKELT"
-const val TOKEN_TYPE_AUTHORITY_PREFIX = "TOKEN_"
+private const val TOKEN_TYPE_AUTHORITY_PREFIX = "TOKEN_"
 const val OBO_AUTHORITY = "${TOKEN_TYPE_AUTHORITY_PREFIX}OBO"
 const val CCF_AUTHORITY = "${TOKEN_TYPE_AUTHORITY_PREFIX}CCF"
 private const val ROLE = "ROLE_"
@@ -30,23 +30,21 @@ class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(private val env: En
     @Value($$"${gruppe.enkelttilgang:}") private val gruppeEnkeltTilgang: UUID) : Converter<Jwt, AbstractAuthenticationToken> {
 
     private val log = getLogger(javaClass)
-
-
+    
     private val delegate = JwtAuthenticationConverter()
         .andThen {
             val jwt = it as JwtAuthenticationToken
-            val authorities = linkedSetOf<GrantedAuthority>()
-            authorities += jwt.authorities
-            authorities += roleAuthorities(jwt.token)
-            tokenTypeAuthority(jwt.token)?.let(authorities::add)
-            if (shouldAddEnkeltRole(jwt.token.getClaimAsStringList(ROLES))) {
-                authorities += SimpleGrantedAuthority(ENKELT_ROLE)
+            val authorities = buildSet {
+                addAll(jwt.authorities)
+                addAll(roller(jwt.token))
+                tokenTypeAuthority(jwt.token)?.let(::add)
+                if (shouldAddEnkeltRole(jwt.token.getClaimAsStringList(ROLES))) add(SimpleGrantedAuthority(ENKELT_ROLE))
             }
             JwtAuthenticationToken(jwt.token, principal(jwt.token, authorities), authorities)
         }
 
-    override fun convert(jwt: Jwt): AbstractAuthenticationToken =
-        delegate.convert(jwt) ?: throw IllegalArgumentException("JWT konvertering feilet for token med claims: ${jwt.claims}")
+    override fun convert(jwt: Jwt)  =
+        delegate.convert(jwt) ?: error("JWT konvertering feilet for token med claims: ${jwt.claims}")
 
     private fun shouldAddEnkeltRole(roles: List<String>?)  =
         !env.acceptsProfiles(PROD_GCP_PROFILE) || "$gruppeEnkeltTilgang" in roles.orEmpty()
@@ -54,9 +52,9 @@ class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(private val env: En
     private fun principal(jwt: Jwt, authorities: Set<GrantedAuthority>) =
         DefaultOAuth2AuthenticatedPrincipal(
             jwt.subject ?: jwt.getClaimAsString(NAVIDENT) ?: "unknown",
-            jwt.claims,
-            authorities
-        ).also { log.info("Principal satt til ${it.name} med authorities: ${it.authorities}") }
+            jwt.claims, authorities).also {
+                log.info("Principal satt til ${it.name} med authorities: ${it.authorities}")
+            }
 
     private fun tokenTypeAuthority(jwt: Jwt) =
         when {
@@ -65,10 +63,12 @@ class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(private val env: En
             else -> null
         }
 
-    private fun roleAuthorities(jwt: Jwt) =
+    private fun roller(jwt: Jwt) =
         buildSet {
-            jwt.getClaimAsStringList(ROLES).orEmpty().forEach { role ->
-                add(SimpleGrantedAuthority(role.takeIf { it.startsWith(ROLE) } ?: "$ROLE$role"))
+            jwt.getClaimAsStringList(ROLES).orEmpty().forEach { rolle ->
+                add(SimpleGrantedAuthority(rolle.takeIf {
+                    it.startsWith(ROLE)
+                } ?: "$ROLE$rolle"))
             }
         }
 }

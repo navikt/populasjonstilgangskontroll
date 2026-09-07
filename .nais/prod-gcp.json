@@ -288,6 +288,11 @@
       "name": "historisk-regnskap",
       "namespace": "historisk",
       "cluster": "prod-gcp"
+    },
+    {
+      "name": "ekspertbistand-backend",
+      "namespace": "fager",
+      "cluster": "prod-gcp"
     }
 
   ],

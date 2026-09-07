@@ -431,6 +431,11 @@
       "name": "historisk-regnskap",
       "namespace": "historisk",
       "cluster": "dev-gcp"
+    },
+    {
+      "name": "ekspertbistand-backend",
+      "namespace": "fager",
+      "cluster": "dev-gcp"
     }
   ],
   "nais": {

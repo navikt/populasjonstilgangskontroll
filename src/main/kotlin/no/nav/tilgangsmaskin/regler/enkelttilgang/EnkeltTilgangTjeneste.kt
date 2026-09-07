@@ -9,6 +9,7 @@ import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.diffFromNow
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
@@ -53,7 +54,7 @@ class EnkeltTilgangTjeneste(
                 bruker.medNærmesteFamilie(data.brukerId.verdi))
             adapter.enkeltTilgang(ansattId.verdi, enhetFor(ansattId), data)
             teller.tell(INGEN_REGEL_TAG, ENKELTTILGANG_GITT)
-            log.info("Enkelttilgang til og med ${data.gyldigtil} ble registrert for $ansattId og ${data.brukerId}")
+            log.info("Enkelttilgang OK. $ansattId har fått tilgang til ${data.brukerId} til og med ${data.gyldigtil}")
             true
         }.onFailure { e ->
             when (e) {

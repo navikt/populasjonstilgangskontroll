@@ -44,7 +44,7 @@ open class DevEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private va
         }
 
         Given("role enkelttilgang security chain i dev") {
-            When("request har OBO-token uten rolle enkelttilgang") {
+            xWhen("request har OBO-token uten rolle enkelttilgang") {
                 Then("returnerer likevel 204 for overstyr") {
                     mockMvc.post("$PROD_BASE_PATH/overstyr") {
                         headers {

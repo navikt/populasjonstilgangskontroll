@@ -20,11 +20,11 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.stereotype.Component
 import java.util.UUID
 
-private const val ENKELT_ROLE = "ROLE_ENKELT"
+private const val ROLLE = "ROLE_"
+private const val ENKELTGRUPPE_ROLLE = "${ROLLE}ENKELT"
 private const val TOKEN_TYPE_AUTHORITY_PREFIX = "TOKEN_"
 const val OBO_AUTHORITY = "${TOKEN_TYPE_AUTHORITY_PREFIX}OBO"
 const val CCF_AUTHORITY = "${TOKEN_TYPE_AUTHORITY_PREFIX}CCF"
-private const val ROLE = "ROLE_"
 
 @Component
 class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(private val env: Environment,
@@ -39,7 +39,7 @@ class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(private val env: En
                 addAll(jwt.authorities)
                 addAll(roller(jwt.token))
                 tokenTypeAuthority(jwt.token)?.let(::add)
-                if (shouldAddEnkeltRole(jwt.token.getClaimAsStringList(GROUPS))) add(SimpleGrantedAuthority(ENKELT_ROLE))
+                if (shouldAddEnkeltRole(jwt.token.getClaimAsStringList(GROUPS))) add(SimpleGrantedAuthority(ENKELTGRUPPE_ROLLE))
             }
             JwtAuthenticationToken(jwt.token, principal(jwt.token, authorities), authorities)
         }
@@ -68,8 +68,8 @@ class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(private val env: En
         buildSet {
             jwt.getClaimAsStringList(ROLES).orEmpty().forEach { rolle ->
                 add(SimpleGrantedAuthority(rolle.takeIf {
-                    it.startsWith(ROLE)
-                } ?: "$ROLE$rolle"))
+                    it.startsWith(ROLLE)
+                } ?: "$ROLLE$rolle"))
             }
         }
 }

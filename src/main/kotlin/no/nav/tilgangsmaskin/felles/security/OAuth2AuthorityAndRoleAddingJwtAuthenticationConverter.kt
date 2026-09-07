@@ -30,7 +30,7 @@ class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(private val env: En
     @Value($$"${gruppe.enkelttilgang:}") private val gruppeEnkeltTilgang: UUID) : Converter<Jwt, AbstractAuthenticationToken> {
 
     private val log = getLogger(javaClass)
-    
+
     private val delegate = JwtAuthenticationConverter()
         .andThen {
             val jwt = it as JwtAuthenticationToken

@@ -22,6 +22,7 @@ import org.springframework.web.method.annotation.HandlerMethodValidationExceptio
 private const val ENKELTTILGANG_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.tilgang.tag.description"
  const val SUMMARY_ENKELTTILGANG = "${MSG}openapi.tilgang.enkelttilgang.summary"
  const val DESCRIPTION_ENKELTTILGANG = "${MSG}openapi.tilgang.enkelttilgang.description"
+const  val ENKELTTILGANG_PATH = "$PROD_BASE_PATH/overstyr"
 
 
 @RestController

@@ -54,7 +54,7 @@ class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(private val env: En
         DefaultOAuth2AuthenticatedPrincipal(
             jwt.subject ?: jwt.getClaimAsString(NAVIDENT) ?: "unknown",
             jwt.claims, authorities).also {
-                log.info("Principal satt til ${it.name} med authorities: ${it.authorities}")
+                log.trace("Principal satt til {} med authorities: {}", it.name, it.authorities)
             }
 
     private fun tokenTypeAuthority(jwt: Jwt) =

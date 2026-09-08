@@ -22,6 +22,8 @@ permissions:
 
 jobs:
   analyze:
+    env:
+      READER_TOKEN: ${{ secrets.READER_TOKEN }}
     name: Analyze (java-kotlin)
     runs-on: ubuntu-latest
     timeout-minutes: 30

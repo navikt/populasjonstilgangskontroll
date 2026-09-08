@@ -4,8 +4,8 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.tilgangsmaskin.felles.rest.notifikajon.SlackApplicationShutdownNotifier
-import no.nav.tilgangsmaskin.felles.rest.notifikajon.MessagePublisher
+import no.nav.tilgangsmaskin.felles.rest.notifikasjon.SlackApplicationShutdownNotifier
+import no.nav.tilgangsmaskin.felles.rest.notifikasjon.MessagePublisher
 import org.springframework.core.env.Environment
 
 class SlackApplicationShutdownNotifierTest : BehaviorSpec({

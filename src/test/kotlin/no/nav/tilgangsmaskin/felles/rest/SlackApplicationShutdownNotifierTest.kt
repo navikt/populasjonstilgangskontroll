@@ -9,7 +9,6 @@ import no.nav.tilgangsmaskin.felles.rest.notifikajon.MessagePublisher
 import org.springframework.core.env.Environment
 
 class SlackApplicationShutdownNotifierTest : BehaviorSpec({
-    val appName = "tilgangsmaskin"
     val image = "app:1.2.3"
     val podName = "pod-1"
 

@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.felles.rest
 
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.boot.conditionals.ConditionalOnNotProd
+import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import org.springframework.core.annotation.AliasFor
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -14,6 +15,7 @@ import kotlin.annotation.AnnotationTarget.CLASS
 @RestController
 @RequestMapping
 @Tag(name = "")
+@NoCoverageAnalysis
 annotation class DevController(
     @get:AliasFor(annotation = RequestMapping::class, attribute = "value")
     val value: Array<String>,

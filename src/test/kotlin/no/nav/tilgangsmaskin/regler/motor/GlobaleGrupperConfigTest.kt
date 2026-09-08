@@ -4,6 +4,12 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.NASJONAL
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.SKJERMING
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.STRENGT_FORTROLIG
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.UKJENT_BOSTED
+import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.UTENLANDSK
 import no.nav.tilgangsmaskin.regler.motor.GlobaleGrupperConfigTest.TestConfig
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest
@@ -14,8 +20,7 @@ import java.util.*
 @SpringBootTest(classes = [TestConfig::class])
 @TestPropertySource(locations = ["classpath:test.properties"])
 open class GlobaleGrupperConfigTest(
-    private val cfg: GlobaleGrupperConfig,
-) : BehaviorSpec() {
+    private val cfg: GlobaleGrupperConfig) : BehaviorSpec() {
 
     @Configuration
     @EnableConfigurationProperties(GlobaleGrupperConfig::class)
@@ -50,22 +55,22 @@ open class GlobaleGrupperConfigTest(
 
             When("@PostConstruct er kjørt") {
                 Then("settes STRENGT_FORTROLIG-IDen på GlobalGruppe") {
-                    EntraGlobalGruppe.STRENGT_FORTROLIG.id shouldBe cfg.strengt
+                    STRENGT_FORTROLIG.id shouldBe cfg.strengt
                 }
                 Then("settes NASJONAL-IDen på GlobalGruppe") {
-                    EntraGlobalGruppe.NASJONAL.id shouldBe cfg.nasjonal
+                    NASJONAL.id shouldBe cfg.nasjonal
                 }
                 Then("settes UTENLANDSK-IDen på GlobalGruppe") {
-                    EntraGlobalGruppe.UTENLANDSK.id shouldBe cfg.utland
+                    UTENLANDSK.id shouldBe cfg.utland
                 }
                 Then("settes UKJENT_BOSTED-IDen på GlobalGruppe") {
-                    EntraGlobalGruppe.UKJENT_BOSTED.id shouldBe cfg.udefinert
+                    UKJENT_BOSTED.id shouldBe cfg.udefinert
                 }
                 Then("settes FORTROLIG-IDen på GlobalGruppe") {
-                    EntraGlobalGruppe.FORTROLIG.id shouldBe cfg.fortrolig
+                    FORTROLIG.id shouldBe cfg.fortrolig
                 }
                 Then("settes SKJERMING-IDen på GlobalGruppe") {
-                    EntraGlobalGruppe.SKJERMING.id shouldBe cfg.egenansatt
+                    SKJERMING.id shouldBe cfg.egenansatt
                 }
             }
         }

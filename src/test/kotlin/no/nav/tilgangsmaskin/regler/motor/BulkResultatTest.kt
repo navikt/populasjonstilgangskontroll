@@ -23,8 +23,8 @@ class BulkResultatTest : BehaviorSpec({
     val brukerId = BrukerId("08526835670")
     val b = BrukerBuilder(brukerId).build()
 
-    Given("BulkResultat.ok") {
-        When("opprettet via companion-funksjon") {
+    Given("BulkResultat er ok") {
+        When("opprettet med Bruker") {
             Then("har status NO_CONTENT og ingen regel") {
                 val resultat = ok(b)
                 assertSoftly(resultat) {
@@ -37,7 +37,7 @@ class BulkResultatTest : BehaviorSpec({
         }
     }
 
-    Given("BulkResultat.avvist") {
+    Given("BulkResultat er avvist") {
         When("opprettet med RegelException") {
             Then("har status FORBIDDEN og referanse til regel") {
                 val ansatt = AnsattBuilder(ansattId).build()

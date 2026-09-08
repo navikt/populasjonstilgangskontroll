@@ -83,8 +83,19 @@ class BulkResponsAggregator(
             }
         }
 
-    private operator fun Set<BrukerIdOgRegelsett>.minus(funnet: Set<BulkResultat>) = filterNot { brukerIdOgRegelsett ->
-        brukerIdOgRegelsett.brukerId in (funnet.flatMap { it.bruker.historiskeIds.map { id -> id.verdi } } + funnet.map { it.bruker.oppslagId })
+    private operator fun Set<BrukerIdOgRegelsett>.minus(funnet: Set<BulkResultat>): List<BrukerIdOgRegelsett> {
+        val kjenteIds = funnet.asSequence()
+            .flatMap { resultat ->
+                sequenceOf(
+                    resultat.bruker.oppslagId,
+                    *resultat.bruker.historiskeIds.map { id -> id.verdi }.toTypedArray()
+                )
+            }
+            .toSet()
+
+        return filterNot { brukerIdOgRegelsett ->
+            brukerIdOgRegelsett.brukerId in kjenteIds
+        }
     }
 
     private fun Set<BrukerOgRegelsett>.finnBruker(oppslagId: String) =

@@ -1,8 +1,7 @@
 package no.nav.tilgangsmaskin.regler
 
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.booleans.shouldBeFalse
-import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.SKJERMING
@@ -20,28 +19,28 @@ class SkjermingRegelTest : BehaviorSpec({
         When("ansatt er medlem av skjerming") {
             Then("tilgang gis") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(SKJERMING).build()
-                regel.evaluer(ansatt, bruker).shouldBeTrue()
+                regel.evaluer(ansatt, bruker) shouldBe true
             }
         }
 
         When("ansatt har ingen spesialtilganger") {
             Then("avvises av SkjermingRegel") {
                 val ansatt = AnsattBuilder(ansattId).build()
-                regel.evaluer(ansatt, bruker).shouldBeFalse()
+                regel.evaluer(ansatt, bruker) shouldBe false
             }
         }
 
         When("ansatt er fortrolig") {
             Then("avvises av SkjermingRegel") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(FORTROLIG).build()
-                regel.evaluer(ansatt, bruker).shouldBeFalse()
+                regel.evaluer(ansatt, bruker) shouldBe false
             }
         }
 
         When("ansatt er strengt fortrolig") {
             Then("avvises av SkjermingRegel") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(STRENGT_FORTROLIG).build()
-                regel.evaluer(ansatt, bruker).shouldBeFalse()
+                regel.evaluer(ansatt, bruker) shouldBe false
             }
         }
     }

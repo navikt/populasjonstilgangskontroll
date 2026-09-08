@@ -1,8 +1,7 @@
 package no.nav.tilgangsmaskin.regler
 
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.booleans.shouldBeFalse
-import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.UKJENT_BOSTED
 import no.nav.tilgangsmaskin.bruker.BrukerId
@@ -20,14 +19,14 @@ class UkjentBostedRegelTest : BehaviorSpec({
         When("ansatt er medlem av ukjent bosted") {
             Then("tilgang gis") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(UKJENT_BOSTED).build()
-                regel.evaluer(ansatt, bruker).shouldBeTrue()
+                regel.evaluer(ansatt, bruker) shouldBe true
             }
         }
 
         When("ansatt mangler gruppen") {
             Then("avvises av UkjentBostedRegel") {
                 val ansatt = AnsattBuilder(ansattId).build()
-                regel.evaluer(ansatt, bruker).shouldBeFalse()
+                regel.evaluer(ansatt, bruker) shouldBe false
             }
         }
     }

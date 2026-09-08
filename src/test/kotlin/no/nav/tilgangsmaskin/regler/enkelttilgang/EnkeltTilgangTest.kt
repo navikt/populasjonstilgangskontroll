@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.regler.enkelttilgang
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -123,7 +122,7 @@ class EnkeltTilgangTest(
                     every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } returns brukerMedHistorikk
                     every { brukere.medNærmesteFamilie(historiskBrukerId.verdi) } returns vanligBruker(historiskBrukerId)
                     registrerEnkelttilgang(historiskBrukerId)
-                    enkeltTilgang.harTilgang(ansattId, vanligBruker(vanligBrukerId).brukerId).shouldBeTrue()
+                    enkeltTilgang.harTilgang(ansattId, vanligBruker(vanligBrukerId).brukerId) shouldBe true
                 }
             }
             When("det finnes flere enkelttilganger") {
@@ -132,7 +131,7 @@ class EnkeltTilgangTest(
                     every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } returns bruker
                     registrerEnkelttilgang(bruker.brukerId, "Denne er gammel", IGÅR)
                     registrerEnkelttilgang(bruker.brukerId, "Denne er ny", IMORGEN)
-                    enkeltTilgang.harTilgang(ansattId, bruker.brukerId).shouldBeTrue()
+                    enkeltTilgang.harTilgang(ansattId, bruker.brukerId) shouldBe true
                 }
             }
             When("nyeste enkelttilgang er utgått, eldre er aktiv") {
@@ -237,7 +236,7 @@ class EnkeltTilgangTest(
                     registrerEnkelttilgang(bruker.brukerId, "Dette er en begrunnelse")
                     val entity = adapter.gjeldendeTilgang(ansattId.verdi, vanligBrukerId.verdi, emptyList())!!
                     val lastet = repo.findById(entity.id!!)
-                    lastet.isPresent.shouldBeTrue()
+                    lastet.isPresent shouldBe true
                     with(lastet.get()) {
                         navid shouldBe ansattId.verdi
                         fnr shouldBe vanligBrukerId.verdi

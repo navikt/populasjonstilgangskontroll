@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.ansatt.skjerming
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.maps.shouldContainExactly
@@ -67,9 +66,9 @@ class SkjermingTjenesteTest(
                 Then("andre kall returneres fra cache uten REST-kall") {
                     server.expect(once(), requestTo(skjermingUri))
                         .andRespond(withSuccess("true", APPLICATION_JSON))
-                    tjeneste.skjerming(ID1).shouldBeTrue()
-                    tjeneste.skjerming(ID1).shouldBeTrue()
-                    cache.getOne<Boolean>(SKJERMING_CACHE, I1).shouldBeTrue()
+                    tjeneste.skjerming(ID1) shouldBe true
+                    tjeneste.skjerming(ID1) shouldBe true
+                    cache.getOne<Boolean>(SKJERMING_CACHE, I1) shouldBe true
                 }
             }
         }
@@ -112,7 +111,7 @@ class SkjermingTjenesteTest(
                     server.expect(once(), requestTo(skjermingerUri))
                         .andRespond(withSuccess("""{"$I1":true}""", APPLICATION_JSON))
                     tjeneste.skjerminger(listOf(ID1))
-                    cache.getOne<Boolean>(SKJERMING_CACHE, I1).shouldBeTrue()
+                    cache.getOne<Boolean>(SKJERMING_CACHE, I1) shouldBe true
                 }
             }
         }

@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.felles.utils.extensions
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_0_6
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.Dødsperiode.MND_13_24
@@ -33,7 +32,7 @@ class TimeExtensionsTest : BehaviorSpec({
     Given("isBeforeNow med fast Clock") {
         When("Instant er før klokken") {
             Then("returneres true") {
-                Instant.parse("2020-01-01T00:00:00Z").isBeforeNow(fastClock).shouldBeTrue()
+                Instant.parse("2020-01-01T00:00:00Z").isBeforeNow(fastClock) shouldBe true
             }
         }
         When("Instant er etter klokken") {
@@ -107,7 +106,7 @@ class TimeExtensionsTest : BehaviorSpec({
     Given("diffFromNow med fast Clock") {
         When("Instant er etter klokken") {
             Then("gir ikke-tom streng") {
-                Instant.parse("2026-05-27T01:30:00Z").diffFromNow(fastClock).isNotBlank().shouldBeTrue()
+                Instant.parse("2026-05-27T01:30:00Z").diffFromNow(fastClock).isNotBlank() shouldBe true
             }
         }
         When("Instant er før klokken") {
@@ -158,17 +157,17 @@ class TimeExtensionsTest : BehaviorSpec({
         val end = LocalDate.of(2026, 12, 31)
         When("dato er innenfor") {
             Then("returnerer true") {
-                LocalDate.of(2026, 6, 15).isBetween(start, end).shouldBeTrue()
+                LocalDate.of(2026, 6, 15).isBetween(start, end) shouldBe true
             }
         }
         When("dato er lik start") {
             Then("returnerer true (inklusivt)") {
-                start.isBetween(start, end).shouldBeTrue()
+                start.isBetween(start, end) shouldBe true
             }
         }
         When("dato er lik end") {
             Then("returnerer true (inklusivt)") {
-                end.isBetween(start, end).shouldBeTrue()
+                end.isBetween(start, end) shouldBe true
             }
         }
         When("dato er før start") {

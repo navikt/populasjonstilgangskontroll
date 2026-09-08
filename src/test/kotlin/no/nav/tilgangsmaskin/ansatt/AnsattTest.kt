@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.ansatt
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.SKJERMING
@@ -33,7 +32,7 @@ class AnsattTest : BehaviorSpec({
                 val gruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-GEO_$kommune")
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(gruppe).build()
                 val gt = KommuneTilknytning(Kommune(kommune))
-                (ansatt kanBehandle gt).shouldBeTrue()
+                (ansatt kanBehandle gt) shouldBe true
             }
         }
 
@@ -43,7 +42,7 @@ class AnsattTest : BehaviorSpec({
                 val gruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-GEO_$bydel")
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(gruppe).build()
                 val gt = BydelTilknytning(Bydel(bydel))
-                (ansatt kanBehandle gt).shouldBeTrue()
+                (ansatt kanBehandle gt) shouldBe true
             }
         }
 
@@ -59,7 +58,7 @@ class AnsattTest : BehaviorSpec({
             Then("returnerer true") {
                 val ansatt = AnsattBuilder(ansattId).build()
                 val gt = UdefinertTilknytning()
-                (ansatt kanBehandle gt).shouldBeTrue()
+                (ansatt kanBehandle gt) shouldBe true
             }
         }
 
@@ -67,7 +66,7 @@ class AnsattTest : BehaviorSpec({
             Then("returnerer true") {
                 val ansatt = AnsattBuilder(ansattId).build()
                 val gt = UkjentBosted()
-                (ansatt kanBehandle gt).shouldBeTrue()
+                (ansatt kanBehandle gt) shouldBe true
             }
         }
 
@@ -75,7 +74,7 @@ class AnsattTest : BehaviorSpec({
             Then("returnerer true") {
                 val ansatt = AnsattBuilder(ansattId).build()
                 val gt = UtenlandskTilknytning()
-                (ansatt kanBehandle gt).shouldBeTrue()
+                (ansatt kanBehandle gt) shouldBe true
             }
         }
     }
@@ -87,7 +86,7 @@ class AnsattTest : BehaviorSpec({
                 val enhet = Enhetsnummer("4242")
                 val gruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-ENHET_${enhet.verdi}")
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(gruppe).build()
-                (ansatt tilhører enhet).shouldBeTrue()
+                (ansatt tilhører enhet) shouldBe true
             }
         }
 
@@ -105,7 +104,7 @@ class AnsattTest : BehaviorSpec({
         When("ansatt har riktig global gruppe") {
             Then("returnerer true") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(FORTROLIG).build()
-                (ansatt erMedlemAv FORTROLIG).shouldBeTrue()
+                (ansatt erMedlemAv FORTROLIG) shouldBe true
             }
         }
 
@@ -122,7 +121,7 @@ class AnsattTest : BehaviorSpec({
         When("ansatt mangler gruppen") {
             Then("returnerer true") {
                 val ansatt = AnsattBuilder(ansattId).build()
-                (ansatt ikkeErMedlemAv SKJERMING).shouldBeTrue()
+                (ansatt ikkeErMedlemAv SKJERMING) shouldBe true
             }
         }
 
@@ -140,7 +139,7 @@ class AnsattTest : BehaviorSpec({
             Then("returnerer true") {
                 val bruker = BrukerBuilder(brukerId).build()
                 val ansatt = AnsattBuilder(ansattId).bruker(bruker).build()
-                (ansatt erDenSammeSom bruker).shouldBeTrue()
+                (ansatt erDenSammeSom bruker) shouldBe true
             }
         }
 
@@ -171,7 +170,7 @@ class AnsattTest : BehaviorSpec({
                 val ansattBruker = BrukerBuilder(ansattBrukerId).partnere(setOf(brukerId)).build()
                 val ansatt = AnsattBuilder(ansattId).bruker(ansattBruker).build()
                 val bruker = BrukerBuilder(brukerId).build()
-                (ansatt erNåværendeEllerTidligerePartnerMed bruker).shouldBeTrue()
+                (ansatt erNåværendeEllerTidligerePartnerMed bruker) shouldBe true
             }
         }
 
@@ -192,7 +191,7 @@ class AnsattTest : BehaviorSpec({
                 val ansattBruker = BrukerBuilder(ansattBrukerId).barn(setOf(brukerId)).build()
                 val ansatt = AnsattBuilder(ansattId).bruker(ansattBruker).build()
                 val bruker = BrukerBuilder(brukerId).build()
-                (ansatt erForeldreEllerBarnTil bruker).shouldBeTrue()
+                (ansatt erForeldreEllerBarnTil bruker) shouldBe true
             }
         }
 
@@ -202,7 +201,7 @@ class AnsattTest : BehaviorSpec({
                 val ansattBruker = BrukerBuilder(ansattBrukerId).far(brukerId).build()
                 val ansatt = AnsattBuilder(ansattId).bruker(ansattBruker).build()
                 val bruker = BrukerBuilder(brukerId).build()
-                (ansatt erForeldreEllerBarnTil bruker).shouldBeTrue()
+                (ansatt erForeldreEllerBarnTil bruker) shouldBe true
             }
         }
 
@@ -223,7 +222,7 @@ class AnsattTest : BehaviorSpec({
                 val ansattBruker = BrukerBuilder(ansattBrukerId).søsken(setOf(brukerId)).build()
                 val ansatt = AnsattBuilder(ansattId).bruker(ansattBruker).build()
                 val bruker = BrukerBuilder(brukerId).build()
-                (ansatt erSøskenTil bruker).shouldBeTrue()
+                (ansatt erSøskenTil bruker) shouldBe true
             }
         }
 
@@ -245,7 +244,7 @@ class AnsattTest : BehaviorSpec({
                 val ansattBruker = BrukerBuilder(ansattBrukerId).barn(setOf(barn)).build()
                 val ansatt = AnsattBuilder(ansattId).bruker(ansattBruker).build()
                 val bruker = BrukerBuilder(brukerId).barn(setOf(barn)).build()
-                (ansatt harFellesBarnMed bruker).shouldBeTrue()
+                (ansatt harFellesBarnMed bruker) shouldBe true
             }
         }
 

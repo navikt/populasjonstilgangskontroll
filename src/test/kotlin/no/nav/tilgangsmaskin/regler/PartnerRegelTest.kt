@@ -1,8 +1,7 @@
 package no.nav.tilgangsmaskin.regler
 
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.booleans.shouldBeFalse
-import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.regler.motor.PartnerRegel
@@ -20,7 +19,7 @@ class PartnerRegelTest : BehaviorSpec({
 
         When("regelen evalueres") {
             Then("avvises av PartnerRegel") {
-                regel.evaluer(ansatt, partner).shouldBeFalse()
+                regel.evaluer(ansatt, partner) shouldBe false
             }
         }
     }
@@ -34,7 +33,7 @@ class PartnerRegelTest : BehaviorSpec({
 
         When("regelen evalueres") {
             Then("tilgang gis") {
-                regel.evaluer(ansatt, bruker).shouldBeTrue()
+                regel.evaluer(ansatt, bruker) shouldBe true
             }
         }
     }

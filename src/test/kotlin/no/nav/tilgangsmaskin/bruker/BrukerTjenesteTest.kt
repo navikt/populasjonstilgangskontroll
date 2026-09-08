@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.bruker
 
 import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.collections.shouldNotContain
@@ -60,7 +59,7 @@ class BrukerTjenesteTest : BehaviorSpec({
             Then("returneres bruker med SKJERMING-gruppe") {
                 every { pdl.personer(setOf(id1.verdi)) } returns setOf(person(id1, aktørId1))
                 every { skjerming.skjerminger(listOf(id1)) } returns mapOf(id1 to true)
-                (brukerTjeneste.brukere(setOf(id1.verdi)).single() kreverMedlemskapI SKJERMING).shouldBeTrue()
+                (brukerTjeneste.brukere(setOf(id1.verdi)).single() kreverMedlemskapI SKJERMING) shouldBe true
             }
         }
         When("to brukere returneres fra PDL") {
@@ -71,7 +70,7 @@ class BrukerTjenesteTest : BehaviorSpec({
                 assertSoftly {
                     result shouldHaveSize 2
                     result.first { it.brukerId == id1 } kreverMedlemskapI SKJERMING shouldBe false
-                    (result.first { it.brukerId == id2 } kreverMedlemskapI SKJERMING).shouldBeTrue()
+                    (result.first { it.brukerId == id2 } kreverMedlemskapI SKJERMING) shouldBe true
                 }
             }
         }
@@ -118,7 +117,7 @@ class BrukerTjenesteTest : BehaviorSpec({
             Then("settes SKJERMING-gruppe") {
                 every { pdl.medFamilie(id1.verdi) } returns person(id1, aktørId1)
                 every { skjerming.skjerming(id1) } returns true
-                (brukerTjeneste.medNærmesteFamilie(id1.verdi) kreverMedlemskapI SKJERMING).shouldBeTrue()
+                (brukerTjeneste.medNærmesteFamilie(id1.verdi) kreverMedlemskapI SKJERMING) shouldBe true
             }
         }
         When("brukerMedNærmesteFamilie kalles") {
@@ -146,7 +145,7 @@ class BrukerTjenesteTest : BehaviorSpec({
             Then("settes SKJERMING-gruppe") {
                 every { pdl.medUtvidetFamilie(id1.verdi) } returns person(id1, aktørId1)
                 every { skjerming.skjerming(id1) } returns true
-                (brukerTjeneste.medUtvidetFamilie(id1.verdi) kreverMedlemskapI SKJERMING).shouldBeTrue()
+                (brukerTjeneste.medUtvidetFamilie(id1.verdi) kreverMedlemskapI SKJERMING) shouldBe true
             }
         }
         When("brukerMedUtvidetFamilie kalles") {

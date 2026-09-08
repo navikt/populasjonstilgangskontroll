@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.ansatt.nom
 
 import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
@@ -59,7 +58,7 @@ class NomDBOpprydderTest(private val opprydder: NomDBOpprydder, private val repo
                     assertSoftly {
                         opprydder.ryddOpp() shouldBe 1
                         repo.count() shouldBe 1
-                        repo.findById(gyldig.id!!).isPresent.shouldBeTrue()
+                        repo.findById(gyldig.id!!).isPresent shouldBe true
                     }
                 }
 

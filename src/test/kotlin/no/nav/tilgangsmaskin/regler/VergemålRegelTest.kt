@@ -1,8 +1,7 @@
 package no.nav.tilgangsmaskin.regler
 
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.booleans.shouldBeFalse
-import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilgangsmaskin.ansatt.AnsattId
@@ -22,7 +21,7 @@ class VergemålRegelTest : BehaviorSpec({
                 every { vergemål.alle(ansattId) } returns setOf(brukerId)
                 val ansatt = AnsattBuilder(ansattId).build()
                 val bruker = BrukerBuilder(brukerId).build()
-                regel.evaluer(ansatt, bruker).shouldBeFalse()
+                regel.evaluer(ansatt, bruker) shouldBe false
             }
         }
     }
@@ -33,7 +32,7 @@ class VergemålRegelTest : BehaviorSpec({
                 every { vergemål.alle(ansattId) } returns emptySet()
                 val ansatt = AnsattBuilder(ansattId).build()
                 val bruker = BrukerBuilder(brukerId).build()
-                regel.evaluer(ansatt, bruker).shouldBeTrue()
+                regel.evaluer(ansatt, bruker) shouldBe true
             }
         }
     }
@@ -44,7 +43,7 @@ class VergemålRegelTest : BehaviorSpec({
                 every { vergemål.alle(ansattId) } throws RuntimeException("tjenesten er nede")
                 val ansatt = AnsattBuilder(ansattId).build()
                 val bruker = BrukerBuilder(brukerId).build()
-                regel.evaluer(ansatt, bruker).shouldBeTrue()
+                regel.evaluer(ansatt, bruker) shouldBe true
             }
         }
     }

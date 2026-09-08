@@ -81,26 +81,31 @@ class RegelMotorBulkReglerTest(
                     kjerne.single().status shouldBe NO_CONTENT
 
                     val komplett = regelMotor.bulkRegler(ansatt, setOf(BrukerOgRegelsett(utlandsBruker, KOMPLETT_REGELTYPE)))
-                    komplett.single().status shouldBe FORBIDDEN
-                    komplett.single().regel.shouldBeInstanceOf<UtlandRegel>()
+                    assertSoftly(komplett) {
+                        single().status shouldBe FORBIDDEN
+                        single().regel.shouldBeInstanceOf<UtlandRegel>()
+                    }
+
                 }
             }
 
             When("samme bruker evalueres som komplett og overstyrbar") {
-                Then("kjerne-regler ignoreres for overstyrbar type") {
+                Then("kjerne-regler avslår for ikke-overstyrbar regel") {
                     val ansatt = AnsattBuilder(ansattId).build()
                     val skjermetForKjerne = BrukerBuilder(BrukerId("08526835644")).kreverMedlemskapI(STRENGT_FORTROLIG).build()
 
                     val komplett = regelMotor.bulkRegler(ansatt, setOf(BrukerOgRegelsett(skjermetForKjerne, KOMPLETT_REGELTYPE)))
-                    komplett.single().status shouldBe FORBIDDEN
-                    komplett.single().regel.shouldBeInstanceOf<StrengtFortroligRegel>()
+                    assertSoftly(komplett) {
+                        single().status shouldBe FORBIDDEN
+                        single().regel.shouldBeInstanceOf<StrengtFortroligRegel>()
+                    }
 
                     val overstyrbar = regelMotor.bulkRegler(ansatt, setOf(BrukerOgRegelsett(skjermetForKjerne, OVERSTYRBAR_REGELTYPE)))
                     overstyrbar.single().status shouldBe NO_CONTENT
                 }
             }
 
-            When("en regelkall feiler med annen exception enn RegelException") {
+            When("regel feiler med annen exception enn RegelException") {
                 Then("exception videresendes") {
                     every { oppfølging.enhetFor(any()) } throws IllegalStateException("uventet feil")
                     val ansatt = AnsattBuilder(ansattId).build()

@@ -1,8 +1,7 @@
 package no.nav.tilgangsmaskin.regler
 
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.booleans.shouldBeFalse
-import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.SKJERMING
 import no.nav.tilgangsmaskin.bruker.BrukerId
@@ -19,7 +18,7 @@ class EgneDataRegelTest : BehaviorSpec({
 
         When("regelen evalueres") {
             Then("avvises av EgneDataRegel") {
-                regel.evaluer(ansatt, bruker).shouldBeFalse()
+                regel.evaluer(ansatt, bruker) shouldBe false
             }
         }
     }
@@ -31,7 +30,7 @@ class EgneDataRegelTest : BehaviorSpec({
 
         When("regelen evalueres") {
             Then("tilgang gis") {
-                regel.evaluer(ansatt, bruker).shouldBeTrue()
+                regel.evaluer(ansatt, bruker) shouldBe true
             }
         }
     }

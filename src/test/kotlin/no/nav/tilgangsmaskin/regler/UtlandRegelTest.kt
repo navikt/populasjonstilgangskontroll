@@ -1,8 +1,7 @@
 package no.nav.tilgangsmaskin.regler
 
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.booleans.shouldBeFalse
-import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.UTENLANDSK
 import no.nav.tilgangsmaskin.bruker.BrukerId
@@ -20,14 +19,14 @@ class UtlandRegelTest : BehaviorSpec({
         When("ansatt mangler utenlandsk gruppe") {
             Then("avvises av UtlandRegel") {
                 val ansatt = AnsattBuilder(ansattId).build()
-                regel.evaluer(ansatt, bruker).shouldBeFalse()
+                regel.evaluer(ansatt, bruker) shouldBe false
             }
         }
 
         When("ansatt er medlem av utenlandsk") {
             Then("tilgang gis") {
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(UTENLANDSK).build()
-                regel.evaluer(ansatt, bruker).shouldBeTrue()
+                regel.evaluer(ansatt, bruker) shouldBe true
             }
         }
     }

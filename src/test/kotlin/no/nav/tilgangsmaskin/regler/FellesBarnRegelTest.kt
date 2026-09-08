@@ -1,14 +1,12 @@
 package no.nav.tilgangsmaskin.regler
 
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.booleans.shouldBeFalse
-import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.regler.motor.FellesBarnRegel
 
 class FellesBarnRegelTest : BehaviorSpec({
-    val regel = FellesBarnRegel()
     val ansattId = AnsattId("Z999999")
     val brukerId = BrukerId("08526835670")
 
@@ -21,7 +19,7 @@ class FellesBarnRegelTest : BehaviorSpec({
 
         When("regelen evalueres") {
             Then("avvises av FellesBarnRegel") {
-                regel.evaluer(ansatt, mor).shouldBeFalse()
+                FellesBarnRegel().evaluer(ansatt, mor) shouldBe false
             }
         }
     }
@@ -36,7 +34,7 @@ class FellesBarnRegelTest : BehaviorSpec({
 
         When("regelen evalueres") {
             Then("tilgang gis") {
-                regel.evaluer(ansatt, bruker).shouldBeTrue()
+                FellesBarnRegel().evaluer(ansatt, bruker) shouldBe true
             }
         }
     }

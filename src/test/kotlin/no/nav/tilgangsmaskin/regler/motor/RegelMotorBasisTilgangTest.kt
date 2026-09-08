@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.regler.motor
 
+import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.every
@@ -19,21 +20,27 @@ class RegelMotorBasisTilgangTest(
             When("ansatt er strengt fortrolig") {
                 Then("tilgang gis") {
                     val ansatt = AnsattBuilder(ansattId).medMedlemskapI(STRENGT_FORTROLIG).build()
-                    ansatt kanBehandle bruker
+                    shouldNotThrowAny {
+                        regelMotor.kompletteRegler(ansatt, bruker)
+                    }
                 }
             }
 
             When("ansatt er fortrolig") {
                 Then("tilgang gis") {
                     val ansatt = AnsattBuilder(ansattId).medMedlemskapI(FORTROLIG).build()
-                    ansatt kanBehandle bruker
+                    shouldNotThrowAny {
+                        regelMotor.kompletteRegler(ansatt, bruker)
+                    }
                 }
             }
 
             When("ansatt har ingen spesialtilganger") {
                 Then("tilgang gis") {
                     val ansatt = AnsattBuilder(ansattId).build()
-                    ansatt kanBehandle bruker
+                    shouldNotThrowAny {
+                        regelMotor.kompletteRegler(ansatt, bruker)
+                    }
                 }
             }
         }

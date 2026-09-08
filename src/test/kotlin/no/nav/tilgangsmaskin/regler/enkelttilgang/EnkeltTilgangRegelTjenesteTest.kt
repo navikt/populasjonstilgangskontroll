@@ -5,7 +5,6 @@ import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
@@ -233,7 +232,7 @@ class EnkeltTilgangRegelTjenesteTest(
                         brukere.medNærmesteFamilie(vanligBrukerId.verdi)
                     } returns vanligBruker(vanligBrukerId)
                     registrerEnkelttilgang(vanligBrukerId, "Gyldig test")
-                    enkeltTilgang.harTilgang(ansattId, vanligBrukerId).shouldBeTrue()
+                    enkeltTilgang.harTilgang(ansattId, vanligBrukerId) shouldBe true
                 }
             }
             When("bulk enkelttilganger  med utløpt og gyldig") {

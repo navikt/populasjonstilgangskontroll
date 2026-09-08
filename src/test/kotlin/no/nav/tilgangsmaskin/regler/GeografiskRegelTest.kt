@@ -2,8 +2,7 @@ package no.nav.tilgangsmaskin.regler
 
 import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.booleans.shouldBeFalse
-import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.shouldBe
 import io.mockk.Called
 import io.mockk.clearMocks
 import io.mockk.every
@@ -40,7 +39,7 @@ class GeografiskRegelTest : BehaviorSpec({
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(EntraGlobalGruppe.NASJONAL).build()
                 val bruker = BrukerBuilder(brukerId).build()
                 assertSoftly {
-                    regel.evaluer(ansatt, bruker).shouldBeTrue()
+                    regel.evaluer(ansatt, bruker) shouldBe true
                     verify { oppfølging wasNot Called }
                 }
             }
@@ -54,7 +53,7 @@ class GeografiskRegelTest : BehaviorSpec({
         When("ansatt mangler bydelgruppe") {
             Then("avvises av GeografiskRegel") {
                 val ansatt = AnsattBuilder(ansattId).build()
-                regel.evaluer(ansatt, bruker).shouldBeFalse()
+                regel.evaluer(ansatt, bruker) shouldBe false
             }
         }
 
@@ -62,7 +61,7 @@ class GeografiskRegelTest : BehaviorSpec({
             Then("tilgang gis") {
                 val bydelGruppe = EntraGruppe(UUID.randomUUID(), "0000-GA-GEO_$bydel")
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(bydelGruppe).build()
-                regel.evaluer(ansatt, bruker).shouldBeTrue()
+                regel.evaluer(ansatt, bruker) shouldBe true
             }
         }
     }
@@ -75,7 +74,7 @@ class GeografiskRegelTest : BehaviorSpec({
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(enhetGruppe).build()
                 val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune(enhet.verdi))).build()
                 assertSoftly {
-                    regel.evaluer(ansatt, bruker).shouldBeTrue()
+                    regel.evaluer(ansatt, bruker) shouldBe true
                     verify { oppfølging wasNot Called }
                 }
             }
@@ -86,7 +85,7 @@ class GeografiskRegelTest : BehaviorSpec({
                 val ansatt = AnsattBuilder(ansattId).build()
                 val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("9999"))).build()
                 assertSoftly {
-                    regel.evaluer(ansatt, bruker).shouldBeFalse()
+                    regel.evaluer(ansatt, bruker) shouldBe false
                     verify { oppfølging.enhetFor(Identifikator(brukerId.verdi)) }
                 }
             }
@@ -100,7 +99,7 @@ class GeografiskRegelTest : BehaviorSpec({
                 val ansatt = AnsattBuilder(ansattId).medMedlemskapI(oppfølgingGruppe).build()
                 val bruker = BrukerBuilder(brukerId).gt(KommuneTilknytning(Kommune("9999"))).build()
                 assertSoftly {
-                    regel.evaluer(ansatt, bruker).shouldBeTrue()
+                    regel.evaluer(ansatt, bruker) shouldBe true
                     verify { oppfølging.enhetFor(Identifikator(brukerId.verdi)) }
                 }
             }

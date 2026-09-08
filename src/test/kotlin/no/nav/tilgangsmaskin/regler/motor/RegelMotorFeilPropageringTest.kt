@@ -11,7 +11,7 @@ import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 
-class RegelMotorFeilpropageringTest : BehaviorSpec({
+class RegelMotorFeilPropageringTest : BehaviorSpec({
     val ansatt = AnsattBuilder(AnsattId("Z999999")).build()
     val bruker = BrukerBuilder(BrukerId("08526835670")).build()
     val logger = mockk<RegelMotorLogger>(relaxed = true)

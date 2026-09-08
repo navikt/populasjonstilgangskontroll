@@ -28,7 +28,7 @@ const val CCF_AUTHORITY = "${TOKEN_TYPE_AUTHORITY_PREFIX}CCF"
 
 @Component
 class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(private val env: Environment,
-    @Value($$"${gruppe.enkelttilgang:}") private val gruppeEnkeltTilgang: UUID) : Converter<Jwt, AbstractAuthenticationToken> {
+    @param:Value($$"${gruppe.enkelttilgang:}") private val gruppeEnkeltTilgang: UUID) : Converter<Jwt, AbstractAuthenticationToken> {
 
     private val log = getLogger(javaClass)
 

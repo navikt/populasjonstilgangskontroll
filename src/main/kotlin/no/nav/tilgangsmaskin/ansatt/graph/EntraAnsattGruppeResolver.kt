@@ -10,7 +10,7 @@ import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.felles.security.AuthContext
 import no.nav.tilgangsmaskin.felles.security.TokenType.CCF
 import no.nav.tilgangsmaskin.felles.security.TokenType.OBO
-import no.nav.tilgangsmaskin.felles.rest.notifikajon.MessagePublisher
+import no.nav.tilgangsmaskin.felles.rest.notifikasjon.MessagePublisher
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component

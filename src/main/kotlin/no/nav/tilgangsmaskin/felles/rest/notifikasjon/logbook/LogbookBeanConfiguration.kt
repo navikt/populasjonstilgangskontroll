@@ -1,10 +1,9 @@
-package no.nav.tilgangsmaskin.felles.rest.notifikajon.logbook
+package no.nav.tilgangsmaskin.felles.rest.notifikasjon.logbook
 
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.zalando.logbook.Logbook
 import org.zalando.logbook.attributes.AttributeExtractor

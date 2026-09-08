@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.felles.rest.notifikajon
+package no.nav.tilgangsmaskin.felles.rest.notifikasjon
 
 @FunctionalInterface
 interface Auditor {

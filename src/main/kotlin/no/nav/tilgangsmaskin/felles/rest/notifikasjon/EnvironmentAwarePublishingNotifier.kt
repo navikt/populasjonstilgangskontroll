@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.felles.rest.notifikajon
+package no.nav.tilgangsmaskin.felles.rest.notifikasjon
 
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.env.Environment

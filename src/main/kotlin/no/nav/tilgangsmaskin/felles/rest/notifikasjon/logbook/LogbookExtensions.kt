@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.felles.rest.notifikajon.logbook
+package no.nav.tilgangsmaskin.felles.rest.notifikasjon.logbook
 
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.OSLO
 import org.zalando.logbook.HttpRequest

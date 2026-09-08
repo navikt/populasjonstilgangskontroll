@@ -23,7 +23,7 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
-import no.nav.tilgangsmaskin.felles.rest.notifikajon.MessagePublisher
+import no.nav.tilgangsmaskin.felles.rest.notifikasjon.MessagePublisher
 import no.nav.tilgangsmaskin.felles.security.AuthContext
 import no.nav.tilgangsmaskin.felles.security.TokenType
 import no.nav.tilgangsmaskin.felles.security.TokenType.CCF

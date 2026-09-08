@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.felles.rest.notifikajon.logbook
+package no.nav.tilgangsmaskin.felles.rest.notifikasjon.logbook
 
 import org.zalando.logbook.Correlation
 import org.zalando.logbook.HttpLogFormatter

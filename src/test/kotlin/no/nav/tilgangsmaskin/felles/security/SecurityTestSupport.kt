@@ -6,7 +6,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.tilgangsmaskin.felles.cache.CaffeineCacheOperations
-import no.nav.tilgangsmaskin.felles.rest.notifikajon.logbook.LogbookBeanConfiguration
+import no.nav.tilgangsmaskin.felles.rest.notifikasjon.logbook.LogbookBeanConfiguration
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.NAVIDENT
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.OID
 import no.nav.tilgangsmaskin.felles.security.SecurityTestOAuth2.server

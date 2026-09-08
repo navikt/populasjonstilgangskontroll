@@ -10,6 +10,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
+import no.nav.tilgangsmaskin.regler.enkelttilgang.ENKELTTILGANG_PATH
 import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode.AVVIST_STRENGT_FORTROLIG_ADRESSE
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.regler.motor.KjerneRegel
@@ -172,7 +173,7 @@ open class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
             When("enkelttilgang kalles med gyldig request og OBO-token") {
                 Then("returnerer 204 og dokumenteres i rest docs") {
                     every { enkeltTilgangTjeneste.registrerTilgang(ansattId, request) } returns true
-                    mockMvc.post("$PROD_BASE_PATH/overstyr") {
+                    mockMvc.post(ENKELTTILGANG_PATH) {
                         contentType = APPLICATION_JSON
                         content = mapper.writeValueAsString(request)
                     }.andExpect {
@@ -185,7 +186,7 @@ open class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
 
             When("begrunnelse er for kort") {
                 Then("returnerer 400") {
-                    mockMvc.post("$PROD_BASE_PATH/overstyr") {
+                    mockMvc.post(ENKELTTILGANG_PATH) {
                         contentType = APPLICATION_JSON
                         content = mapper.writeValueAsString(EnkeltTilgangData(BrukerId(brukerId), "For kort", gyldigTil))
                     }.andExpect {
@@ -200,7 +201,7 @@ open class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
 
             When("begrunnelse er for lang") {
                 Then("returnerer 400") {
-                    mockMvc.post("$PROD_BASE_PATH/overstyr") {
+                    mockMvc.post(ENKELTTILGANG_PATH) {
                         contentType = APPLICATION_JSON
                         content = mapper.writeValueAsString(EnkeltTilgangData(BrukerId(brukerId), "x".repeat(401), gyldigTil))
                     }.andExpect {
@@ -212,7 +213,7 @@ open class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
 
             When("gyldigtil er i fortiden") {
                 Then("returnerer 400") {
-                    mockMvc.post("$PROD_BASE_PATH/overstyr") {
+                    mockMvc.post(ENKELTTILGANG_PATH) {
                         contentType = APPLICATION_JSON
                         content = mapper.writeValueAsString(
                             EnkeltTilgangData(BrukerId(brukerId), "En god begrunnelse", LocalDate.now().minusDays(1))
@@ -229,7 +230,7 @@ open class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
 
             When("gyldigtil er mer enn 3 måneder frem i tid") {
                 Then("returnerer 400") {
-                    mockMvc.post("$PROD_BASE_PATH/overstyr") {
+                    mockMvc.post(ENKELTTILGANG_PATH) {
                         contentType = APPLICATION_JSON
                         content = mapper.writeValueAsString(
                             EnkeltTilgangData(BrukerId(brukerId), "En god begrunnelse", LocalDate.now().plusMonths(4))

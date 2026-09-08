@@ -27,6 +27,11 @@
   },
   "inbound": [
     {
+      "name": "ekspertbistand-backend",
+      "namespace": "fager",
+      "cluster": "prod-gcp"
+    },
+    {
       "name":  "syk-dig-backend",
       "namespace": "teamsykmelding",
       "cluster": "prod-gcp"

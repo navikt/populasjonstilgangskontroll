@@ -29,6 +29,11 @@
   },
   "inbound": [
     {
+      "name": "ekspertbistand-backend",
+      "namespace": "fager",
+      "cluster": "dev-gcp"
+    },
+    {
       "name": "pensjon-pen-q0",
       "namespace": "pensjon-q0",
       "cluster": "dev-fss"

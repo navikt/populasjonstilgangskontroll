@@ -137,5 +137,7 @@ spec:
       value: '{{grupper.enkelttilgang}}'
     - name: DB_POOLSIZE
       value: '{{db.poolsize}}'
+    - name: LOGGING_SECURE_LOG_NAME
+      value: 'secureLog'
     - name: JDK_JAVA_OPTIONS
       value: "-XX:MaxRAMPercentage=60.0"

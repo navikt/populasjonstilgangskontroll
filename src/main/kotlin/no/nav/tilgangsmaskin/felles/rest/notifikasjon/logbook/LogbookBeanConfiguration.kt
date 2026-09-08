@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest.notifikasjon.logbook
 
+import no.nav.boot.conditionals.ConditionalOnNotProd
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.springframework.context.annotation.Bean
@@ -17,6 +18,7 @@ private val BRUKER_ID_REGEX = Regex("""(?<!\d)\d{11}(?!\d)""")
 
 @Configuration
 @NoCoverageAnalysis
+@ConditionalOnNotProd
 class LogbookBeanConfiguration {
 
     @Bean

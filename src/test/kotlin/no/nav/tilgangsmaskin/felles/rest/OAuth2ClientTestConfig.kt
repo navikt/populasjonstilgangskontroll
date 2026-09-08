@@ -22,8 +22,7 @@ class OAuth2ClientTestConfig {
 
     @Bean
     fun restClientGroupCustomizer(
-        customizers: ObjectProvider<RestClientCustomizer>,
-        env: Environment) =
+        customizers: ObjectProvider<RestClientCustomizer>, env: Environment) =
         RestClientHttpServiceGroupConfigurer { groups ->
             groups.forEachClient { group, builder ->
                 env.getRequiredProperty("${SERVICE_CLIENT_PREFIX}.${group.name()}.base-url").let(builder::baseUrl)

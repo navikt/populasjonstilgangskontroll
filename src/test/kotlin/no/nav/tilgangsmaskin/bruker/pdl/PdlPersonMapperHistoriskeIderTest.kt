@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.bruker.pdl
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPerson
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapperTestFixture.BRUKER_ID
@@ -26,12 +27,12 @@ class PdlPersonMapperHistoriskeIderTest : BehaviorSpec({
         }
         When("historisk AKTORID") {
             Then("ekskluderes") {
-                tilPerson(BRUKER_ID, pdlRespons(identer = identer(historiske = listOf("9876543210123" to AKTORID)))).historiskeIds.shouldBeEmpty()
+                tilPerson(BRUKER_ID, pdlRespons(identer = identer(historiske = listOf("9876543210123" to AKTORID)))).historiskeIds shouldBe emptySet()
             }
         }
         When("ingen historiske identer") {
             Then("er tom") {
-                tilPerson(BRUKER_ID, pdlRespons()).historiskeIds.shouldBeEmpty()
+                tilPerson(BRUKER_ID, pdlRespons()).historiskeIds shouldBe emptySet()
             }
         }
     }

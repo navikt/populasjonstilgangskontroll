@@ -65,7 +65,7 @@ class PersonTilBrukerMapperTest : BehaviorSpec({
     Given("tilBruker - påkrevdeGrupper — gradering") {
         When("ugradert person uten skjerming") {
             Then("ingen grupper kreves") {
-                tilBruker(person(graderinger = listOf(UGRADERT)), false).påkrevdeGrupper.shouldBeEmpty()
+                tilBruker(person(graderinger = listOf(UGRADERT)), false).påkrevdeGrupper shouldBe emptySet()
             }
         }
         When("ingen graderinger og ingen skjerming") {
@@ -165,7 +165,7 @@ class PersonTilBrukerMapperTest : BehaviorSpec({
         }
         When("ugradert, ikke skjermet, kjent GT") {
             Then("ingen grupper kreves") {
-                tilBruker(person(gt = kommuneGT, graderinger = listOf(UGRADERT)), false).påkrevdeGrupper.shouldBeEmpty()
+                tilBruker(person(gt = kommuneGT, graderinger = listOf(UGRADERT)), false).påkrevdeGrupper shouldBe emptySet()
             }
         }
     }

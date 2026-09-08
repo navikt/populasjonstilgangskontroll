@@ -48,7 +48,8 @@ class OppfølgingTjenesteTest(
     @TestConfiguration
     class OppfølgingTestConfig : CacheTestConfig(OPPFØLGING)
 
-    @MockkBean private lateinit var authContext: AuthContext
+    @MockkBean
+    private lateinit var authContext: AuthContext
 
     init {
         beforeEach {

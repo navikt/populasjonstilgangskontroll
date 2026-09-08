@@ -49,9 +49,9 @@ class BrukerTjenesteTest : BehaviorSpec({
                 every { pdl.personer(setOf(id1.verdi)) } returns setOf(person(id1, aktørId1))
                 every { skjerming.skjerminger(listOf(id1)) } returns mapOf(id1 to false)
                 val result = brukerTjeneste.brukere(setOf(id1.verdi)).single()
-                assertSoftly {
-                    result.brukerId shouldBe id1
-                    result.påkrevdeGrupper shouldNotContain SKJERMING
+                assertSoftly(result) {
+                    brukerId shouldBe id1
+                    påkrevdeGrupper shouldNotContain SKJERMING
                 }
             }
         }

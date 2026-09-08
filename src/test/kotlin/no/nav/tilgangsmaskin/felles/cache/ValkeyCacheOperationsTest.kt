@@ -60,8 +60,7 @@ import kotlin.time.measureTime
 class ValkeyCacheOperationsTest(
     private val cache: CacheOperations,
     private val cacheSizeAware: CacheSizeAware,
-    private val valkey: StringRedisTemplate,
-) : BehaviorSpec() {
+    private val valkey: StringRedisTemplate) : BehaviorSpec() {
 
     @TestConfiguration
     class ValkeyCacheTestConfig(private val cf: RedisConnectionFactory) : RedisListenerConfigurer{

@@ -103,7 +103,7 @@ class SkjermingTjenesteTest(
             When("ingen identer") {
                 Then("kalles ikke REST") {
                     server.expect(never(), requestTo(skjermingerUri))
-                    tjeneste.skjerminger(emptyList()).shouldBeEmpty()
+                    tjeneste.skjerminger(emptyList()) shouldBe emptyMap()
                 }
             }
             When("REST returnerer resultat") {

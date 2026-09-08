@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldExist
 import io.kotest.matchers.shouldBe
@@ -15,8 +16,7 @@ class PingableHealthIndicatorTest : BehaviorSpec({
     class StubPingable(
         override val pingEndpoint: URI = URI.create("http://example.com/ping"),
         override val name: String = "test",
-        val onPing: () -> Any? = { }
-    ) : Pingable {
+        val onPing: () -> Any? = { }) : Pingable {
         var pinged = false
         override fun ping(): Any? { pinged = true; return onPing() }
     }
@@ -35,9 +35,12 @@ class PingableHealthIndicatorTest : BehaviorSpec({
             Then("returneres DOWN med feilmelding og riktig endpoint") {
                 val pingable = StubPingable(onPing = { throw RuntimeException("Connection refused") })
                 val health = PingableHealthIndicator(pingable).health()
-                health.status shouldBe DOWN
-                health.details[ENDPOINT] shouldBe "http://example.com/ping"
-                health.details.values.map { it.toString() }.shouldExist { it.contains("Connection refused") }
+                assertSoftly(health) {
+                    status shouldBe DOWN
+                    details[ENDPOINT] shouldBe "http://example.com/ping"
+                    details.values.map { it.toString() }.shouldExist { it.contains("Connection refused") }
+                }
+
             }
         }
         When("annen pingEndpoint er konfigurert og ping feiler") {

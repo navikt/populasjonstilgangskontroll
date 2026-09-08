@@ -63,7 +63,7 @@ class EntraTjenesteTest(private val tjeneste: EntraTjeneste, private val server:
                         .andExpect(method(GET))
                         .andRespond(withSuccess("""{ "value": [] }""", APPLICATION_JSON))
 
-                    tjeneste.geoGrupper(ANSATTID, OID).shouldBeEmpty()
+                    tjeneste.geoGrupper(ANSATTID, OID) shouldBe emptySet()
                 }
             }
 
@@ -104,7 +104,7 @@ class EntraTjenesteTest(private val tjeneste: EntraTjeneste, private val server:
                         .andExpect(method(GET))
                         .andRespond(withSuccess("""{ "value": [] }""", APPLICATION_JSON))
 
-                    tjeneste.geoOgGlobaleGrupper(ANSATTID, OID).shouldBeEmpty()
+                    tjeneste.geoOgGlobaleGrupper(ANSATTID, OID) shouldBe emptySet()
                 }
             }
         }

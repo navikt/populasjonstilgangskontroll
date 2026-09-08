@@ -34,17 +34,20 @@ class DefaultRestErrorHandlerTest : BehaviorSpec({
     Given("handle - 404 Not Found") {
         When("request uten identifikator") {
             Then("kastes NotFoundRestException med riktig URI og null identifikator") {
-                val e = shouldThrow<NotFoundRestException> { handler.handle(req(), res(NOT_FOUND)) }
-                assertSoftly {
-                    e.uri shouldBe uri
-                    e.identifikator shouldBe null
+                shouldThrow<NotFoundRestException> { handler.handle(req(), res(NOT_FOUND)) }.apply {
+                    assertSoftly {
+                        uri shouldBe uri
+                        identifikator shouldBe null
+                    }
                 }
             }
         }
         When("request med identifikator-header") {
+            val id = "12345678901"
             Then("kastes NotFoundRestException med identifikator fra header") {
-                val e = shouldThrow<NotFoundRestException> { handler.handle(req("12345678901"), res(NOT_FOUND)) }
-                e.identifikator shouldBe "12345678901"
+                shouldThrow<NotFoundRestException> {
+                    handler.handle(req(id), res(NOT_FOUND))
+                }.identifikator shouldBe id
             }
         }
     }
@@ -52,26 +55,33 @@ class DefaultRestErrorHandlerTest : BehaviorSpec({
     Given("handle - 4xx klientfeil (ikke 404)") {
         When("400 Bad Request") {
             Then("kastes IrrecoverableRestException, ikke NotFoundRestException") {
-                val e = shouldThrow<IrrecoverableRestException> { handler.handle(req(), res(BAD_REQUEST)) }
-                assertSoftly {
-                    e.shouldBeInstanceOf<IrrecoverableRestException>()
-                    e.shouldNotBeInstanceOf<NotFoundRestException>()
+                shouldThrow<IrrecoverableRestException> { handler.handle(req(), res(BAD_REQUEST)) }.apply {
+                    assertSoftly {
+                        shouldBeInstanceOf<IrrecoverableRestException>()
+                        shouldNotBeInstanceOf<NotFoundRestException>()
+                    }
                 }
             }
         }
         When("403 Forbidden") {
             Then("kastes IrrecoverableRestException") {
-                shouldThrow<IrrecoverableRestException> { handler.handle(req(), res(FORBIDDEN)) }
+                shouldThrow<IrrecoverableRestException> {
+                    handler.handle(req(), res(FORBIDDEN))
+                }
             }
         }
         When("429 Too Many Requests") {
             Then("kastes RecoverableRestException") {
-                shouldThrow<RecoverableRestException> { handler.handle(req(), res(TOO_MANY_REQUESTS)) }
+                shouldThrow<RecoverableRestException> {
+                    handler.handle(req(), res(TOO_MANY_REQUESTS))
+                }
             }
         }
         When("408 Request Timeout") {
             Then("kastes RecoverableRestException") {
-                shouldThrow<RecoverableRestException> { handler.handle(req(), res(REQUEST_TIMEOUT)) }
+                shouldThrow<RecoverableRestException> {
+                    handler.handle(req(), res(REQUEST_TIMEOUT))
+                }
             }
         }
     }
@@ -79,13 +89,16 @@ class DefaultRestErrorHandlerTest : BehaviorSpec({
     Given("handle - 5xx serverfeil") {
         When("500 Internal Server Error") {
             Then("kastes RecoverableRestException, ikke IrrecoverableRestException") {
-                val e = shouldThrow<RecoverableRestException> { handler.handle(req(), res(INTERNAL_SERVER_ERROR)) }
-                e.shouldNotBeInstanceOf<IrrecoverableRestException>()
+                shouldThrow<RecoverableRestException> {
+                    handler.handle(req(), res(INTERNAL_SERVER_ERROR))
+                }.shouldNotBeInstanceOf<IrrecoverableRestException>()
             }
         }
         When("503 Service Unavailable") {
             Then("kastes RecoverableRestException") {
-                shouldThrow<RecoverableRestException> { handler.handle(req(), res(SERVICE_UNAVAILABLE)) }
+                shouldThrow<RecoverableRestException> {
+                    handler.handle(req(), res(SERVICE_UNAVAILABLE))
+                }
             }
         }
     }

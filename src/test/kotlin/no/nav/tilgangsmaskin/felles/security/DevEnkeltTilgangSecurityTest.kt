@@ -24,7 +24,7 @@ import java.util.UUID
 
 @SpringBootTest(classes = [SecurityTestApplication::class])
 @AutoConfigureMockMvc
-open class DevEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private val mapper: JsonMapper) : BehaviorSpec() {
+open class DevEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, mapper: JsonMapper) : BehaviorSpec() {
 
 
     val dto = EnkeltTilgangData(TEST_BRUKER_ID, "En god begrunnelse", now().plusMonths(2))

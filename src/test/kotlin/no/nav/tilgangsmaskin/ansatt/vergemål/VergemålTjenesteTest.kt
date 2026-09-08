@@ -103,7 +103,7 @@ class VergemålTjenesteTest(
                         .andExpect(method(POST))
                         .andRespond(withSuccess("[]", APPLICATION_JSON))
 
-                    tjeneste.alle(ANSATT_ID).shouldBeEmpty()
+                    tjeneste.alle(ANSATT_ID) shouldBe emptySet()
                 }
             }
         }
@@ -146,7 +146,7 @@ class VergemålTjenesteTest(
                 Then("returnerer tom liste uten HTTP-kall") {
                     every { nom.fnrForAnsatt(ANSATT_ID) } returns null
 
-                    tjeneste.alle(ANSATT_ID).shouldBeEmpty()
+                    tjeneste.alle(ANSATT_ID) shouldBe emptySet()
                 }
             }
         }

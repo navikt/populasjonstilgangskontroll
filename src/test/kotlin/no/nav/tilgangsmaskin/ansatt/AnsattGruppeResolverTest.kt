@@ -69,14 +69,14 @@ class AnsattGruppeResolverTest : BehaviorSpec({
         When("ingen av token-gruppeIDene er kjente") {
             Then("AuthContext.globaleGrupper returnerer tomt sett") {
                 every { authContext.globaleGruppeIds } returns setOf(UUID.randomUUID(), UUID.randomUUID())
-                authContext.globaleGrupper().shouldBeEmpty()
+                authContext.globaleGrupper() shouldBe emptySet()
             }
         }
 
         When("token ikke har noen gruppe-IDer") {
             Then("AuthContext.globaleGrupper returnerer tomt sett") {
                 every { authContext.globaleGruppeIds } returns emptySet()
-                authContext.globaleGrupper().shouldBeEmpty()
+                authContext.globaleGrupper() shouldBe emptySet()
             }
         }
 

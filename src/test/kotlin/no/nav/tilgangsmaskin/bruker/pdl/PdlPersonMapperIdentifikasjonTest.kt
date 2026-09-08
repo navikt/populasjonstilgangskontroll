@@ -28,12 +28,16 @@ class PdlPersonMapperIdentifikasjonTest : BehaviorSpec({
         }
         When("aktørId mangler") {
             Then("kastes IllegalStateException") {
-                shouldThrow<IllegalStateException> { PdlPipRespons(PdlPerson(), PdlIdenter(listOf(PdlIdent(BRUKER_ID, false, FOLKEREGISTERIDENT)))) }
+                shouldThrow<IllegalStateException> {
+                    PdlPipRespons(PdlPerson(), PdlIdenter(listOf(PdlIdent(BRUKER_ID, false, FOLKEREGISTERIDENT))))
+                }
             }
         }
         When("brukerId mangler") {
             Then("kastes IllegalStateException") {
-                shouldThrow<IllegalStateException> { PdlPipRespons(PdlPerson(), PdlIdenter(listOf(PdlIdent(AKTOR_ID, false, AKTORID)))) }
+                shouldThrow<IllegalStateException> {
+                    PdlPipRespons(PdlPerson(), PdlIdenter(listOf(PdlIdent(AKTOR_ID, false, AKTORID))))
+                }
             }
         }
     }

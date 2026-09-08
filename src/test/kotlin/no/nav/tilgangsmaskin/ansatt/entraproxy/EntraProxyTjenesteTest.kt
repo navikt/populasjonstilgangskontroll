@@ -84,7 +84,7 @@ class EntraProxyTjenesteTest(private val tjeneste: EntraProxyTjeneste, private v
                         .andExpect(method(GET))
                         .andRespond(withSuccess("[]", APPLICATION_JSON))
 
-                    tjeneste.enheter(ANSATTID).shouldBeEmpty()
+                    tjeneste.enheter(ANSATTID) shouldBe emptySet()
                 }
             }
         }

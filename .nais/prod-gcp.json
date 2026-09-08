@@ -294,6 +294,7 @@
   ],
   "nais": {
     "cluster": {
+      "cache": "cache",
       "type": "prod"
     }
   },

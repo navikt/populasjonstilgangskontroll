@@ -440,6 +440,7 @@
   ],
   "nais": {
     "cluster": {
+      "cache": "cache1",
       "type": "dev"
     }
   },

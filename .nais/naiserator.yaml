@@ -12,9 +12,6 @@ spec:
   strategy:
     rollingUpdate:
       maxSurge: 50%
-  valkey:
-    - instance: {{nais.cluster.cache}}
-      access: readwrite
   leaderElection: true
   kafka:
     pool: nav-{{nais.cluster.type}}
@@ -111,8 +108,6 @@ spec:
   env:
     - name: NAIS_CLUSTER_TYPE
       value: {{nais.cluster.type}}
-    - name: NAIS_CLUSTER_CACHE
-      value: {{nais.cluster.cache}}
     - name: PDLGRAPH
       value: {{pdlgraph}}
     - name: PDLPIP

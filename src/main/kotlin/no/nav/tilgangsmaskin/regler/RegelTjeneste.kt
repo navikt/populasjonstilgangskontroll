@@ -41,7 +41,7 @@ class RegelTjeneste(
                     if (!enkeltTilgangTjeneste.harTilgang(ansattId, bruker.brukerId)) {
                         throw e
                     }
-                    log.info("Enkelttilgang gitt for {} og {}", ansattId, brukerId.maskFnr())
+                    log.info("Enkelttilgang OK. {} fikk tilgang til {}", ansattId, brukerId.maskFnr())
                 }
             }
                 ?: log.info("${KOMPLETT_REGELTYPE.beskrivelse} ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang likevel gitt")

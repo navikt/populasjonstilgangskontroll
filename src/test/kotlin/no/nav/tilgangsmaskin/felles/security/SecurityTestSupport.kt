@@ -34,6 +34,12 @@ const val AUDIENCES_PROPERTY = "spring.security.oauth2.resourceserver.jwt.audien
 
 object SecurityTestOAuth2 {
     val server = MockOAuth2Server().also { it.start() }
+
+    init {
+        Runtime.getRuntime().addShutdownHook(Thread {
+            server.shutdown()
+        })
+    }
 }
 
 fun jwt(aud: String, ansattId: AnsattId, claims: Map<String,Any> = emptyMap()) = server.issueToken(

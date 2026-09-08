@@ -4,6 +4,9 @@ name: Build (reusable)
 
 on:
   workflow_call:
+    secrets:
+      READER_TOKEN:
+        required: true
     inputs:
       publish-pages:
         description: "Publiser JaCoCo + testrapport til GitHub Pages"
@@ -138,5 +141,3 @@ jobs:
         if: ${{ inputs.publish-pages }}
         id: deployment
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
-
-

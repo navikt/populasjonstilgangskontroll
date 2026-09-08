@@ -42,8 +42,8 @@ fun jwt(aud: String, ansattId: AnsattId, claims: Map<String,Any> = emptyMap()) =
 ).serialize()
 
 fun DynamicPropertyRegistry.setProperties(clusterName: String? = null) {
-    add(ISSUER_URI_PROPERTY, server.issuerUrl(TEST_ISSUER_ID)::toString)
-    add(AUDIENCES_PROPERTY, TEST_AUDIENCE::toString)
+    add(ISSUER_URI_PROPERTY) { server.issuerUrl(TEST_ISSUER_ID).toString() }
+    add(AUDIENCES_PROPERTY) { TEST_AUDIENCE }
     clusterName?.let { add(NAIS_CLUSTER_NAME) { it } }
 }
 

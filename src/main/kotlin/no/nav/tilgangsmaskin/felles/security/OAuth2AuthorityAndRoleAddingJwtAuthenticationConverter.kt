@@ -45,7 +45,9 @@ class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(private val env: En
         }
 
     override fun convert(jwt: Jwt)  =
-        delegate.convert(jwt) ?: error("JWT konvertering feilet for token med claims: ${jwt.claims}")
+        delegate.convert(jwt) ?: error(
+            "JWT konvertering feilet for token med subject='${jwt.subject ?: "unknown"}', claimKeys=${jwt.claims.keys}"
+        )
 
     private fun shouldAddEnkeltRole(groups: List<String>?)  =
         !env.acceptsProfiles(PROD_GCP_PROFILE) || "$gruppeEnkeltTilgang" in groups.orEmpty()

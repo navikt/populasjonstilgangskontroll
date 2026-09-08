@@ -38,7 +38,7 @@ class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(private val env: En
             val authorities = buildSet {
                 addAll(jwt.authorities)
                 addAll(roller(jwt.token))
-                tokenTypeAuthority(jwt.token)?.let(::add)
+                authority(jwt.token)?.let(::add)
                 if (shouldAddEnkeltRole(jwt.token.getClaimAsStringList(GROUPS))) add(SimpleGrantedAuthority(ENKELTGRUPPE_ROLLE))
             }
             JwtAuthenticationToken(jwt.token, principal(jwt.token, authorities), authorities)
@@ -57,7 +57,7 @@ class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(private val env: En
                 log.trace("Principal satt til {} med authorities: {}", it.name, it.authorities)
             }
 
-    private fun tokenTypeAuthority(jwt: Jwt) =
+    private fun authority(jwt: Jwt) =
         when {
             jwt.getClaimAsStringList(ROLES).orEmpty().contains(CLIENT_CREDENTIALS) -> SimpleGrantedAuthority(CCF_AUTHORITY)
             jwt.getClaimAsString(OID) != null -> SimpleGrantedAuthority(OBO_AUTHORITY)

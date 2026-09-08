@@ -22,9 +22,9 @@ import java.util.UUID
 
 private const val ROLLE = "ROLE_"
 private const val ENKELTGRUPPE_ROLLE = "${ROLLE}ENKELT"
-private const val TOKEN_TYPE_AUTHORITY_PREFIX = "TOKEN_"
-const val OBO_AUTHORITY = "${TOKEN_TYPE_AUTHORITY_PREFIX}OBO"
-const val CCF_AUTHORITY = "${TOKEN_TYPE_AUTHORITY_PREFIX}CCF"
+private const val PREFIX = "TOKEN_"
+const val OBO_AUTHORITY = "${PREFIX}OBO"
+const val CCF_AUTHORITY = "${PREFIX}CCF"
 
 @Component
 class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(private val env: Environment,

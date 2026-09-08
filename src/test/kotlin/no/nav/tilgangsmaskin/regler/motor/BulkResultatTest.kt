@@ -21,15 +21,18 @@ class BulkResultatTest : BehaviorSpec({
 
     val ansattId = AnsattId("Z999999")
     val brukerId = BrukerId("08526835670")
-    val bruker = BrukerBuilder(brukerId).build()
+    val b = BrukerBuilder(brukerId).build()
 
     Given("BulkResultat.ok") {
         When("opprettet via companion-funksjon") {
             Then("har status NO_CONTENT og ingen regel") {
-                val resultat = ok(bruker)
-                resultat.status shouldBe NO_CONTENT
-                resultat.bruker shouldBe bruker
-                resultat.regel shouldBe null
+                val resultat = ok(b)
+                assertSoftly(resultat) {
+                    status shouldBe NO_CONTENT
+                    bruker shouldBe b
+                    regel shouldBe null
+                }
+
             }
         }
     }
@@ -38,13 +41,13 @@ class BulkResultatTest : BehaviorSpec({
         When("opprettet med RegelException") {
             Then("har status FORBIDDEN og referanse til regel") {
                 val ansatt = AnsattBuilder(ansattId).build()
-                val regel = StrengtFortroligRegel()
-                val exception = RegelException(ansatt, bruker, regel)
-                val resultat = avvist(bruker, exception)
-                assertSoftly {
-                    resultat.status shouldBe FORBIDDEN
-                    resultat.bruker shouldBe bruker
-                    resultat.regel shouldBe regel
+                val r = StrengtFortroligRegel()
+                val exception = RegelException(ansatt, b, r)
+                val resultat = avvist(b, exception)
+                assertSoftly(resultat) {
+                    status shouldBe FORBIDDEN
+                    bruker shouldBe b
+                    regel shouldBe r
                 }
             }
         }

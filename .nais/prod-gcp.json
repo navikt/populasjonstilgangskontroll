@@ -292,6 +292,11 @@
     }
 
   ],
+  "nais": {
+    "cluster": {
+      "type": "prod"
+    }
+  },
   "mem": {
     "min": "1Gi",
     "max": "2Gi"

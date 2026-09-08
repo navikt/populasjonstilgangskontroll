@@ -16,6 +16,8 @@ updates:
     schedule:
       interval: "daily"
     registry: pdl
+    cooldown:
+      default-days: 7
   - package-ecosystem: github-actions
     directory: "/"
     schedule:

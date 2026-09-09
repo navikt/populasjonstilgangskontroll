@@ -1,5 +1,7 @@
 package no.nav.tilgangsmaskin.regler.enkelttilgang
 
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
@@ -7,6 +9,8 @@ import org.springframework.data.repository.query.Param
 import java.time.Instant
 
 interface EnkeltTilgangRepository : JpaRepository<EnkeltTilgangEntity, Long> {
+
+    fun findByRapportertIsNull(pageable: Pageable): Page<EnkeltTilgangEntity>
 
     fun findByRapportertIsNull(): List<EnkeltTilgangEntity>
 

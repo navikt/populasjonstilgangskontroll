@@ -8,6 +8,8 @@ import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
+import no.nav.tilgangsmaskin.felles.rest.notifikasjon.LoggingMessagePublisher
+import no.nav.tilgangsmaskin.felles.rest.notifikasjon.MessagePublisher
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.diffFromNow
@@ -16,6 +18,7 @@ import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.regler.motor.RegelMotorLogger.Companion.INGEN_REGEL_TAG
 import no.nav.tilgangsmaskin.regler.motor.RegelMotorLogger.Companion.tag
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Clock
@@ -33,14 +36,27 @@ class EnkeltTilgangTjeneste(
     private val motor: RegelMotor,
     private val proxy: EntraProxyTjeneste,
     private val clock: Clock,
-    private val teller: EnkeltTilgangTeller) {
+    private val teller: EnkeltTilgangTeller,
+    private val publisher: MessagePublisher = LoggingMessagePublisher()) {
 
     private val log = getLogger(javaClass)
 
     fun tilganger(ansattId: AnsattId, brukerIds: Set<BrukerId>) =
         adapter.gjeldendeTilganger(ansattId.verdi, brukerIds.map { it.verdi }.toSet())
 
-    fun ikkeRapporterte() = adapter.ikkeRapporterte()
+    fun ikkeRapporterte() {
+        var pageNumber = 0
+        var page = adapter.ikkeRapporterte(PageRequest.of(pageNumber, RAPPORTERTE_PAGE_SIZE))
+        val ids = mutableListOf<EnkeltTilgang>()
+
+        while (true) {
+            ids += page.content
+            if (!page.hasNext()) break
+            pageNumber++
+            page = adapter.ikkeRapporterte(PageRequest.of(pageNumber, RAPPORTERTE_PAGE_SIZE))
+            publisher.publish("Ho",page.content.toString())
+        }
+    }
 
     fun harTilgang(ansattId: AnsattId, brukerId: BrukerId) =
         gjeldendeEnkeltTilgang(ansattId, brukerId)
@@ -81,6 +97,7 @@ class EnkeltTilgangTjeneste(
 
     private companion object {
         private const val TAG = "overstyrt"
+        private const val RAPPORTERTE_PAGE_SIZE = 1000
         private val ENKELTTILGANG_GITT = Tag.of(TAG, "true")
         private val ENKELTTILGANG_AVVIST = Tag.of(TAG, "false")
     }

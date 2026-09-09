@@ -48,9 +48,8 @@ class EnkeltTilgangDevController(private val enkelt: EnkeltTilgangTjeneste,
         adapter.gjeldendeTilgang(ansattId.verdi, brukerId.verdi, emptyList())
 
     @GetMapping("rapporterte")
-    fun ikkeRapporterte() = adapter.ikkeRapporterte()
+    fun ikkeRapporterte() = enkelt.ikkeRapporterte()
 
     @ExceptionHandler(HandlerMethodValidationException::class)
     fun handleValidation(ex: HandlerMethodValidationException) = valideringsfeilRespons(ex)
 }
-

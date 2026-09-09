@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
 import no.nav.tilgangsmaskin.felles.security.RequireOAuth2OBOAndEnkelt
-import no.nav.tilgangsmaskin.felles.rest.ProdController
 import no.nav.tilgangsmaskin.felles.security.ansattId
 import no.nav.tilgangsmaskin.regler.enkelttilgang.openapi.EnkeltTilgangApiResponse
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG

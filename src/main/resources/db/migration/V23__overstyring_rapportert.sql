@@ -1,0 +1,2 @@
+ALTER TABLE overstyring
+    ADD rapportert TIMESTAMP WITHOUT TIME ZONE;

@@ -56,4 +56,7 @@ class EnkeltTilgangEntity(
 
     @Column(name = "span", length = 16)
     var span: String? = null
+
+    @Column(name = "rapportert")
+    var rapportert: Instant? = null
 }

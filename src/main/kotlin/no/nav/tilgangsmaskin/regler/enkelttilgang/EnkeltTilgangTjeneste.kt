@@ -40,6 +40,8 @@ class EnkeltTilgangTjeneste(
     fun tilganger(ansattId: AnsattId, brukerIds: Set<BrukerId>) =
         adapter.gjeldendeTilganger(ansattId.verdi, brukerIds.map { it.verdi }.toSet())
 
+    fun ikkeRapporterte() = adapter.ikkeRapporterte()
+
     fun harTilgang(ansattId: AnsattId, brukerId: BrukerId) =
         gjeldendeEnkeltTilgang(ansattId, brukerId)
             ?.also {

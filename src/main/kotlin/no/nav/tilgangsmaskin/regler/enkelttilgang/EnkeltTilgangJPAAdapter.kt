@@ -11,6 +11,9 @@ class EnkeltTilgangJPAAdapter(
     private val repo: EnkeltTilgangRepository,
     private val clock: Clock) {
 
+
+    fun ikkeRapporterte() = repo.findByRapportertIsNull().map { it.id }
+
     fun enkeltTilgang(ansattId: String, enhetsnummer: String, data: EnkeltTilgangData): EnkeltTilgangEntity {
         val expires = data.gyldigtil.plusDays(1)
             .atStartOfDay(clock.zone)

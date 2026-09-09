@@ -13,8 +13,8 @@ spec:
     rollingUpdate:
       maxSurge: 50%
   valkey:
-    - instance: {{nais.cluster.cache}}
-      access: readwrite
+   - instance: {{nais.cluster.cache}}
+     access: readwrite
   leaderElection: true
   kafka:
     pool: nav-{{nais.cluster.type}}

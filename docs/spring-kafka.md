@@ -1,11 +1,7 @@
 # Spring Kafka: konfigurere en konsument
 
-Denne guiden beskriver hvordan Kafka-konsumenter er satt opp i Populasjonstilgangskontroll,
-med utgangspunkt i `application-gcp.yaml` og de eksisterende `*Konsument`-klassene
-(`PdlHendelseKonsument`, `NomHendelseKonsument`, `OppfølgingHendelseKonsument`).
+Denne guiden beskriver hvordan Kafka-konsumenter kan settes opp,
 
-Se også [ADR-003: Eksponentiell backoff uten DLT for Kafka-konsumenter](adr/ADR-003-kafka-feilhåndtering.md)
-for bakgrunnen til feilhåndteringsstrategien.
 
 ## 1. Felles Kafka-konfigurasjon (`application-gcp.yaml`)
 
@@ -32,9 +28,9 @@ spring:
       key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       properties:
-        "[auto.offset.reset]": earliest
+        "[auto.offset.reset]": <egen preferanse>
         "[spring.json.use.type.headers]": false
-        "[spring.json.trusted.packages]": no.nav.tilgangsmaskin
+        "[spring.json.trusted.packages]": <dine pakker>
         "[spring.deserializer.key.delegate.class]": org.apache.kafka.common.serialization.StringDeserializer
         "[spring.deserializer.value.delegate.class]": org.springframework.kafka.support.serializer.JacksonJsonDeserializer
 ```
@@ -50,7 +46,7 @@ Nøkkelpunkter:
   `spring.json.use.type.headers=false` betyr at typen *ikke* leses fra Kafka-headere — den må
   oppgis eksplisitt per lytter (se punkt 3).
 - **`spring.json.trusted.packages`** begrenser hvilke pakker Jackson har lov til å deserialisere til.
-- **`auto.offset.reset: earliest`** — nye consumer-grupper leser fra start av topic.
+- **`auto.offset.reset: <egen preferanse>`** — nye consumer-grupper leser fra herfra
 
 Denne konfigurasjonen dekker JSON-baserte topics (NOM, Oppfølging). PDL-topicet bruker Avro og
 har derfor sin egen `ConsumerFactory` (se punkt 4).
@@ -59,33 +55,30 @@ har derfor sin egen `ConsumerFactory` (se punkt 4).
 
 ```kotlin
 @Component
-class OppfølgingHendelseKonsument(private val oppfølging: OppfølgingTjeneste) {
+class HendelseKonsument(private val tjeneste: Tjeneste) {
 
     private val log = getLogger(javaClass)
 
     @KafkaListener(
-        topics = [OPPFØLGING_TOPIC],
-        properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse"],
-        groupId = OPPFØLGING)
-    fun listen(hendelse: OppfølgingHendelse) {
+        topics = [TOPIC],
+        properties = ["spring.json.value.default.type=....Hendelse"],
+        groupId = "<groupId>")
+    fun listen(hendelse: Hendelse) {
         // prosesser hendelsen
     }
 
     companion object {
-        private const val OPPFØLGING_TOPIC = "poao.siste-oppfolgingsperiode-v3"
+        private const val TOPIC = "<some topic>"
     }
 }
 ```
 
-- **`@Component`** — konsumenten er en vanlig Spring-bean, oppdaget via component scan.
+- **`@Component`** — konsumenten er en vanlig Spring-bean, registrert via component scan.
 - **`@KafkaListener(topics = [...])`** — topic-navn som et konstant-array; hold navnet som en
   `private const val` i companion object for å unngå "magic strings" spredt i koden.
 - **`properties = ["spring.json.value.default.type=..."]`** — siden
   `spring.json.use.type.headers=false` er satt globalt, må hver lytter fortelle
   `JacksonJsonDeserializer` hvilken klasse meldingen skal deserialiseres til.
-- **`groupId`** — hentes fra en delt `*Config`-klasse sin companion (f.eks.
-  `OppfølgingConfig.OPPFØLGING`), slik at samme konstant gjenbrukes til både consumer-group,
-  cache-navn og metrikker.
 - **Exceptions propageres ut av `listen(...)`** — ikke fang exceptions internt. Den delte
   `CommonErrorHandler` (se punkt 5) håndterer retry/backoff/dropping sentralt.
 
@@ -96,22 +89,22 @@ i stedet for å gjøre det som et `if`-utsagn tidlig i `listen(...)`:
 
 ```kotlin
 @KafkaListener(
-    topics = [NOM_TOPIC],
-    properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.nom.NomHendelse"],
+    topics = [TOPIC],
+    properties = ["spring.json.value.default.type=...Hendelse"],
     groupId = NOM,
-    filter = NOM_FNR_FILTER_STRATEGY)
-fun listen(hendelse: NomHendelse, ...)
+    filter = FILTER_STRATEGY)
+fun listen(hendelse: Hendelse, ...)
 ```
 
 Filter-bønnen registreres med et navngitt `@Bean`, og navnet refereres fra `filter = "..."`:
 
 ```kotlin
 @Configuration
-class NomBeanConfig {
-    @Bean(NOM_FNR_FILTER_STRATEGY)
-    fun nomFnrFilterStrategy() =
-        RecordFilterStrategy<String, NomHendelse> {
-            runCatching { BrukerId(it.value().personident) }.isFailure
+class Config {
+    @Bean(FILTER_STRATEGY)
+    fun filterStrategy() =
+        RecordFilterStrategy<String, Hendelse> {
+            runCatching { BrukerId(it.value().personident) }.isFailure  // alt som ikke er gyldig personident droppes
         }
 }
 ```

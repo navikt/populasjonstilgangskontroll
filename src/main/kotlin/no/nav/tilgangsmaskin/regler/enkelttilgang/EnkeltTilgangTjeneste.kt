@@ -49,7 +49,9 @@ class EnkeltTilgangTjeneste(
         var page = adapter.ikkeRapporterte(PageRequest.of(pageNumber, RAPPORTERTE_PAGE_SIZE))
 
         while (true) {
-            publisher.publish("Ho",page.content.toString())
+            page.content.forEach {
+                publisher.publish("Ovestyring",it.toString())
+            }
             if (!page.hasNext()) break
             pageNumber++
             page = adapter.ikkeRapporterte(PageRequest.of(pageNumber, RAPPORTERTE_PAGE_SIZE))

@@ -47,14 +47,12 @@ class EnkeltTilgangTjeneste(
     fun ikkeRapporterte() {
         var pageNumber = 0
         var page = adapter.ikkeRapporterte(PageRequest.of(pageNumber, RAPPORTERTE_PAGE_SIZE))
-        val ids = mutableListOf<EnkeltTilgang>()
 
         while (true) {
-            ids += page.content
+            publisher.publish("Ho",page.content.toString())
             if (!page.hasNext()) break
             pageNumber++
             page = adapter.ikkeRapporterte(PageRequest.of(pageNumber, RAPPORTERTE_PAGE_SIZE))
-            publisher.publish("Ho",page.content.toString())
         }
     }
 

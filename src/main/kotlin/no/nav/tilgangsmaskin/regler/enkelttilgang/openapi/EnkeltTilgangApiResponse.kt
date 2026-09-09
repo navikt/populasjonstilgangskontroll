@@ -4,8 +4,6 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import io.swagger.v3.oas.annotations.tags.Tag
-import no.nav.tilgangsmaskin.regler.enkelttilgang.DESCRIPTION_ENKELTTILGANG
 import no.nav.tilgangsmaskin.tilgang.openapi.ProblemSwaggerDetailResponse
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
 import kotlin.annotation.AnnotationRetention.RUNTIME
@@ -13,8 +11,6 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
 
 @Target(FUNCTION)
 @Retention(RUNTIME)
-@Tag(name = "EnkeltTilgangController", description = DESCRIPTION_ENKELTTILGANG)
-
 @ApiResponses(
     value = [
         ApiResponse(

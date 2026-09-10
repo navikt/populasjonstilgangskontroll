@@ -1,3 +1,4 @@
+
 # Populasjonstilgangskontroll
 Backendsystem for å tilby tilgangskontroll basert på populasjonen, også kjent som tilgangsmaskinen.
 Fagsystemer kan spørre tilgangsmaskinen om den ansatte har tilgang til brukeren, men ikke domenespesifikk tilgangskontroll (f.eks om den ansatte har tilgang til fagsystemet, eller til å godkjenne forslag til vedtak).

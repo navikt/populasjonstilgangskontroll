@@ -1,15 +1,23 @@
 package no.nav.tilgangsmaskin.regler.enkelttilgang
 
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
 import org.springframework.dao.DataIntegrityViolationException
 import java.time.Clock
+import java.time.Instant
 import java.time.Instant.now
 
 @Repository
 class EnkeltTilgangJPAAdapter(
     private val repo: EnkeltTilgangRepository,
     private val clock: Clock) {
+
+    fun ikkeRapporterte(pageable: Pageable): Page<EnkeltTilgang> =
+        repo.findByRapportertIsNull(pageable).map { EnkeltTilgang(AnsattId(it.navid), it.begrunnelse,it.enhet, it.created)
+        }
 
     fun enkeltTilgang(ansattId: String, enhetsnummer: String, data: EnkeltTilgangData): EnkeltTilgangEntity {
         val expires = data.gyldigtil.plusDays(1)
@@ -35,3 +43,5 @@ class EnkeltTilgangJPAAdapter(
 
     private fun cutoff() = now(clock)
 }
+
+data class EnkeltTilgang(val id: AnsattId, val begrunnelse: String, val enhet: String, val created: Instant?)

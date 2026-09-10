@@ -1,1 +1,0 @@
-CREATE INDEX idx_overstyringentity_navid ON overstyring (navid, fnr);

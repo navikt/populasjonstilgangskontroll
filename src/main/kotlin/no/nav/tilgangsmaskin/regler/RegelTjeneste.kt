@@ -35,13 +35,18 @@ class RegelTjeneste(
         val elapsedTime = measureTime {
             log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
             bruker(brukerId)?.let { bruker ->
-                try {
+                runCatching {
                     motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)
-                } catch (e: RegelException) {
-                    if (!enkeltTilgangTjeneste.harTilgang(ansattId, bruker.brukerId)) {
-                        throw e
+                }.onFailure { e ->
+                    when (e) {
+                        is RegelException -> {
+                            if (!enkeltTilgangTjeneste.harTilgang(ansattId, bruker.brukerId)) {
+                                throw e
+                            }
+                            log.info("Enkelttilgang benyttet. {} fikk tilgang til {}", ansattId, brukerId.maskFnr())
+                        }
+                        else -> throw e
                     }
-                    log.info("Enkelttilgang benyttet. {} fikk tilgang til {}", ansattId, brukerId.maskFnr())
                 }
             }
                 ?: log.info("${KOMPLETT_REGELTYPE.beskrivelse} ikke kjørt for $ansattId og ${brukerId.maskFnr()} siden bruker ikke ble funnet, tilgang likevel gitt")

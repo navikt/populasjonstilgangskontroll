@@ -21,7 +21,6 @@ import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON
 import org.springframework.http.ProblemDetail
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.servlet.MockMvc
@@ -34,8 +33,7 @@ import java.util.UUID
 
 @SpringBootTest(classes = [SecurityTestApplication::class])
 @AutoConfigureMockMvc
-@ActiveProfiles(PROD_GCP)
-open class ProdEnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private val mapper: JsonMapper) : BehaviorSpec() {
+open class EnkeltTilgangSecurityTest(private val mockMvc: MockMvc, private val mapper: JsonMapper) : BehaviorSpec() {
 
     @MockkBean
     private lateinit var regelTjeneste: RegelTjeneste

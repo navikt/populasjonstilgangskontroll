@@ -1,8 +1,6 @@
 package no.nav.tilgangsmaskin.felles.security
 
-import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
-import no.nav.tilgangsmaskin.regler.enkelttilgang.ENKELTTILGANG_PATH
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
@@ -35,7 +33,6 @@ class OAuth2SecurityBeanConfig {
                             deniedHandler: AccessDeniedHandler,
                             entryPoint: AuthenticationEntryPoint) =
         http.authorizeHttpRequests { requests ->
-            requests.requestMatchers(ENKELTTILGANG_PATH).hasRole(ENKELT)
             requests.requestMatchers( *UNPROTECTED_ENDPOINTS).permitAll()
             requests.anyRequest().authenticated()
         }

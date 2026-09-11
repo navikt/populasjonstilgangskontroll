@@ -5,11 +5,9 @@ import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.GROUPS
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.NAVIDENT
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.OID
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.ROLES
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP_PROFILE
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.convert.converter.Converter
-import org.springframework.core.env.Environment
 import org.springframework.security.authentication.AbstractAuthenticationToken
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -27,7 +25,7 @@ const val OBO_AUTHORITY = "${PREFIX}OBO"
 const val CCF_AUTHORITY = "${PREFIX}CCF"
 
 @Component
-class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(private val env: Environment,
+class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(
     @param:Value($$"${gruppe.enkelttilgang:}") private val gruppeEnkeltTilgang: UUID) : Converter<Jwt, AbstractAuthenticationToken> {
 
     private val log = getLogger(javaClass)
@@ -49,8 +47,7 @@ class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(private val env: En
             "JWT konvertering feilet for token med subject='${jwt.subject ?: "unknown"}', claimKeys=${jwt.claims.keys}"
         )
 
-    private fun shouldAddEnkeltRole(groups: List<String>?)  =
-        !env.acceptsProfiles(PROD_GCP_PROFILE) || "$gruppeEnkeltTilgang" in groups.orEmpty()
+    private fun shouldAddEnkeltRole(groups: List<String>?)  =  "$gruppeEnkeltTilgang" in groups.orEmpty()
 
     private fun principal(jwt: Jwt, authorities: Set<GrantedAuthority>) =
         DefaultOAuth2AuthenticatedPrincipal(

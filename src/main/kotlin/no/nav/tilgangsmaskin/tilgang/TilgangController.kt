@@ -7,11 +7,14 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.DESCRIPTION_CACHE_FLUSH
 import no.nav.tilgangsmaskin.felles.cache.SUMMARY_CACHE_FLUSH
+import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import no.nav.tilgangsmaskin.felles.rest.ProdController
 import no.nav.tilgangsmaskin.felles.security.OAuth2RequireCCF
 import no.nav.tilgangsmaskin.felles.security.OAuth2RequireOBO
 import no.nav.tilgangsmaskin.felles.security.ansattId
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withAnsattContext
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withMDC
 import org.slf4j.LoggerFactory.getLogger
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType
@@ -89,9 +92,11 @@ class TilgangController(private val regelTjeneste: RegelTjeneste, private val ca
             sjekk(isNotBlank(), BAD_REQUEST, "brukerId kan ikke være tom")
             sjekk(regelType in listOf(KJERNE_REGELTYPE, KOMPLETT_REGELTYPE), BAD_REQUEST, "Ugyldig regeltype: $regelType")
             log.trace(CONFIDENTIAL, "Kjører {} regler for {} og {}", regelType, ansatt, maskFnr())
-            when (regelType) {
-                KJERNE_REGELTYPE -> regelTjeneste.kjerneregler(ansatt, this)
-                else -> regelTjeneste.kompletteRegler(ansatt, this)
+            withAnsattContext(ansatt) {
+                when (regelType) {
+                    KJERNE_REGELTYPE -> regelTjeneste.kjerneregler(ansatt, this)
+                    else -> regelTjeneste.kompletteRegler(ansatt, this)
+                }
             }
         }
 }

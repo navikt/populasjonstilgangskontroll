@@ -1,6 +1,5 @@
 [versions]
 asciidoctor = "4.0.5"
-avro-plugin = "1.9.1"
 boot-conditionals = "6.0.7"
 commons-pool2 = "2.13.1"
 confluent = "8.3.1"

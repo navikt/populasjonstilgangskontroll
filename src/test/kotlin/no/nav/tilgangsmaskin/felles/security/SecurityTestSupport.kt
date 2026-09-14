@@ -5,21 +5,11 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
-import no.nav.tilgangsmaskin.felles.cache.CaffeineCacheOperations
-import no.nav.tilgangsmaskin.felles.rest.notifikasjon.logbook.LogbookBeanConfiguration
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.NAVIDENT
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.OID
 import no.nav.tilgangsmaskin.felles.security.SecurityTestOAuth2.server
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.NAIS_CLUSTER_NAME
-import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController
-import no.nav.tilgangsmaskin.tilgang.BulkTilgangController
-import no.nav.tilgangsmaskin.tilgang.TilgangController
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.flyway.autoconfigure.FlywayAutoConfiguration
-import org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration
-import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.context.annotation.Import
 import org.springframework.test.context.DynamicPropertyRegistry
 import java.util.UUID
 
@@ -56,14 +46,3 @@ fun DynamicPropertyRegistry.setProperties(clusterName: String? = null) {
 @TestConfiguration
 class PdlTestConfig : CacheTestConfig(PDL)
 
-@SpringBootApplication(exclude = [DataSourceAutoConfiguration::class, HibernateJpaAutoConfiguration::class, FlywayAutoConfiguration::class])
-@Import(
-    OAuth2SecurityBeanConfig::class,
-    TilgangController::class,
-    BulkTilgangController::class,
-    EnkeltTilgangController::class,
-    PdlTestConfig::class,
-    LogbookBeanConfiguration::class,
-    CaffeineCacheOperations::class
-)
-class SecurityTestApplication

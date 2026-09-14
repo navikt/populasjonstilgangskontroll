@@ -14,7 +14,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 
-class AnsattTjenesteTest : BehaviorSpec({
+class saAnsattTjenesteTest : BehaviorSpec({
 
     val nom      = mockk<NomTjeneste>(relaxed = true)
     val brukere  = mockk<BrukerTjeneste>(relaxed = true)

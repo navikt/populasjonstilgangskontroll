@@ -4,6 +4,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.Companion.girNasjonalTilgang
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.Companion.globaleGrupper
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GEO_OG_GLOBALE_CACHE
+import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
@@ -45,7 +46,7 @@ class EntraAnsattGruppeResolver(private val entra: EntraTjeneste,
 
     private fun notFound(ansattId: AnsattId,
                         exception: NotFoundRestException): Set<EntraGruppe> {
-        val deleted = cache.delete(GEO_OG_GLOBALE_CACHE, ansattId.verdi)
+        val deleted = cache.delete(OID_CACHE, ansattId.verdi)
         if (!deleted) {
             publisher.warn("Entra OID-problemer",
                 "Kunne ikke fjerne entra cache innslag for ${ansattId.verdi}")

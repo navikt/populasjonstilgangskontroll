@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.ansatt.graph
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.Companion.girNasjonalTilgang
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.Companion.globaleGrupper
-import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GEO_OG_GLOBALE_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
@@ -45,25 +44,24 @@ class EntraAnsattGruppeResolver(private val entra: EntraTjeneste,
 
 
     private fun notFound(ansattId: AnsattId,
-                        exception: NotFoundRestException): Set<EntraGruppe> {
+                         e: NotFoundRestException): Set<EntraGruppe> {
+        log.info("${ansattId.verdi} med oid ${e.identifikator} ikke funnet i Entra, sletter cache-innslag og prøver på nytt")
         val deleted = cache.delete(OID_CACHE, ansattId.verdi)
         if (!deleted) {
             publisher.warn("Entra OID-problemer",
-                "Kunne ikke fjerne entra cache innslag for ${ansattId.verdi}")
+                "Kunne ikke fjerne entra cache innslag for ${ansattId.verdi} og oid ${e.identifikator}")
         }
-        publisher.warn("Entra OID-problemer", "${exception.identifikator}, tømmer cache og prøver på nytt")
         val nyoid = oid.oid(ansattId)
-        log.warn("OID for $ansattId endret til $nyoid for $ansattId, ${exception.identifikator} ikke funnet, tømte cache og prøvde på nytt")
-        publisher.warn("OID for $ansattId endret til $nyoid",
-            "${exception.identifikator} ikke funnet, tømte cache og prøvde på nytt")
+        log.warn("OID for $ansattId endret fra ${e.identifikator} til  $nyoid for $ansattId, ${e.identifikator} ikke funnet, tømte cache og prøvde på nytt")
+        publisher.warn("OID for $ansattId endret fra ${e.identifikator} til $nyoid","prøver på nytt med ny oid")
         runCatching {
             return entra.geoOgGlobaleGrupper(ansattId, nyoid).also {
-                log.info("CC-flow: {} slo opp globale og GEO-grupper i Entra med ny oid {}", ansattId, nyoid)
+                log.info("{} slo opp globale og GEO-grupper i Entra med ny oid {}", ansattId, nyoid)
             }
             }.onFailure { e ->
                 publisher.warn("Entra OID-problemer",
                     "Kunne ikke slå opp globale og GEO-grupper i Entra med ny oid $nyoid")
-                log.error("CC-flow: Kunne ikke slå opp globale og GEO-grupper i Entra med ny oid $nyoid",e)
+                log.error("Kunne ikke slå opp globale og GEO-grupper i Entra med ny oid $nyoid",e)
         }.getOrThrow()
     }
 

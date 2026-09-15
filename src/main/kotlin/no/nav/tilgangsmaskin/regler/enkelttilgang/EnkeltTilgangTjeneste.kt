@@ -9,7 +9,6 @@ import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.diffFromNow
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
@@ -50,11 +49,12 @@ class EnkeltTilgangTjeneste(
     @Transactional
     fun registrerTilgang(ansattId: AnsattId, data: EnkeltTilgangData): Boolean =
         runCatching {
+            val enhetsnummer = enhetsNummerFor(ansattId)
             motor.kjerneregler(ansattTjeneste.ansatt(ansattId),
                 bruker.medNærmesteFamilie(data.brukerId.verdi))
-            adapter.enkeltTilgang(ansattId.verdi, enhetFor(ansattId), data)
+            adapter.enkeltTilgang(ansattId.verdi, enhetsnummer, data)
             teller.tell(INGEN_REGEL_TAG, ENKELTTILGANG_GITT)
-            log.info("Enkelttilgang OK. $ansattId har fått tilgang til ${data.brukerId} til og med ${data.gyldigtil}")
+            log.info("Enkelttilgang OK. $ansattId ved enhet $enhetsnummer har fått tilgang til ${data.brukerId} til og med ${data.gyldigtil}")
             true
         }.onFailure { e ->
             when (e) {
@@ -71,7 +71,7 @@ class EnkeltTilgangTjeneste(
                 it.verdi
             })?.expires
 
-    private fun enhetFor(ansattId: AnsattId) =
+    private fun enhetsNummerFor(ansattId: AnsattId) =
         runCatching {
             proxy.enhet(ansattId).enhetnummer.verdi
         }.getOrDefault(UTILGJENGELIG)

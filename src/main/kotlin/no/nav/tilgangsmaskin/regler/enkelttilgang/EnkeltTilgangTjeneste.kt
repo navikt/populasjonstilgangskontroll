@@ -8,12 +8,14 @@ import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
+import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.diffFromNow
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.regler.motor.RegelMotorLogger.Companion.INGEN_REGEL_TAG
 import no.nav.tilgangsmaskin.regler.motor.RegelMotorLogger.Companion.tag
+import org.jboss.logging.MDC
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -49,6 +51,7 @@ class EnkeltTilgangTjeneste(
     @Transactional
     fun registrerTilgang(ansattId: AnsattId, data: EnkeltTilgangData): Boolean =
         runCatching {
+            MDC.put(USER_ID, ansattId.verdi)
             val enhetsnummer = enhetsNummerFor(ansattId)
             motor.kjerneregler(ansattTjeneste.ansatt(ansattId),
                 bruker.medNærmesteFamilie(data.brukerId.verdi))

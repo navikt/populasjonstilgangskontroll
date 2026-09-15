@@ -14,8 +14,7 @@ import java.util.*
 @ImportHttpServices(types = [EntraGrupperClient::class], group = GRAPH)
 class EntraTjeneste(
     private val client: EntraGrupperClient,
-    private val cfg: EntraGrupperConfig
-) {
+    private val cfg: EntraGrupperConfig) {
 
     @Cacheable(cacheNames = [GRAPH], key = "#root.methodName + ':' + #ansattId.verdi")
     fun geoOgGlobaleGrupper(ansattId: AnsattId, oid: UUID) =
@@ -26,8 +25,8 @@ class EntraTjeneste(
         grupper("$oid", false)
 
     private fun grupper(ansattId: String, trengerGlobaleGrupper: Boolean): Set<EntraGruppe> =
-        generateSequence(client.grupper(cfg.grupperURI(ansattId, trengerGlobaleGrupper))) { bolk ->
-            bolk.next?.let(client::grupper)
+        generateSequence(client.grupper(cfg.grupperURI(ansattId, trengerGlobaleGrupper),ansattId)) { bolk ->
+            bolk.next?.let { client.grupper(it, ansattId) }
         }.flatMapTo(mutableSetOf()) { it.value }
 
     @NoCoverageAnalysis

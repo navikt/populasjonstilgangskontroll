@@ -51,7 +51,7 @@ class EnkeltTilgangTjeneste(
     @Transactional
     fun registrerTilgang(ansattId: AnsattId, data: EnkeltTilgangData): Boolean =
         runCatching {
-            MDC.put(USER_ID, ansattId.verdi)
+            MDC.put("x" +USER_ID, ansattId.verdi)
             val enhetsnummer = enhetsNummerFor(ansattId)
             motor.kjerneregler(ansattTjeneste.ansatt(ansattId),
                 bruker.medNærmesteFamilie(data.brukerId.verdi))

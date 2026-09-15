@@ -67,7 +67,7 @@ class EntraTjenesteTest(private val tjeneste: EntraTjeneste, private val server:
             }
 
             When("responsen inneholder @odata.nextLink") {
-                Then("folger paginering via @odata.nextLink") {
+                Then("følger paginering via @odata.nextLink") {
                     val nextUrl = "http://graph/users/$OID/memberOf?page=2"
                     server.expect(requestTo(cfg.grupperURI(OID.toString(), false)))
                         .andExpect(method(GET))

@@ -52,11 +52,18 @@ class EntraAnsattGruppeResolver(private val entra: EntraTjeneste,
         }
         publisher.warn("Entra OID-problemer", "${exception.identifikator}, tømmer cache og prøver på nytt")
         val nyoid = oid.oid(ansattId)
-        publisher.warn("OID endret til $nyoid",
+        log.warn("OID for $ansattId endret til $nyoid, ${exception.identifikator} ikke funnet, tømte cache og prøvde på nytt")
+        publisher.warn("OID for $ansattId endret til $nyoid",
             "${exception.identifikator} ikke funnet, tømte cache og prøvde på nytt")
-        return entra.geoOgGlobaleGrupper(ansattId, nyoid).also {
-            log.info("CC-flow: {} slo opp globale og GEO-grupper i Entra med ny oid {}", ansattId, nyoid)
-        }
+        runCatching {
+            return entra.geoOgGlobaleGrupper(ansattId, nyoid).also {
+                log.info("CC-flow: {} slo opp globale og GEO-grupper i Entra med ny oid {}", ansattId, nyoid)
+            }
+            }.onFailure { e ->
+                publisher.warn("Entra OID-problemer",
+                    "Kunne ikke slå opp globale og GEO-grupper i Entra med ny oid $nyoid")
+                log.error("CC-flow: Kunne ikke slå opp globale og GEO-grupper i Entra med ny oid $nyoid",e)
+        }.getOrThrow()
     }
 
     private fun grupperForObo(ansattId: AnsattId) = with(authContext.globaleGrupper()) {

@@ -52,7 +52,7 @@ class EntraAnsattGruppeResolver(private val entra: EntraTjeneste,
         }
         publisher.warn("Entra OID-problemer", "${exception.identifikator}, tømmer cache og prøver på nytt")
         val nyoid = oid.oid(ansattId)
-        log.warn("OID for $ansattId endret til $nyoid, ${exception.identifikator} ikke funnet, tømte cache og prøvde på nytt")
+        log.warn("OID for $ansattId endret til $nyoid for $ansattId, ${exception.identifikator} ikke funnet, tømte cache og prøvde på nytt")
         publisher.warn("OID for $ansattId endret til $nyoid",
             "${exception.identifikator} ikke funnet, tømte cache og prøvde på nytt")
         runCatching {

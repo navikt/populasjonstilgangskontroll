@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-private const val SUMMARY_CACHE_FLUSH = "${MSG}openapi.dev.cache.flush.summary"
-private const val DESCRIPTION_CACHE_FLUSH = "${MSG}openapi.dev.cache.flush.description"
-
+private const val SUMMARY_CACHE_FLUSH = "${MSG}openapi.cache.flush.summary"
+private const val DESCRIPTION_CACHE_FLUSH = "${MSG}openapi.cache.flush.description"
+private const val CACHE = "/cache"
 @Controller
-@RequestMapping("/cache")
+@RequestMapping(CACHE)
 class CacheFlushController {
 
     @GetMapping("flush")
@@ -26,10 +26,8 @@ class CacheFlushController {
 }
 
 @RestController
-@RequestMapping("/cache")
-class CacheFlushIdController(
-    private val cache: CacheOperations,
-) {
+@RequestMapping(CACHE)
+class CacheFlushIdController(private val cache: CacheOperations) {
 
     private val log = getLogger(javaClass)
 
@@ -37,7 +35,7 @@ class CacheFlushIdController(
     @Operation(summary = SUMMARY_CACHE_FLUSH, description = DESCRIPTION_CACHE_FLUSH)
     fun flushId(@PathVariable id: AnsattId) =
         cache.delete(OID_CACHE, id.verdi).also {
-            if (it) log.info("Slettet cache innslag i cache ${OID_CACHE.fullName} for ${id.verdi}")
-            else log.trace("Fant ikke cache innslag i cache ${OID_CACHE.fullName} for ${id.verdi}")
+            if (it) log.info("Slettet cache innslag i cache ${OID_CACHE.fullName} for $id")
+            else log.trace("Fant ikke cache innslag i cache {} for {}", OID_CACHE.fullName, id)
         }
 }

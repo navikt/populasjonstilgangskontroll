@@ -33,7 +33,7 @@ class CacheFlushIdController(
 
     private val log = getLogger(javaClass)
 
-    @DeleteMapping("flushit/{id}/")
+    @DeleteMapping("{id}")
     @Operation(summary = SUMMARY_CACHE_FLUSH, description = DESCRIPTION_CACHE_FLUSH)
     fun flushId(@PathVariable id: AnsattId) =
         cache.delete(OID_CACHE, id.verdi).also {

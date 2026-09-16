@@ -23,12 +23,13 @@ private val SCRIPT = RedisScript.of(ClassPathResource("scripts/count-all-keys.lu
 @Component
 class ValkeyCacheOperations(
     private val valkey: StringRedisTemplate,
-    vararg cfgs: CachableRestConfig,
-) : CacheOperations {
+    vararg cfgs: CachableRestConfig) : CacheOperations {
 
     private val log = getLogger(javaClass)
     private val defaultTtlForCache = cfgs.flatMap { cfg ->
-        cfg.caches.map { cache -> cache.fullName to cfg.varighet }
+        cfg.caches.map {
+            cache -> cache.fullName to cfg.varighet
+        }
     }.toMap()
 
     init {
@@ -45,10 +46,11 @@ class ValkeyCacheOperations(
 
     @Observed
     override fun delete(cache: CacheNøkkelConfig, id: String) =
-        runCatching { valkey.unlink(cache.tilNøkkel(id)) }
-            .onFailure {
-                log.info("Cache delete feilet for {} nøkkel {}: {}", cache.fullName, id.maskFnr(), it.message, it)
-            }.getOrElse { false }
+        runCatching {
+            valkey.unlink(cache.tilNøkkel(id))
+        }.onFailure {
+            log.info("Cache delete feilet for {} nøkkel {}: {}", cache.fullName, id.maskFnr(), it.message, it)
+        }.getOrElse { false }
 
     @Observed
     override fun <T : Any> getOne(cache: CacheNøkkelConfig, id: String, clazz: KClass<T>): T? {
@@ -75,8 +77,8 @@ class ValkeyCacheOperations(
 
 
     @Observed
-    override fun <T : Any> getMany(cache: CacheNøkkelConfig, ids: Set<String>, clazz: KClass<T>) =  doGetMany(cache, ids.toList(), clazz)
-
+    override fun <T : Any> getMany(cache: CacheNøkkelConfig, ids: Set<String>, clazz: KClass<T>) =
+        doGetMany(cache, ids.toList(), clazz)
 
     @Observed
     override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration?) {
@@ -91,9 +93,7 @@ class ValkeyCacheOperations(
     private fun effectiveTtl(cache: CacheNøkkelConfig, ttl: Duration?) =
         ttl ?: defaultTtlForCache[cache.fullName]
 
-    private fun <T : Any> doGetMany(cache: CacheNøkkelConfig,
-                                    requestedIds: List<String>,
-                                    clazz: KClass<T>): Map<String, T?> {
+    private fun <T : Any> doGetMany(cache: CacheNøkkelConfig, requestedIds: List<String>, clazz: KClass<T>): Map<String, T?> {
         markNow().let { start ->
             return runCatching {
                 val values = valkey.opsForValue().multiGet(requestedIds.map(cache::tilNøkkel)).orEmpty()
@@ -139,8 +139,12 @@ class ValkeyCacheOperations(
         check(!isProd) { "FlushDb er ikke støttet i prod for å unngå utilsiktet sletting av cache-innhold" }
         val before = valkey.execute { it.serverCommands().dbSize() } ?: 0L
         log.info("Tømmer hele Valkey-databasen, størrelse før tømming: {}", before)
-        valkey.execute { it.serverCommands().flushDb() }
-        return valkey.execute { it.serverCommands().dbSize() } ?: 0L
+        valkey.execute {
+            it.serverCommands().flushDb()
+        }
+        return valkey.execute {
+            it.serverCommands().dbSize()
+        } ?: 0L
     }
 
     private fun scanOptions(cache: CacheNøkkelConfig) =
@@ -148,14 +152,18 @@ class ValkeyCacheOperations(
 
     override fun sizes(vararg caches: CacheNøkkelConfig): Map<String, Long> {
         markNow().let { start ->
-            val prefixes = caches.map { "${it.tilNøkkel("")}*" }
+            val prefixes = caches.map { "${it.tilNøkkel("")}*"
+            }
 
             @Suppress("UNCHECKED_CAST")
             val results = (valkey.execute(SCRIPT, emptyList(), *prefixes.toTypedArray()) as List<Number>)
                 .map(Number::toLong)
             val totalDuration = start.elapsedNow()
-            return caches.zip(results).associate { (cache, count) -> cache.fullName to count }
-                .also { log.info("Cache størrelser {} slått opp, tok {}ms", it, totalDuration.inWholeMilliseconds) }
+            return caches.zip(results).associate {
+                (cache, count) -> cache.fullName to count
+            }.also {
+                log.info("Cache størrelser {} slått opp, tok {}ms", it, totalDuration.inWholeMilliseconds)
+            }
         }
     }
 

@@ -11,7 +11,7 @@ private const val SUMMARY_CACHE_VG = "${MSG}openapi.dev.cache.vg.summary"
 private const val DESCRIPTION_CACHE_VG = "${MSG}openapi.dev.cache.vg.description"
 
 
-@Controller
+@Controller("/${DEV}/cache")
 class CacheFlushViewController {
 
     @GetMapping("flush")

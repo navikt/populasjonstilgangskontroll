@@ -11,17 +11,17 @@
             min-height: 100vh;
             display: grid;
             place-items: center;
-            background: var(--ax-bg-neutral-moderateA, #f3f3f4);
-            color: var(--ax-text-neutral, #1f1f1f);
+            background: #f3f3f4;
+            color: #1f1f1f;
         }
 
         .aksel-page {
             width: min(100%, 36rem);
             margin: 2rem 1rem;
             padding: 2rem;
-            border-radius: var(--ax-radius-8);
-            background: var(--ax-bg-surface-default, #fff);
-            border: 1px solid var(--ax-border-neutral-subtleA, #d1d6db);
+            border-radius: 8px;
+            background: #ffffff;
+            border: 1px solid #d1d6db;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
         }
 
@@ -31,17 +31,17 @@
         }
 
         #status.success {
-            color: var(--ax-text-success, #0f5f33);
+            color: #0f5f33;
         }
 
         #status.error {
-            color: var(--ax-text-danger, #a40000);
+            color: #a40000;
         }
     </style>
 </head>
 <body>
     <main class="aksel-page">
-        <h1 class="aksel-heading aksel-heading--large">Tøm cache for ansatt</h1>
+        <h1 class="aksel-heading aksel-heading--large">Fjern innslag for ansatt</h1>
         <p class="aksel-body-short">Fjern innslag for Navident i cache.</p>
 
         <div class="aksel-form-field" style="margin-top: 1rem;">
@@ -66,7 +66,7 @@
                 return;
             }
 
-            const response = await fetch(`/dev/cache/flush/${encodeURIComponent(navIdent)}/`, {
+            const response = await fetch(`/cache/flush/${encodeURIComponent(navIdent)}/`, {
                 method: 'DELETE'
             });
 

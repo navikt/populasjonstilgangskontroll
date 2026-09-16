@@ -62,7 +62,7 @@
                 return;
             }
 
-            const response = await fetch(`/dev/cache/flushit/${encodeURIComponent(navIdent)}/`, {
+            const response = await fetch(`/cache/flushit/${encodeURIComponent(navIdent)}/`, {
                 method: 'DELETE'
             });
 

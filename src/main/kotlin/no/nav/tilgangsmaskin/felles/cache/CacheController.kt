@@ -1,8 +1,6 @@
 package no.nav.tilgangsmaskin.felles.cache
 
 import io.swagger.v3.oas.annotations.Operation
-import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL
@@ -18,8 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.server.ResponseStatusException
 
-const val DESCRIPTION_CACHE_FLUSH: String = "${MSG}openapi.dev.cache.flush.description"
-const val SUMMARY_CACHE_FLUSH: String = "${MSG}openapi.dev.cache.flush.summary"
 private const val DEV_CACHE_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.dev.cache.tag.description"
 private const val SUMMARY_CACHE_SKJERMINGER = "${MSG}openapi.dev.cache.skjerminger.summary"
 private const val DESCRIPTION_CACHE_SKJERMINGER = "${MSG}openapi.dev.cache.skjerminger.description"
@@ -55,14 +51,6 @@ class CacheController(
     @Operation(summary = SUMMARY_CACHE_PERSONER, description = DESCRIPTION_CACHE_PERSONER)
     fun cachePersoner(@RequestBody navIds: Set<Identifikator>) =
         cache.getMany<Person>(CacheNøkkelConfig(PDL), navIds.mapTo(mutableSetOf()) { it.verdi })
-
-    @DeleteMapping("flushit/{id}/")
-    @Operation(summary = SUMMARY_CACHE_FLUSH, description = DESCRIPTION_CACHE_FLUSH)
-    fun flushId(@PathVariable id: AnsattId) =
-        cache.delete(OID_CACHE, id.verdi).also {
-            if (it) log.info("Slettet cache innslag i cache ${OID_CACHE.fullName} for ${id.verdi}")
-            else log.trace("Fant ikke cache innslag i cache ${OID_CACHE.fullName} for ${id.verdi}")
-        }
 
     @DeleteMapping("flushCache/{cacheName}")
     @Operation(summary = SUMMARY_CACHE_FLUSH_ALL, description = DESCRIPTION_CACHE_FLUSH_ALL)

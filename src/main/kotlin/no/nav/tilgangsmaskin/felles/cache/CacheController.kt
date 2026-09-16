@@ -29,8 +29,6 @@ private const val SUMMARY_CACHE_FLUSH_ALL = "${MSG}openapi.dev.cache.flush.all.s
 private const val DESCRIPTION_CACHE_FLUSH_ALL = "${MSG}openapi.dev.cache.flush.all.description"
 private const val SUMMARY_CACHE_FLUSH_DB = "${MSG}openapi.dev.cache.flush.db.summary"
 private const val DESCRIPTION_CACHE_FLUSH_DB = "${MSG}openapi.dev.cache.flush.db.description"
-private const val SUMMARY_CACHE_VG = "${MSG}openapi.dev.cache.vg.summary"
-private const val DESCRIPTION_CACHE_VG = "${MSG}openapi.dev.cache.vg.description"
 
 
 @DevController(

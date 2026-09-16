@@ -104,8 +104,9 @@ class CacheController(
                     <title>Flush cache for innlogget bruker</title>
                 </head>
                 <body>
+                    <p>Fjern innslag for Navident i cache</p>
                     <label for="navIdent">NAV-ident</label>
-                    <input id="navIdent" type="text" name="navIdent" placeholder="Skriv inn NAV-ident" pattern="[A-Z][0-9]{6}" title="NAV-ident må være én stor bokstav etterfulgt av 6 sifre" />
+                    <input id="navIdent" type="text" name="navIdent" placeholder="Skriv inn Navident" pattern="[A-Z][0-9]{6}" title="NAV-ident må være én stor bokstav etterfulgt av 6 sifre" />
                     <button type="button" onclick="flushCache()">Flush cache for ansatt</button>
                     <p id="status"></p>
                     <script>
@@ -124,7 +125,7 @@ class CacheController(
 
                             if (response.ok) {
                                 const flushed = await response.json();
-                                status.textContent = flushed ? 'OK' : 'intet innslag slettet';
+                                status.textContent = flushed ? 'Innslag fjernet' : 'Intet innslag slettet';
                                 return;
                             }
 

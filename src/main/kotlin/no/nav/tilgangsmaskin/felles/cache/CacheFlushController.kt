@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 
 @Controller
 @RequestMapping("/cache")
-class CacheFlushViewController {
+class CacheFlushController {
 
     @GetMapping("flush")
     fun flushAnsatt(): String = "cache/flush"

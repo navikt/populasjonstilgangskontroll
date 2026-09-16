@@ -13,9 +13,10 @@
             place-items: center;
             background: #f3f3f4;
             color: #1f1f1f;
+            font-family: Arial, sans-serif;
         }
 
-        .aksel-page {
+        main {
             width: min(100%, 36rem);
             margin: 2rem 1rem;
             padding: 2rem;
@@ -30,17 +31,12 @@
             margin-top: 1rem;
         }
 
-        #status.success {
-            color: #0f5f33;
-        }
-
-        #status.error {
-            color: #a40000;
-        }
+        #status.success { color: #0f5f33; }
+        #status.error { color: #a40000; }
     </style>
 </head>
 <body>
-    <main class="aksel-page">
+    <main>
         <h1 class="aksel-heading aksel-heading--large">Fjern innslag for ansatt</h1>
         <p class="aksel-body-short">Fjern innslag for Navident i cache.</p>
 
@@ -49,7 +45,7 @@
             <input class="aksel-text-field__input" id="navIdent" type="text" name="navIdent" placeholder="Skriv inn Navident" pattern="[A-Z][0-9]{6}" title="NAV-ident må være én stor bokstav etterfulgt av 6 sifre" />
         </div>
 
-        <button class="aksel-button" data-variant="primary" type="button" onclick="flushCache()" style="margin-top: 1rem; width: 100%;">Flush cache for ansatt</button>
+        <button class="aksel-button" data-variant="primary" data-color="brand-blue" type="button" onclick="flushCache()" style="margin-top: 1rem; width: 100%;">Flush cache for ansatt</button>
         <p id="status" class="aksel-body-short" aria-live="polite"></p>
     </main>
 

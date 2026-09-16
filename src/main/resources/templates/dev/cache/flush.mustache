@@ -4,20 +4,25 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Flush cache for innlogget bruker</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@digdir/designsystemet-css@1.21.1/dist/src/index.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@navikt/ds-css@8.16.2/dist/index.css" />
     <style>
         body {
             margin: 0;
             min-height: 100vh;
             display: grid;
             place-items: center;
-            background: var(--ds-color-neutral-background-tinted, #f3f3f4);
-            color: var(--ds-color-neutral-text-default, #292c30);
+            background: var(--ax-bg-neutral-moderateA, #f3f3f4);
+            color: var(--ax-text-neutral, #1f1f1f);
         }
 
-        .ds-page {
+        .aksel-page {
             width: min(100%, 36rem);
             margin: 2rem 1rem;
+            padding: 2rem;
+            border-radius: var(--ax-radius-8);
+            background: var(--ax-bg-surface-default, #fff);
+            border: 1px solid var(--ax-border-neutral-subtleA, #d1d6db);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
         }
 
         #status {
@@ -26,26 +31,26 @@
         }
 
         #status.success {
-            color: var(--ds-color-success-text-default, #023409);
+            color: var(--ax-text-success, #0f5f33);
         }
 
         #status.error {
-            color: var(--ds-color-danger-text-default, #590d0d);
+            color: var(--ax-text-danger, #a40000);
         }
     </style>
 </head>
 <body>
-    <main class="ds-page ds-card">
-        <h1 class="ds-heading">Flush cache for ansatt</h1>
-        <p class="ds-body">Fjern innslag for Navident i cache.</p>
+    <main class="aksel-page">
+        <h1 class="aksel-heading aksel-heading--large">Flush cache for ansatt</h1>
+        <p class="aksel-body-short">Fjern innslag for Navident i cache.</p>
 
-        <div style="margin-top: 1rem; display: grid; gap: 0.5rem;">
-            <label class="ds-label" for="navIdent">NAV-ident</label>
-            <input class="ds-input" id="navIdent" type="text" name="navIdent" placeholder="Skriv inn Navident" pattern="[A-Z][0-9]{6}" title="NAV-ident må være én stor bokstav etterfulgt av 6 sifre" />
+        <div class="aksel-form-field" style="margin-top: 1rem;">
+            <label class="aksel-label" for="navIdent">NAV-ident</label>
+            <input class="aksel-text-field__input" id="navIdent" type="text" name="navIdent" placeholder="Skriv inn Navident" pattern="[A-Z][0-9]{6}" title="NAV-ident må være én stor bokstav etterfulgt av 6 sifre" />
         </div>
 
-        <button class="ds-button" type="button" onclick="flushCache()" style="margin-top: 1rem; width: 100%;">Flush cache for ansatt</button>
-        <p id="status" class="ds-body" aria-live="polite"></p>
+        <button class="aksel-button" data-variant="primary" type="button" onclick="flushCache()" style="margin-top: 1rem; width: 100%;">Flush cache for ansatt</button>
+        <p id="status" class="aksel-body-short" aria-live="polite"></p>
     </main>
 
     <script>

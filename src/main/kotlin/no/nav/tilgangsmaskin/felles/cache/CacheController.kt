@@ -104,20 +104,29 @@ class CacheController(
                     <title>Flush cache for innlogget bruker</title>
                 </head>
                 <body>
-                    <button type="button" onclick="flushCache()">Flush cache for innlogget bruker</button>
+                    <label for="navIdent">NAV-ident</label>
+                    <input id="navIdent" type="text" name="navIdent" placeholder="Skriv inn NAV-ident" pattern="[A-Z][0-9]{6}" title="NAV-ident må være én stor bokstav etterfulgt av 6 sifre" />
+                    <button type="button" onclick="flushCache()">Flush cache for ansatt</button>
                     <p id="status"></p>
                     <script>
-                        async function flushCache() {   
+                        async function flushCache() {
                             const status = document.getElementById('status');
-                            const response = await fetch(`/api/v1/cache/flush`, {
+                            const navIdent = document.getElementById('navIdent').value.trim();
+
+                            if (!/^[A-Z][0-9]{6}$/.test(navIdent)) {
+                                status.textContent = 'Ugyldig NAV-ident. Må være én stor bokstav etterfulgt av 6 sifre.';
+                                return;
+                            }
+
+                            const response = await fetch(`/dev/cache/flushId/${encodeURIComponent(navIdent)}/`, {
                                 method: 'DELETE'
                             });
 
                             if (response.ok) {
                                 const flushed = await response.json();
                                 status.textContent = flushed
-                                    ? `Cache-innslag fjernet`
-                                    : `Ingen cache-innslag funnet`;
+                                    ? `Cache-innslag fjernet for ${navIdent}`
+                                    : `Ingen cache-innslag funnet for ${navIdent}`;
                                 return;
                             }
 

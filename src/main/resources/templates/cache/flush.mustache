@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Flush cache for innlogget bruker</title>
-    <link rel="stylesheet" href="/vendor/aksel/aksel.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@navikt/ds-css@8.16.2/dist/index.css" />
     <style>
         body {
             margin: 0;
@@ -37,15 +37,15 @@
 </head>
 <body>
     <main>
-        <h1 class="aksel-heading aksel-heading--large">Fjern innslag for ansatt</h1>
-        <p class="aksel-body-short">Fjern innslag for Navident i cache.</p>
+        <h1 class="aksel-heading aksel-heading--large">Slett innslag for ansatt</h1>
+        <p class="aksel-body-short">Slett innslag for Navident i cache.</p>
 
         <div class="aksel-form-field" style="margin-top: 1rem;">
             <label class="aksel-label" for="navIdent">NAV-ident</label>
             <input class="aksel-text-field__input" id="navIdent" type="text" name="navIdent" placeholder="Skriv inn Navident" pattern="[A-Z][0-9]{6}" title="NAV-ident må være én stor bokstav etterfulgt av 6 sifre" />
         </div>
 
-        <button class="aksel-button" data-variant="primary" data-color="brand-blue" type="button" onclick="flushCache()" style="margin-top: 1rem; width: 100%;">Flush cache for ansatt</button>
+        <button class="aksel-button" data-variant="primary" data-color="brand-blue" type="button" onclick="flushCache()" style="margin-top: 1rem; width: 100%;">Slett innslag for ansatt</button>
         <p id="status" class="aksel-body-short" aria-live="polite"></p>
     </main>
 
@@ -68,7 +68,7 @@
 
             if (response.ok) {
                 const flushed = await response.json();
-                status.textContent = flushed ? 'Innslag fjernet' : 'Intet innslag fjernet';
+                status.textContent = flushed ? 'Innslag slettet' : 'Intet innslag slettet';
                 status.classList.add(flushed ? 'success' : 'error');
                 return;
             }
@@ -76,12 +76,12 @@
             const contentType = response.headers.get('content-type') ?? '';
             if (contentType.includes('json')) {
                 const problem = await response.json();
-                status.textContent = problem.detail ?? `Flush feilet: ${response.status}`;
+                status.textContent = problem.detail ?? `Sletting feilet: ${response.status}`;
                 status.classList.add('error');
                 return;
             }
 
-            status.textContent = `Flush feilet: ${response.status}`;
+            status.textContent = `Sletting feilet: ${response.status}`;
             status.classList.add('error');
         }
     </script>

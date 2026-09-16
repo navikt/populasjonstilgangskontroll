@@ -3,8 +3,6 @@ package no.nav.tilgangsmaskin.felles.cache
 import io.swagger.v3.oas.annotations.Operation
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
-import no.nav.tilgangsmaskin.felles.rest.DevController
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Controller

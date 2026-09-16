@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.tilgang
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.clearAllMocks
-import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.cache.CacheOperations
@@ -145,7 +144,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
             clearAllMocks()
             restDocumentation.beforeTest(TilgangControllerTestBase::class.java, case.name.name)
             mockMvc = standaloneSetup(
-                TilgangController(regelTjeneste, cache),
+                TilgangController(regelTjeneste),
                 EnkeltTilgangController(enkeltTilgangTjeneste),
                 BulkTilgangController(regelTjeneste)
             )

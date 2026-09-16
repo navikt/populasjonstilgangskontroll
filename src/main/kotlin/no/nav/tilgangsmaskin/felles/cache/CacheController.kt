@@ -56,7 +56,7 @@ class CacheController(
     fun cachePersoner(@RequestBody navIds: Set<Identifikator>) =
         cache.getMany<Person>(CacheNøkkelConfig(PDL), navIds.mapTo(mutableSetOf()) { it.verdi })
 
-    @DeleteMapping("flush/{id}/")
+    @DeleteMapping("flushit/{id}/")
     @Operation(summary = SUMMARY_CACHE_FLUSH, description = DESCRIPTION_CACHE_FLUSH)
     fun flushId(@PathVariable id: AnsattId) =
         cache.delete(OID_CACHE, id.verdi).also {

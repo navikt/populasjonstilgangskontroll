@@ -21,7 +21,7 @@ import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer
 
 const val ENKELT = "ENKELT"
-private val UNPROTECTED_ENDPOINTS = arrayOf("/$DEV/**", "/swagger-ui/**", "/v3/api-docs/**", "/monitoring/**","/cache/flush/**","/dev/cache/flushit/**")
+private val UNPROTECTED_ENDPOINTS = arrayOf("/$DEV/**", "/swagger-ui/**", "/v3/api-docs/**", "/monitoring/**","/cache/flush/**","/cache/flushit/**")
 
 @Configuration
 @EnableMethodSecurity

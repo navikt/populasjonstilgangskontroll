@@ -12,12 +12,7 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.NOT_FOUND
-import org.springframework.http.MediaType.TEXT_HTML
-import org.springframework.http.MediaType.TEXT_HTML_VALUE
-import org.springframework.http.ResponseEntity
-import org.springframework.http.ResponseEntity.ok
 import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -89,59 +84,5 @@ class CacheController(
         cache.clearAll().also {
             log.info("Tømte hele databasen og slettet {} nøkler", it)
         }
-
-    @GetMapping("flush", produces = [TEXT_HTML_VALUE])
-    @Operation(summary = SUMMARY_CACHE_VG, description = DESCRIPTION_CACHE_VG)
-    fun flushAnsatt(): ResponseEntity<String> =
-        ok()
-            .contentType(TEXT_HTML)
-            .body(
-                $$"""
-                <!doctype html>
-                <html lang="no">
-                <head>
-                    <meta charset="utf-8">
-                    <title>Flush cache for innlogget bruker</title>
-                </head>
-                <body>
-                    <p>Fjern innslag for Navident i cache</p>
-                    <label for="navIdent">NAV-ident</label>
-                    <input id="navIdent" type="text" name="navIdent" placeholder="Skriv inn Navident" pattern="[A-Z][0-9]{6}" title="NAV-ident må være én stor bokstav etterfulgt av 6 sifre" />
-                    <button type="button" onclick="flushCache()">Flush cache for ansatt</button>
-                    <p id="status"></p>
-                    <script>
-                        async function flushCache() {
-                            const status = document.getElementById('status');
-                            const navIdent = document.getElementById('navIdent').value.trim();
-
-                            if (!/^[A-Z][0-9]{6}$/.test(navIdent)) {
-                                status.textContent = 'Ugyldig NAV-ident. Må være én stor bokstav etterfulgt av 6 sifre.';
-                                return;
-                            }
-
-                            const response = await fetch(`/dev/cache/flush/${encodeURIComponent(navIdent)}/`, {
-                                method: 'DELETE'
-                            });
-
-                            if (response.ok) {
-                                const flushed = await response.json();
-                                status.textContent = flushed ? 'Innslag fjernet' : 'Intet innslag slettet';
-                                return;
-                            }
-
-                            const contentType = response.headers.get('content-type') ?? '';
-                            if (contentType.includes('json')) {
-                                const problem = await response.json();
-                                status.textContent = problem.detail ?? `Flush feilet: ${response.status}`;
-                                return;
-                            }
-
-                            status.textContent = `Flush feilet: ${response.status}`;
-                        }
-                    </script>
-                </body>
-                </html>
-                """.trimIndent()
-            )
 
 }

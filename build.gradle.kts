@@ -84,6 +84,7 @@ dependencies {
     implementation(libs.spring.boot.starter.web) {
         exclude(group = "org.springframework.boot", "spring-boot-starter-tomcat")
     }
+    implementation(libs.spring.boot.starter.mustache)
     implementation(libs.spring.boot.starter.webclient)
     implementation(libs.springdoc.openapi.webmvc.ui)
     testImplementation(libs.caffeine)

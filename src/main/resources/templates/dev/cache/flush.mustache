@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="no">
+<head>
+    <meta charset="utf-8">
+    <title>Flush cache for innlogget bruker</title>
+</head>
+<body>
+    <p>Fjern innslag for Navident i cache</p>
+    <label for="navIdent">NAV-ident</label>
+    <input id="navIdent" type="text" name="navIdent" placeholder="Skriv inn Navident" pattern="[A-Z][0-9]{6}" title="NAV-ident må være én stor bokstav etterfulgt av 6 sifre" />
+    <button type="button" onclick="flushCache()">Flush cache for ansatt</button>
+    <p id="status"></p>
+    <script>
+        async function flushCache() {
+            const status = document.getElementById('status');
+            const navIdent = document.getElementById('navIdent').value.trim();
+
+            if (!/^[A-Z][0-9]{6}$/.test(navIdent)) {
+                status.textContent = 'Ugyldig NAV-ident. Må være én stor bokstav etterfulgt av 6 sifre.';
+                return;
+            }
+
+            const response = await fetch(`/dev/cache/flush/${encodeURIComponent(navIdent)}/`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                const flushed = await response.json();
+                status.textContent = flushed ? 'Innslag fjernet' : 'Intet innslag slettet';
+                return;
+            }
+
+            const contentType = response.headers.get('content-type') ?? '';
+            if (contentType.includes('json')) {
+                const problem = await response.json();
+                status.textContent = problem.detail ?? `Flush feilet: ${response.status}`;
+                return;
+            }
+
+            status.textContent = `Flush feilet: ${response.status}`;
+        }
+    </script>
+</body>
+</html>

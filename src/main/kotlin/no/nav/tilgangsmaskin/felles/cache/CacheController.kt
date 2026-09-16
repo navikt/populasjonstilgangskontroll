@@ -124,9 +124,7 @@ class CacheController(
 
                             if (response.ok) {
                                 const flushed = await response.json();
-                                status.textContent = flushed
-                                    ? `Cache-innslag fjernet for ${navIdent}`
-                                    : `Ingen cache-innslag funnet for ${navIdent}`;
+                                status.textContent = flushed ? 'OK' : 'intet innslag slettet';
                                 return;
                             }
 

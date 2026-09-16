@@ -118,7 +118,7 @@ class CacheController(
                                 return;
                             }
 
-                            const response = await fetch(`/dev/cache/flushId/${encodeURIComponent(navIdent)}/`, {
+                            const response = await fetch(`/dev/cache/flush/${encodeURIComponent(navIdent)}/`, {
                                 method: 'DELETE'
                             });
 

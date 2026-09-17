@@ -38,6 +38,8 @@ class CacheFlushIdController(private val cache: CacheOperations) {
                 if (it) {
                     log.info("Flush av cache ${cacheNøkkel.fullName} for $id OK")
                 }
+                else {
+                    log.trace("Flush av cache {} for {} feilet", cacheNøkkel.fullName, id)
             }
         }
         return true

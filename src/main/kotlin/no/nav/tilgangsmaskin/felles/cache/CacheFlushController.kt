@@ -33,7 +33,6 @@ class CacheFlushIdController(private val cache: CacheOperations) {
     @Operation(summary = SUMMARY_CACHE_FLUSH, description = DESCRIPTION_CACHE_FLUSH)
     fun flushId(@PathVariable id: AnsattId) =
         cache.delete(OID_CACHE, id.verdi).also {
-            if (it) log.info("Slettet cache innslag i cache ${OID_CACHE.fullName} for $id")
-            else log.trace("Fant ikke cache innslag i cache {} for {}", OID_CACHE.fullName, id)
+            if (it) log.info("Innslag i cache manuelt slettet for ident $id")
         }
 }

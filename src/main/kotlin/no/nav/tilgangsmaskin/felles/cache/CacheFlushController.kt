@@ -40,6 +40,7 @@ class CacheFlushIdController(private val cache: CacheOperations) {
                 }
                 else {
                     log.trace("Flush av cache {} for {} feilet", cacheNøkkel.fullName, id)
+                }
             }
         }
         return true

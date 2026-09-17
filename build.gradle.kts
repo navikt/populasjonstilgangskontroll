@@ -57,7 +57,6 @@ dependencies {
         implementation("at.yawk.lz4:lz4-java:1.11.1")
         testImplementation("at.yawk.lz4:lz4-java:1.11.1")
     }
-
     implementation(libs.contract.pdl.avro)
     implementation(libs.boot.conditionals)
     implementation(libs.bundles.observability)
@@ -85,6 +84,7 @@ dependencies {
     implementation(libs.spring.boot.starter.web) {
         exclude(group = "org.springframework.boot", "spring-boot-starter-tomcat")
     }
+    implementation(libs.spring.boot.starter.mustache)
     implementation(libs.spring.boot.starter.webclient)
     implementation(libs.springdoc.openapi.webmvc.ui)
     testImplementation(libs.caffeine)

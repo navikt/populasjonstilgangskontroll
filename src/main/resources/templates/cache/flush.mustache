@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="no">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Slett innslag fra cache</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@navikt/ds-css@8.16.2/dist/index.css" />
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            background: #f3f3f4;
+            color: #1f1f1f;
+            font-family: Arial, sans-serif;
+        }
+
+        main {
+            width: min(100%, 36rem);
+            margin: 2rem 1rem;
+            padding: 2rem;
+            border-radius: 8px;
+            background: #ffffff;
+            border: 1px solid #d1d6db;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+        }
+
+        #status {
+            min-height: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        #status.success { color: #0f5f33; }
+        #status.error { color: #a40000; }
+    </style>
+</head>
+<body>
+    <main>
+        <h1 class="aksel-heading aksel-heading--large">Slett innslag for Nav-ident</h1>
+        <p class="aksel-body-short">Denne funksjonen lar deg slette cachede populasjonstilganger for en Nav-ident. Den kan brukes f.eks. når en Nav-ansatt har fått nasjonal tilgang gjennom Mine Tilganger, og trenger at den får umiddelbar effekt i fagsystemene. Merk at du ikke får slettet andre cachede tilganger, som tilgang til fagsystemer, dokumenter eller liknende.</p>
+
+        <div class="aksel-form-field" style="margin-top: 1rem;">
+            <label class="aksel-label" for="navIdent">NAV-ident</label>
+            <input class="aksel-text-field__input" id="navIdent" type="text" name="navIdent" placeholder="Skriv inn Nav-ident" pattern="[A-Z][0-9]{6}" title="NAV-ident må være én stor bokstav etterfulgt av 6 sifre" />
+        </div>
+
+        <button class="aksel-button" data-variant="primary" data-color="brand-blue" type="button" onclick="flushCache()" style="margin-top: 1rem; width: 100%;">Slett innslag for Nav-ident</button>
+        <p id="status" class="aksel-body-short" aria-live="polite"></p>
+    </main>
+
+    <script>
+        async function flushCache() {
+            const status = document.getElementById('status');
+            const navIdent = document.getElementById('navIdent').value.trim();
+
+            status.classList.remove('success', 'error');
+
+            if (!/^[A-Z][0-9]{6}$/.test(navIdent)) {
+                status.textContent = 'Ugyldig NAV-ident. Må være én stor bokstav etterfulgt av 6 sifre.';
+                status.classList.add('error');
+                return;
+            }
+
+            const response = await fetch(`/cache/${encodeURIComponent(navIdent)}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                const flushed = await response.json();
+                status.textContent = flushed ? 'Innslag slettet' : 'Intet innslag slettet, ble ikke funnet i cache';
+                status.classList.add(flushed ? 'success' : 'error');
+                return;
+            }
+
+            const contentType = response.headers.get('content-type') ?? '';
+            if (contentType.includes('json')) {
+                const problem = await response.json();
+                status.textContent = problem.detail ?? `Sletting feilet: ${response.status}`;
+                status.classList.add('error');
+                return;
+            }
+
+            status.textContent = `Sletting feilet: ${response.status}`;
+            status.classList.add('error');
+        }
+    </script>
+</body>
+</html>

@@ -69,7 +69,7 @@
 
             if (response.ok) {
                 const flushed = await response.json();
-                status.textContent = flushed ? 'Cache slettet' : 'ble ikke funnet i cache';
+                status.textContent = flushed ? 'Cache slettet' : 'Ingen innslag funnet i cache';
                 status.classList.add(flushed ? 'success' : 'error');
                 return;
             }

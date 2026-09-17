@@ -36,10 +36,10 @@ class CacheFlushIdController(private val cache: CacheOperations) {
         (ENTRA_CACHES + OID_CACHE).forEach { cacheNøkkel ->
             cache.delete(cacheNøkkel, id.verdi).also {
                 if (it) {
-                    log.info("Flush av cache ${cacheNøkkel.fullName} for $id OK")
+                    log.info("Manuell sletting av cache ${cacheNøkkel.fullName} for $id OK")
                 }
                 else {
-                    log.trace("Flush av cache {} for {} feilet", cacheNøkkel.fullName, id)
+                    log.trace("Manuell sletting av cache {} for {} feilet", cacheNøkkel.fullName, id)
                 }
             }
         }

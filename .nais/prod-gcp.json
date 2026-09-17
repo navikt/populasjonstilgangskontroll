@@ -1,5 +1,5 @@
 {
-  "ingresses": ["https://tilgangsmaskin.intern.nav.no"],
+  "ingresses": ["https://tilgangsmaskin.intern.nav.no", "https://tilgangsmaskin.ansatt.nav.no"],
   "pdlgraph": "pdl-api.prod-fss-pub.nais.io",
   "pdlpip": "pdl-pip-api.prod-fss-pub.nais.io",
   "grupper": {

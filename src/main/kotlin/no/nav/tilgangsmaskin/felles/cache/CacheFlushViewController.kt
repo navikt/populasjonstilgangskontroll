@@ -41,7 +41,7 @@ class CacheFlushIdController(private val cache: CacheOperations) {
                     log.info("Manuell sletting av cache ${cacheNøkkel.fullName} for $id OK")
                 }
                 else {
-                    log.trace("Manuell sletting av cache {} for {} feilet", cacheNøkkel.fullName, id)
+                    log.info("Manuell sletting av cache {} for {} feilet", cacheNøkkel.fullName, id)
                 }
             }
         }

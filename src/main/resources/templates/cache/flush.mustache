@@ -37,27 +37,28 @@
 </head>
 <body>
     <main>
-        <h1 class="aksel-heading aksel-heading--large">Slett innslag for Nav-ident</h1>
+        <h1 class="aksel-heading aksel-heading--large">Slett cache for Nav-ident</h1>
         <p class="aksel-body-short">Denne funksjonen lar deg slette cachede populasjonstilganger for en Nav-ident. Den kan brukes f.eks. når en Nav-ansatt har fått nasjonal tilgang gjennom Mine Tilganger, og trenger at den får umiddelbar effekt i fagsystemene. Merk at du ikke får slettet andre cachede tilganger, som tilgang til fagsystemer, dokumenter eller liknende.</p>
 
         <div class="aksel-form-field" style="margin-top: 1rem;">
             <label class="aksel-label" for="navIdent">NAV-ident</label>
-            <input class="aksel-text-field__input" id="navIdent" type="text" name="navIdent" placeholder="Skriv inn Nav-ident" pattern="[A-Z][0-9]{6}" title="NAV-ident må være én stor bokstav etterfulgt av 6 sifre" />
+            <input class="aksel-text-field__input" id="navIdent" type="text" name="navIdent" placeholder="Skriv inn Nav-ident" pattern="[A-Za-z][0-9]{6}" title="NAV-ident må være én bokstav etterfulgt av 6 sifre" />
         </div>
 
-        <button class="aksel-button" data-variant="primary" data-color="brand-blue" type="button" onclick="flushCache()" style="margin-top: 1rem; width: 100%;">Slett innslag for Nav-ident</button>
+        <button class="aksel-button" data-variant="primary" data-color="brand-blue" type="button" onclick="flushCache()" style="margin-top: 1rem; width: 100%;">Slett cache for Nav-ident</button>
         <p id="status" class="aksel-body-short" aria-live="polite"></p>
     </main>
 
     <script>
         async function flushCache() {
             const status = document.getElementById('status');
-            const navIdent = document.getElementById('navIdent').value.trim();
+            const rawNavIdent = document.getElementById('navIdent').value.trim();
+            const navIdent = rawNavIdent.toUpperCase();
 
             status.classList.remove('success', 'error');
 
-            if (!/^[A-Z][0-9]{6}$/.test(navIdent)) {
-                status.textContent = 'Ugyldig NAV-ident. Må være én stor bokstav etterfulgt av 6 sifre.';
+            if (!/^[A-Za-z][0-9]{6}$/.test(rawNavIdent)) {
+                status.textContent = 'Ugyldig NAV-ident. Må være én bokstav etterfulgt av 6 sifre.';
                 status.classList.add('error');
                 return;
             }
@@ -68,7 +69,7 @@
 
             if (response.ok) {
                 const flushed = await response.json();
-                status.textContent = flushed ? 'Innslag slettet' : 'Intet innslag slettet, ble ikke funnet i cache';
+                status.textContent = flushed ? 'Cache slettet' : 'ble ikke funnet i cache';
                 status.classList.add(flushed ? 'success' : 'error');
                 return;
             }

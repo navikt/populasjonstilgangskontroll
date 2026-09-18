@@ -32,19 +32,14 @@ class CacheFlushIdController(private val cache: CacheOperations) {
 
     @DeleteMapping("{id}")
     @Operation(summary = SUMMARY_CACHE_FLUSH, description = DESCRIPTION_CACHE_FLUSH)
-    fun flushId(@PathVariable id: AnsattId) : Boolean  {
-        var teller = 0
-        (ENTRA_CACHES + OID_CACHE).forEach { cacheNøkkel ->
-            cache.delete(cacheNøkkel, id.verdi).also {
-                if (it) {
-                    teller++
-                    log.info("Manuell sletting av cache ${cacheNøkkel.fullName} for $id OK")
-                }
-                else {
-                    log.info("Manuell sletting av cache {} for {} feilet", cacheNøkkel.fullName, id)
-                }
+    fun flushId(@PathVariable id: AnsattId): Boolean =
+        (ENTRA_CACHES + OID_CACHE).any { cacheNøkkel ->
+            val slettet = cache.delete(cacheNøkkel, id.verdi)
+            if (slettet) {
+                log.info("Manuell sletting av cache ${cacheNøkkel.fullName} for $id OK")
+            } else {
+                log.info("Manuell sletting av cache {} for {} feilet", cacheNøkkel.fullName, id)
             }
+            slettet
         }
-        return teller > 0
-    }
 }

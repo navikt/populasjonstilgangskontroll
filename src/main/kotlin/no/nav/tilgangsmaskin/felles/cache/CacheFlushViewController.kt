@@ -21,7 +21,8 @@ private const val CACHE = "/cache"
 class CacheFlushViewController {
 
     @GetMapping("flush")
-    fun flushAnsatt(): String = "cache/flush"
+    fun flushAnsatt() =
+        "cache/flush"
 }
 
 @RestController

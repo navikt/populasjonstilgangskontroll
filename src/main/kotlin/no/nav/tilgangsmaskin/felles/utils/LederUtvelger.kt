@@ -1,85 +1,134 @@
 package no.nav.tilgangsmaskin.felles.utils
 
-import jakarta.annotation.PreDestroy
+import io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.context.ApplicationEvent
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.event.ContextClosedEvent
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
-import org.springframework.web.reactive.function.client.WebClient.Builder
+import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.bodyToFlux
+import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.Disposable
+import io.netty.handler.timeout.ReadTimeoutException
+import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.context.annotation.Bean
+import org.springframework.http.client.reactive.ReactorClientHttpConnector
+import org.springframework.web.reactive.function.client.WebClient.Builder
+import reactor.netty.http.client.HttpClient
 import reactor.netty.http.client.PrematureCloseException
 import reactor.util.retry.Retry.backoff
 import java.net.URI
 import java.time.Duration.ofSeconds
 import java.time.LocalDateTime
-import kotlin.Long.Companion.MAX_VALUE
+import java.util.concurrent.atomic.AtomicReference
 
 @Component
-class LederUtvelger(private val builder: Builder,
-                    @param:Value("\${elector.sse.url}") private val uri: URI,
+class LederUtvelger(private val client: WebClient,
+                    private val elector: ElectorConfig,
                     private val publisher: ApplicationEventPublisher) {
 
     protected val log = getLogger(javaClass)
     private var subscription: Disposable? = null
-
-    @Volatile
-    private var shuttingDown = false
+    private val gjeldendeLeder = AtomicReference<String?>(null)
 
     @EventListener(ApplicationReadyEvent::class)
     fun onApplicationReady() {
+        log.info("SSE Application ready,connecting to ${elector.sse.url}")
+        subscribeSSE()
+        hentGjeldendeLeder()
+    }
+
+    private fun subscribeSSE() {
         subscription =
-            builder.build()
+            client
                 .get()
-                .uri(uri)
+                .uri(elector.sse.url)
                 .retrieve()
                 .bodyToFlux<LederUtvelgerRespons>()
-                .doOnError { log.error("SSE connection feilet for godt: ${it.message}", it) }
-                .doOnSubscribe { log.trace("SSE subscribe") }
-                .doOnNext { log.trace("SSE next: {} ", it) }
+                .doOnError {
+                    log.error("SSE connection feilet for godt: ${it.message}", it)
+                }
+                .doOnSubscribe {
+                    log.info("SSE subscribe")
+                }
+                .doOnNext {
+                    log.info("SSE next: {} ", it)
+                }
                 .retryWhen(
-                    backoff(MAX_VALUE, ofSeconds(1))
+                    backoff(5, ofSeconds(1))
                         .maxBackoff(ofSeconds(30))
                         .filter {
-                            if (shuttingDown) {
-                                log.info("SSE shutdown, slutt med retries")
-                                return@filter false
-                            }
                             it is WebClientRequestException ||
                                     it is PrematureCloseException ||
-                                    it.cause is PrematureCloseException
+                                    it.cause is PrematureCloseException ||
+                                    it is ReadTimeoutException ||
+                                    it.cause is ReadTimeoutException
                         }
-                        .doBeforeRetry { log.warn("SSE retry ${it.failure().message}", it) }
+                        .doBeforeRetry {
+                            log.info("SSE retry ${it.failure().message}", it)
+                        }
                         .doAfterRetry {
-                            log.trace("SSE connection retry etter ${it.totalRetriesInARow()} forsøk",
+                            log.info("SSE connection retry etter ${it.totalRetriesInARow()} forsøk",
                                 it.failure())
                         }
                 )
                 .subscribe(
-                    { publisher.publishEvent(LeaderChangedEvent(this, it.name)) },
-                    { log.warn("SSE error: ${it.message}", it) }
+                    {
+                        varsleOmLeder(it.name)
+                    }, {
+                        log.warn("SSE error: ${it.message}", it)
+                    }
                 )
     }
 
-    @PreDestroy
-    fun onPreDestroy() {
-        log.info("SSE Application shutting down (PreDestroy)")
-        shuttingDown = true
-        subscription?.dispose()
+    private fun varsleOmLeder(ny: String) {
+        val gammel = gjeldendeLeder.getAndSet(ny)
+        if ( gammel != ny) {
+            log.info("Ny leder: {}, gammel var {}", ny,gammel)
+            publisher.publishEvent(LeaderChangedEvent(this, ny))
+        }
+    }
+
+    private fun hentGjeldendeLeder() {
+        runCatching {
+            client
+                .get()
+                .uri(elector.get.url)
+                .retrieve()
+                .bodyToMono<LederUtvelgerRespons>()
+                .block(ofSeconds(5))
+        }.onSuccess { respons ->
+            respons?.let {
+                log.debug("Hentet gjeldende leder {} via {}", it.name, elector.get.url)
+                varsleOmLeder(it.name)
+            }
+        }.onFailure {
+            log.warn("Klarte ikke å hente gjeldende leder via {}: {}", elector.get.url, it.message, it)
+        }
     }
 
     @EventListener(ContextClosedEvent::class)
     fun onShutdown() {
-        log.info("SSE Application shutting down (ContextClosed)")
-        shuttingDown = true
+        log.info("SSE Application shutting down")
         subscription?.dispose()
     }
 
     private data class LederUtvelgerRespons(val name: String, val last_update: LocalDateTime)
     class LeaderChangedEvent(source: Any, val leder: String) : ApplicationEvent(source)
 }
+
+@ConfigurationProperties(prefix = "elector")
+data class ElectorConfig(val get: Endpoint, val sse: Endpoint) {
+    data class Endpoint(val url: URI)
+}
+@Bean
+fun electorWebClient(builder: Builder): WebClient =
+    builder
+        .clientConnector(ReactorClientHttpConnector(
+            HttpClient.create().option(CONNECT_TIMEOUT_MILLIS, 3000)
+        ))
+        .build()

@@ -63,14 +63,8 @@
                 return;
             }
 
-            const xsrfToken = document.cookie
-                .split('; ')
-                .find(row => row.startsWith('XSRF-TOKEN='))
-                ?.split('=')[1];
-
             const response = await fetch(`/cache/${encodeURIComponent(navIdent)}`, {
-                method: 'DELETE',
-                headers: { 'X-XSRF-TOKEN': xsrfToken }
+                method: 'DELETE'
             });
 
             if (response.ok) {

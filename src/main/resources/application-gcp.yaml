@@ -62,14 +62,6 @@ spring:
           azuread:
             issuer-uri: ${azure.openid.config.issuer}
         registration:
-          login:
-            provider: azuread
-            client-id: ${azure.app.client.id}
-            client-secret: ${azure.app.client.secret}
-            authorization-grant-type: authorization_code
-            scope:
-              - openid
-              - profile
           skjerming:
             provider: azuread
             client-id: ${azure.app.client.id}

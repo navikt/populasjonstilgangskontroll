@@ -4,7 +4,6 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.annotation.Order
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.http.SessionCreationPolicy.STATELESS
@@ -20,9 +19,7 @@ import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpReq
 import org.springframework.security.oauth2.client.web.client.support.OAuth2RestClientHttpServiceGroupConfigurer.from
 import org.springframework.http.HttpStatusCode
 import org.springframework.security.web.AuthenticationEntryPoint
-import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.access.AccessDeniedHandler
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer
 import org.zalando.logbook.spring.LogbookClientHttpRequestInterceptor
@@ -36,16 +33,6 @@ class OAuth2SecurityBeanConfig( private val handler: ErrorHandler,
                                 private val logbookInterceptor: ObjectProvider<LogbookClientHttpRequestInterceptor>){
 
     @Bean
-    @Order(1)
-    fun cacheSecurityFilterChain(http: HttpSecurity): SecurityFilterChain =
-        http.securityMatcher("/cache/**")
-            .authorizeHttpRequests { it.anyRequest().authenticated() }
-            .oauth2Login { }
-            .csrf { it.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) }
-            .build()
-
-    @Bean
-    @Order(2)
     fun securityFilterChain(http: HttpSecurity,
                             converter: OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter,
                             deniedHandler: AccessDeniedHandler,

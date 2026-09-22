@@ -68,11 +68,11 @@ class NomDBOpprydderTest(private val opprydder: NomDBOpprydder, private val repo
             }
 
             When("pod er ikke leder") {
-                Then("returnerer 0 uten å slette noe") {
+                Then("returnerer null uten å slette noe") {
                     lagre(FNR,LocalDate.now().minusDays(1))
 
                     assertSoftly {
-                        opprydder.ryddOpp() shouldBe 0
+                        opprydder.ryddOpp() shouldBe null
                         repo.count() shouldBe 1
                     }
                 }

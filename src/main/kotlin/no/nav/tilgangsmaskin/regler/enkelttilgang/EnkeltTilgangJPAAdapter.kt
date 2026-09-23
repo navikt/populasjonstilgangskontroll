@@ -1,9 +1,13 @@
 package no.nav.tilgangsmaskin.regler.enkelttilgang
 
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import org.springframework.stereotype.Repository
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import java.time.Clock
+import java.time.Instant
 import java.time.Instant.now
 
 @Repository
@@ -26,6 +30,9 @@ class EnkeltTilgangJPAAdapter(
         }
     }
 
+    fun ikkeRapporterte(pageable: Pageable): Page<EnkeltTilgang> =
+        repo.findByRapportertIsNull(pageable).map { EnkeltTilgang(AnsattId(it.navid), it.begrunnelse,it.enhet, it.created)
+        }
     fun gjeldendeTilgang(ansattId: String, brukerId: String, brukerIds: List<String>) =
         repo.gjeldende(ansattId, setOf(brukerId) + brukerIds, cutoff())
 
@@ -35,3 +42,5 @@ class EnkeltTilgangJPAAdapter(
 
     private fun cutoff() = now(clock)
 }
+
+data class EnkeltTilgang(val id: AnsattId, val begrunnelse: String, val enhet: String, val created: Instant?)

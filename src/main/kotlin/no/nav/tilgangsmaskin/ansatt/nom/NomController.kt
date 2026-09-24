@@ -6,14 +6,17 @@ import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 
-
-
 @DevController(
-    value = ["/${DEV}/nom/leder"],
-    name = "NomController")
+    value = ["/${DEV}/nom"],
+    name = "NomDevController")
 class NomController(
     private val nom: NomTjeneste) {
 
-    @GetMapping("{ansattId}")
-    fun leder(@PathVariable ansattId: AnsattId) = nom.lederForAnsatt(ansattId)
+    @GetMapping("/leder/{ansattId}")
+    fun leder(@PathVariable ansattId: AnsattId) =
+        nom.lederForAnsatt(ansattId)
+
+    @GetMapping("/{ansattId}")
+    fun nomFnr(@PathVariable ansattId: AnsattId) =
+        nom.fnrForAnsatt(ansattId)
 }

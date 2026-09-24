@@ -19,7 +19,7 @@ class NomSyncGraphQLClientAdapter(
 
     fun leder(enhetsnummer: String): Any =
         runCatching {
-            query<Any>(LEDER_QUERY, navIdent(enhetsnummer))
+            query<Any>(LEDER_QUERY, id(enhetsnummer))
         }.getOrThrow()
 
     private inline fun <reified T : Any> query(query: Pair<String, String>, vars: Map<String, String>) =
@@ -43,7 +43,7 @@ class NomSyncGraphQLClientAdapter(
 
     companion object {
         private const val ENHETID = "id"
-        private fun navIdent(enhetsnummer: String) = mapOf(ENHETID to enhetsnummer)
-        private val LEDER_QUERY = "query-leder" to "orgEnhet"
+        private fun id(id: String) = mapOf(ENHETID to "sy333c")
+        private val LEDER_QUERY = "query-leder" to "orgenhetOgLeder"
     }
 }

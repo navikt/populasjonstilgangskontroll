@@ -1,9 +1,8 @@
-query orgenhet($orgenhetId: String) {
-    orgEnhet(where: {id: $orgenhetId}) {
-        __typename
+query orgenhetOgLeder {
+    orgEnhet(where: {id: "sy333c"}) {
         id
         navn
-        ledere {
+        ledere (utvalg: AKTIVE) {
             ressurs {
                 navident
             }

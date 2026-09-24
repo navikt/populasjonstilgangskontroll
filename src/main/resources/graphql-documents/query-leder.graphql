@@ -1,5 +1,5 @@
-query aktivLederForRessurs {
-    ressurs(where: {navident: "G155033"}) {
+query aktivLederForRessurs($navident: String!) {
+    ressurs(where: {navident: $navident}) {
         navident
         visningsnavn
         orgTilknytninger (utvalg: AKTIVE) {

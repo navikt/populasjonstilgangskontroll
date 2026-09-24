@@ -36,8 +36,7 @@ class EnkeltTilgangDevController(private val enkelt: EnkeltTilgangTjeneste,
     @EnkeltTilgangApiResponse
     fun enkelt(@PathVariable ansattId: AnsattId, @EnkeltTilgangGyldig @RequestBody data: EnkeltTilgangData) =
         enkelt.registrerTilgang(ansattId, data)
-
-
+    
     @GetMapping("sjekk/ikkerapporterte")
     fun ikkeRapportertePrEnhet() =
         enkelt.ikkeRapportertePrEnhet()

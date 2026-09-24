@@ -31,19 +31,19 @@ class EnkeltTilgangJPAAdapter(
 
     fun ikkeRapportertePrEnhet(): Set<EnhetEnkeltTilganger> =
         repo.findByRapportertIsNullGruppert()
-            .map { (enhet, entities) ->
+            .mapTo(sortedSetOf(compareBy { it.enhet.verdi })) { (enhet, ansatte) ->
                 EnhetEnkeltTilganger(
                     Enhetsnummer(enhet),
-                    entities.map {
+                    ansatte.mapTo(sortedSetOf(compareBy { it.id.verdi })) { ansatt ->
                         EnkeltTilgang(
-                            AnsattId(it.navid),
-                            it.begrunnelse,
-                            it.enhet,
-                            it.created,
+                            AnsattId(ansatt.navid),
+                            ansatt.begrunnelse,
+                            ansatt.enhet,
+                            ansatt.created,
                         )
-                    }.toSet(),
+                    },
                 )
-            }.toSet()
+            }
     fun gjeldendeTilgang(ansattId: String, brukerId: String, brukerIds: List<String>) =
         repo.gjeldende(ansattId, setOf(brukerId) + brukerIds, cutoff())
 

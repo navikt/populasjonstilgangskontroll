@@ -17,9 +17,9 @@ class NomSyncGraphQLClientAdapter(
 
     private val log = getLogger(javaClass)
 
-    fun leder(ansattId: String): Any =
+    fun leder(ansattId: String): NomRessurs =
         runCatching {
-            query<Ledere>(LEDER_QUERY, ident(ansattId))
+            query<NomRessurs>(LEDER_QUERY, ident(ansattId))
         }.getOrThrow()
 
     private inline fun <reified T : Any> query(query: Pair<String, String>, vars: Map<String, String>) =

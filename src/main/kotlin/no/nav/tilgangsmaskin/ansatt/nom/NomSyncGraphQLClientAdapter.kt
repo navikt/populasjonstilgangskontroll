@@ -52,6 +52,6 @@ class NomSyncGraphQLClientAdapter(
     companion object {
         private const val ENHET = "orgenhetId"
         private fun navIdent(enhetsnummer: String) = mapOf(ENHET to enhetsnummer)
-        private val LEDER_QUERY = "query-leder" to "orgEnhet"
+        private val LEDER_QUERY = "query-leder" to "orgenhetId"
     }
 }

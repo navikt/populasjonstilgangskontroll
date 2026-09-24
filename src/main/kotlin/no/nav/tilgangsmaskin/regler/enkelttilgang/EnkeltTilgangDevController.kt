@@ -37,6 +37,11 @@ class EnkeltTilgangDevController(private val enkelt: EnkeltTilgangTjeneste,
     fun enkelt(@PathVariable ansattId: AnsattId, @EnkeltTilgangGyldig @RequestBody data: EnkeltTilgangData) =
         enkelt.registrerTilgang(ansattId, data)
 
+
+    @GetMapping("sjekk/ikkerapporterte")
+    fun ikkeRapportertePrEnhet() =
+        enkelt.ikkeRapportertePrEnhet()
+
     @GetMapping("sjekk/{ansattId}/{brukerId}")
     @Operation(summary = SUMMARY_HAR, description = DESCRIPTION_HAR)
     fun harTilgang(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) =

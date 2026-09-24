@@ -79,6 +79,10 @@ class EnkeltTilgangTjeneste(
                 it.verdi
             })?.expires
 
+
+    fun ikkeRapportertePrEnhet(): Set<EnhetEnkeltTilganger> =
+        adapter.ikkeRapportertePrEnhet()
+
     private fun enhetsNummerFor(ansattId: AnsattId) =
         runCatching {
             proxy.enhet(ansattId).enhetnummer.verdi

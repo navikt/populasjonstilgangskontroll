@@ -90,6 +90,8 @@ spec:
           namespace: nais-system
         - application: skjermede-personer-pip
           namespace: nom
+        - application: nom-api
+          namespace: nom
         - application: logging
           namespace: nais-system
       external:
@@ -113,6 +115,8 @@ spec:
       value: {{nais.cluster.cache}}
     - name: PDLGRAPH
       value: {{pdlgraph}}
+    - name: NOMGRAPH
+      value: {{nomgraph}}
     - name: PDLPIP
       value: {{pdlpip}}
     - name: GRUPPE_ENKELTTILGANG

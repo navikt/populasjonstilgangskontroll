@@ -31,6 +31,9 @@ import java.time.LocalDate.now
 @EnableAutoConfiguration
 class NomTjenesteTest(private val tjeneste: NomTjeneste, private val repo: NomRepository, private val cache: CacheOperations) : BehaviorSpec() {
 
+    @MockkBean
+    private lateinit var graph: NomSyncGraphQLClientAdapter
+
     @TestConfiguration
     class NomTestConfig : CacheTestConfig(NOM)
 

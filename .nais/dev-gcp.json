@@ -3,6 +3,7 @@
     "https://tilgangsmaskin.intern.dev.nav.no",
     "https://tilgangsmaskin.ansatt.dev.nav.no"
   ],
+  "nomgraph": "nom-api.nom",
   "pdlgraph": "pdl-api.dev-fss-pub.nais.io",
   "pdlpip": "pdl-pip-api.dev-fss-pub.nais.io",
   "grupper": {

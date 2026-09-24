@@ -1,11 +1,37 @@
 package no.nav.tilgangsmaskin.regler.enkelttilgang
 
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import java.time.Instant
 
 interface EnkeltTilgangRepository : JpaRepository<EnkeltTilgangEntity, Long> {
+
+    fun findByRapportertIsNull(pageable: Pageable): Page<EnkeltTilgangEntity>
+
+    fun findAllByRapportertIsNull(): List<EnkeltTilgangEntity>
+
+    fun findByRapportertIsNullGruppert(): Map<String, List<EnkeltTilgangEntity>> =
+        findAllByRapportertIsNull().groupBy { it.enhet }
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+        UPDATE overstyring o
+        SET o.rapportert = :now
+        WHERE o.id IN :ids
+          AND o.rapportert IS NULL
+    """)
+    fun setRapportert(
+        @Param("ids") ids: Collection<Long>,
+        @Param("now") now: Instant,
+    ): Int
+    fun markRapportert(entities: Collection<EnkeltTilgangEntity>): Int {
+        val ids = entities.mapNotNull { it.id }
+        return if (ids.isEmpty()) 0 else setRapportert(ids, Instant.now())
+    }
 
     fun findByNavidAndFnrAndExpires(ansattId: String, brukerId: String, expires: Instant): EnkeltTilgangEntity?
 

@@ -1,0 +1,20 @@
+query aktivLederForRessurs($navident: String!) {
+    ressurs(where: {navident: $navident}) {
+        navident
+        visningsnavn
+        orgTilknytninger (utvalg: AKTIVE) {
+            orgEnhet {
+                id
+                navn
+                ledere (utvalg: AKTIVE) {
+                    ressurs {
+                        epost
+                        navident
+                        visningsnavn
+                    }
+                }
+            }
+            erDagligOppfolging
+        }
+    }
+}

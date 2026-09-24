@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component
 import java.net.URI.create
 
 @Component
-class NomGraphQLConfig(@Value("\${nomgraph}") nomHost: String) : RestConfig(create("https://$nomHost$DEFAULT_GRAPHQL_PATH"), "", NOMGRAPH) {
+class NomGraphQLConfig(@Value("\${nomgraph}") nomHost: String) : RestConfig(create("http://$nomHost$DEFAULT_GRAPHQL_PATH"), "", NOMGRAPH) {
 
     companion object {
         const val NOMGRAPH = "nomgraph"

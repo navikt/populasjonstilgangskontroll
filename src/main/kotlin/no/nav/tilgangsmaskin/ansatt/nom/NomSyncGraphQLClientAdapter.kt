@@ -19,7 +19,7 @@ class NomSyncGraphQLClientAdapter(
 
     fun leder(ansattId: String): Any =
         runCatching {
-            query<Any>(LEDER_QUERY, ident(ansattId))
+            query<Leder>(LEDER_QUERY, ident(ansattId))
         }.getOrThrow()
 
     private inline fun <reified T : Any> query(query: Pair<String, String>, vars: Map<String, String>) =

@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.ansatt.nom
 
 import no.nav.tilgangsmaskin.ansatt.nom.NomGraphQLConfig.Companion.NOMGRAPH
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.pdl.Partnere
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig
@@ -24,9 +25,9 @@ class NomSyncGraphQLClientAdapter(
 
     private val log = getLogger(javaClass)
 
-    fun leder(navIdent: String): Any =
+    fun leder(enhetsnummer: String): Any =
         runCatching {
-            query<Any>(LEDER_QUERY, navIdent(navIdent))
+            query<Any>(LEDER_QUERY, navIdent(enhetsnummer))
         }.getOrThrow()
 
     private inline fun <reified T : Any> query(query: Pair<String, String>, vars: Map<String, String>) =
@@ -50,7 +51,7 @@ class NomSyncGraphQLClientAdapter(
 
     companion object {
         private const val ENHET = "orgenhetId"
-        private fun navIdent(navIdent: String) = mapOf(ENHET to navIdent)
+        private fun navIdent(enhetsnummer: String) = mapOf(ENHET to enhetsnummer)
         private val LEDER_QUERY = "query-leder" to "orgEnhet"
     }
 }

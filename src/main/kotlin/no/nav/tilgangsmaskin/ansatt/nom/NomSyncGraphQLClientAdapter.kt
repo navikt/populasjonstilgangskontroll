@@ -1,16 +1,8 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
 import no.nav.tilgangsmaskin.ansatt.nom.NomGraphQLConfig.Companion.NOMGRAPH
-import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.bruker.Enhetsnummer
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
-import no.nav.tilgangsmaskin.bruker.pdl.Partnere
-import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig
-import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLErrorHandler
-import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPartner
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
-import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.graphql.client.GraphQlClient
@@ -50,8 +42,8 @@ class NomSyncGraphQLClientAdapter(
         "${javaClass.simpleName} [graphQlClient=$client, cfg=$cfg]"
 
     companion object {
-        private const val ENHET = "orgenhetId"
-        private fun navIdent(enhetsnummer: String) = mapOf(ENHET to enhetsnummer)
-        private val LEDER_QUERY = "query-leder" to "orgenhetId"
+        private const val ENHETID = "id"
+        private fun navIdent(enhetsnummer: String) = mapOf(ENHETID to enhetsnummer)
+        private val LEDER_QUERY = "query-leder" to "orgEnhet"
     }
 }

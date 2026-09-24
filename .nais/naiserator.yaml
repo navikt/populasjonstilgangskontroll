@@ -90,6 +90,8 @@ spec:
           namespace: nais-system
         - application: skjermede-personer-pip
           namespace: nom
+        - application: nom-api
+          namespace: nom
         - application: logging
           namespace: nais-system
       external:

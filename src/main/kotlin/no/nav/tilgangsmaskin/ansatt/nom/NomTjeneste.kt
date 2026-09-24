@@ -14,8 +14,8 @@ import org.springframework.transaction.annotation.Transactional
 class NomTjeneste(private val adapter: NomJPAAdapter, private val graph: NomSyncGraphQLClientAdapter) {
 
 
-    fun lederForEnhet(enhetId: Enhetsnummer) =
-        graph.leder(enhetId.verdi)
+    fun lederForAnsatt(ansattId: AnsattId) =
+        graph.leder(ansattId.verdi)
 
 
     @Transactional(readOnly = true)

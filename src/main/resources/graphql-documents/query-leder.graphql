@@ -1,11 +1,19 @@
-query orgenhetOgLeder {
-    orgEnhet(where: {id: "sy333c"}) {
-        id
-        navn
-        ledere (utvalg: AKTIVE) {
-            ressurs {
-                navident
+query aktivLederForRessurs {
+    ressurs(where: {navident: "G155033"}) {
+        navident
+        visningsnavn
+        orgTilknytninger (utvalg: AKTIVE) {
+            orgEnhet {
+                id
+                navn
+                ledere (utvalg: AKTIVE) {
+                    ressurs {
+                        navident
+                        visningsnavn
+                    }
+                }
             }
+            erDagligOppfolging
         }
     }
 }

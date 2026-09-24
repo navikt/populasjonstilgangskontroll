@@ -17,9 +17,9 @@ class NomSyncGraphQLClientAdapter(
 
     private val log = getLogger(javaClass)
 
-    fun leder(enhetsnummer: String): Any =
+    fun leder(ansattId: String): Any =
         runCatching {
-            query<Any>(LEDER_QUERY, id(enhetsnummer))
+            query<Any>(LEDER_QUERY, ident(ansattId))
         }.getOrThrow()
 
     private inline fun <reified T : Any> query(query: Pair<String, String>, vars: Map<String, String>) =
@@ -42,8 +42,8 @@ class NomSyncGraphQLClientAdapter(
         "${javaClass.simpleName} [graphQlClient=$client, cfg=$cfg]"
 
     companion object {
-        private const val ENHETID = "id"
-        private fun id(id: String) = mapOf(ENHETID to "sy333c")
-        private val LEDER_QUERY = "query-leder" to "orgenhetOgLeder"
+        private const val IDENT = "navident"
+        private fun ident(navident: String) = mapOf(IDENT to navident)
+        private val LEDER_QUERY = "query-leder" to "aktivLederForRessurs"
     }
 }

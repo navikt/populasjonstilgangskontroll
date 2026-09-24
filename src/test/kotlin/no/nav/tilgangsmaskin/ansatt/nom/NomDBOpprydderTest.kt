@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
+import com.ninjasquad.springmockk.MockkBean
 import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
@@ -24,6 +25,9 @@ import java.util.concurrent.atomic.*
 @ContextConfiguration(classes = [NomTjeneste::class, NomJPAAdapter::class, NomDBOpprydder::class])
 @EnableAutoConfiguration
 class NomDBOpprydderTest(private val opprydder: NomDBOpprydder, private val repo: NomRepository) : BehaviorSpec() {
+
+    @MockkBean
+    private lateinit var graph: NomSyncGraphQLClientAdapter
 
     init {
         beforeEach {

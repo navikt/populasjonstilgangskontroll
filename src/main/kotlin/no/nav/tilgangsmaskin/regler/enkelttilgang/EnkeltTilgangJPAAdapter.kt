@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.ansatt.nom.Leder
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import org.springframework.stereotype.Repository
@@ -56,4 +57,10 @@ class EnkeltTilgangJPAAdapter(
 
 data class EnhetEnkeltTilganger(val enhet: Enhetsnummer, val enkeltTilganger: Set<EnkeltTilgang>)
 
-data class EnkeltTilgang(val id: AnsattId, val begrunnelse: String, val enhet: String, val created: Instant?)
+data class EnkeltTilgang(
+    val id: AnsattId,
+    val begrunnelse: String,
+    val enhet: String,
+    val created: Instant?,
+    val ledere: Set<Leder> = emptySet(),
+)

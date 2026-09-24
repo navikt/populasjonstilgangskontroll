@@ -81,6 +81,7 @@ class EnkeltTilgangTest(
             stubStandardMocks()
             enkeltTilgang = EnkeltTilgangTjeneste(
                 ansatte,
+                nom,
                 brukere,
                 adapter,
                 motor,

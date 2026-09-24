@@ -6,6 +6,7 @@ import io.micrometer.observation.annotation.Observed
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
+import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
@@ -30,6 +31,7 @@ import java.time.Instant
 @Timed
 class EnkeltTilgangTjeneste(
     private val ansattTjeneste: AnsattTjeneste,
+    private val nom: NomTjeneste,
     private val bruker: BrukerTjeneste,
     private val adapter: EnkeltTilgangJPAAdapter,
     private val motor: RegelMotor,
@@ -80,8 +82,30 @@ class EnkeltTilgangTjeneste(
             })?.expires
 
 
-    fun ikkeRapportertePrEnhet(): Set<EnhetEnkeltTilganger> =
-        adapter.ikkeRapportertePrEnhet()
+    fun ikkeRapportertePrEnhet(): Set<EnhetEnkeltTilganger> {
+        val ikkeRapporterte = adapter.ikkeRapportertePrEnhet()
+        val lederPerAnsatt = ikkeRapporterte
+            .flatMap { it.enkeltTilganger }
+            .map { it.id }
+            .distinct()
+            .associateWith { ansattId ->
+                nom.lederForAnsatt(ansattId)
+                    .orgTilknytninger
+                    .filter { it.erDagligOppfolging }
+                    .flatMapTo(mutableSetOf()) { it.orgEnhet.ledere }
+                    .mapTo(sortedSetOf(compareBy { it.navident.verdi })) { it.ressurs }
+            }
+
+        return ikkeRapporterte.mapTo(sortedSetOf(compareBy { it.enhet.verdi })) { perEnhet ->
+            perEnhet.copy(
+                enkeltTilganger = perEnhet.enkeltTilganger.mapTo(
+                    sortedSetOf(compareBy<EnkeltTilgang> { it.id.verdi }.thenBy { it.created }),
+                ) {
+                    it.copy(ledere = lederPerAnsatt.getValue(it.id))
+                },
+            )
+        }
+    }
 
     private fun enhetsNummerFor(ansattId: AnsattId) =
         runCatching {

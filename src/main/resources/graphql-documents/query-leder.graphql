@@ -8,6 +8,7 @@ query aktivLederForRessurs($navident: String!) {
                 navn
                 ledere (utvalg: AKTIVE) {
                     ressurs {
+                        epost
                         navident
                         visningsnavn
                     }

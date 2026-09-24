@@ -44,6 +44,6 @@ class NomSyncGraphQLClientAdapter(
     companion object {
         private const val IDENT = "navident"
         private fun ident(navident: String) = mapOf(IDENT to navident)
-        private val LEDER_QUERY = "query-leder" to "aktivLederForRessurs"
+        private val LEDER_QUERY = "query-leder" to "ressurs"
     }
 }

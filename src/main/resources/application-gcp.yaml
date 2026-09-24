@@ -90,6 +90,13 @@ spring:
             authorization-grant-type: client_credentials
             scope:
               - "api://${nais.cluster.type}-fss.pdl.pdl-pip-api/.default"
+          nomgraph:
+            provider: azuread
+            client-id: ${azure.app.client.id}
+            client-secret: ${azure.app.client.secret}
+            authorization-grant-type: client_credentials
+            scope:
+              - "api://nom-api.nom/.default"
           pdlgraph:
             provider: azuread
             client-id: ${azure.app.client.id}

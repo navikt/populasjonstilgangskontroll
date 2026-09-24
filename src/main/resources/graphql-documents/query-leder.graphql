@@ -1,0 +1,12 @@
+query orgenhet($orgenhetId: String) {
+    orgEnhet(where: {id: $orgenhetId}) {
+        __typename
+        id
+        navn
+        ledere {
+            ressurs {
+                navident
+            }
+        }
+    }
+}

@@ -113,6 +113,8 @@ spec:
       value: {{nais.cluster.cache}}
     - name: PDLGRAPH
       value: {{pdlgraph}}
+    - name: NOMGRAPH
+      value: {{nomgraph}}
     - name: PDLPIP
       value: {{pdlpip}}
     - name: GRUPPE_ENKELTTILGANG

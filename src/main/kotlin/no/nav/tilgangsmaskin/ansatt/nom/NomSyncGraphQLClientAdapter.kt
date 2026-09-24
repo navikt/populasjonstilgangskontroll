@@ -1,8 +1,11 @@
-package no.nav.tilgangsmaskin.bruker.pdl
+package no.nav.tilgangsmaskin.ansatt.nom
 
+import no.nav.tilgangsmaskin.ansatt.nom.NomGraphQLConfig.Companion.NOMGRAPH
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
-import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
+import no.nav.tilgangsmaskin.bruker.pdl.Partnere
+import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig
+import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLErrorHandler
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPartner
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
@@ -14,25 +17,16 @@ import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.stereotype.Component
 
 @Component
-class PdlSyncGraphQLClientAdapter(
-    private val cfg: PdlGraphQLConfig,
-    @Qualifier(PDLGRAPH) private val client: GraphQlClient,
-    private val errorHandler: PdlGraphQLErrorHandler = PdlGraphQLErrorHandler()) {
+class NomSyncGraphQLClientAdapter(
+    private val cfg: NomGraphQLConfig,
+    @Qualifier(NOMGRAPH) private val client: GraphQlClient,
+    private val errorHandler: NomGraphQLErrorHandler = NomGraphQLErrorHandler()) {
 
     private val log = getLogger(javaClass)
 
-    fun partnere(ident: String): Set<FamilieMedlem> =
+    fun leder(navIdent: String): Any =
         runCatching {
-            query<Partnere>(SIVILSTAND_QUERY, ident(ident)).sivilstand.mapNotNullTo(mutableSetOf()) {
-                it.relatertVedSivilstand?.let { brukerId ->
-                    FamilieMedlem(BrukerId(brukerId), tilPartner(it.type))
-                }
-            }
-        }.recover { e ->
-            (e as? NotFoundRestException)?.let {
-                log.trace("Fant ingen partnere for $ident")
-                emptySet()
-            } ?: throw e
+            query<Any>(LEDER_QUERY, navIdent(navIdent))
         }.getOrThrow()
 
     private inline fun <reified T : Any> query(query: Pair<String, String>, vars: Map<String, String>) =
@@ -55,8 +49,8 @@ class PdlSyncGraphQLClientAdapter(
         "${javaClass.simpleName} [graphQlClient=$client, cfg=$cfg]"
 
     companion object {
-        private const val IDENT = "ident"
-        private fun ident(ident: String) = mapOf(IDENT to ident)
-        private val SIVILSTAND_QUERY = "query-sivilstand" to "hentPerson"
+        private const val ENHET = "orgenhetId"
+        private fun navIdent(navIdent: String) = mapOf(ENHET to navIdent)
+        private val LEDER_QUERY = "query-leder" to "orgEnhet"
     }
 }

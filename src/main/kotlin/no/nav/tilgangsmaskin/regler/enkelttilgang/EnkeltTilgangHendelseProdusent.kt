@@ -13,13 +13,13 @@ class EnkeltTilgangHendelseProdusent(private val kafka: KafkaOperations<String, 
 
     fun publiser(ansattId: AnsattId) {
         runCatching {
-            log.info("Publiserer hendelse om ny enkelttilgang om $ansattId")
+            log.info("Publiserer hendelse om ny enkelttilgang for $ansattId")
             kafka.sendDefault(ansattId.verdi, ansattId).get(10, SECONDS)
         }.onSuccess {
-            log.info("Publiserte hendelse om ny enkelttilgang for ansatt {}", ansattId)
+            log.info("Publiserte hendelse om ny enkelttilgang for {}", ansattId)
         }.onFailure { e ->
             if (e is InterruptedException) currentThread().interrupt()
-            log.error("Kunne ikke publisere hendelse om ny enkelttilgang for ansatt {}", ansattId, e)
+            log.error("Kunne ikke publisere hendelse om ny enkelttilgang for {}", ansattId, e)
         }
     }
 }

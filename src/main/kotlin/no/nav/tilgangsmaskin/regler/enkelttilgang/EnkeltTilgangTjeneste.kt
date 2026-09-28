@@ -38,7 +38,7 @@ class EnkeltTilgangTjeneste(
     private val motor: RegelMotor,
     private val proxy: EntraProxyTjeneste,
     private val clock: Clock,
-    private val kafka: EnkeltTilgangKafkaPublisher,
+    private val kafka: EnkeltTilgangHendelseProdusent,
     private val teller: EnkeltTilgangTeller) {
 
     private val log = getLogger(javaClass)

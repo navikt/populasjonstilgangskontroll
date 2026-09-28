@@ -74,7 +74,7 @@ class EnkeltTilgangRegelTjenesteTest(
     private lateinit var vergemål: VergemålTjeneste
 
     @MockkBean(relaxed = true)
-    private lateinit var kafka: EnkeltTilgangKafkaPublisher
+    private lateinit var kafka: EnkeltTilgangHendelseProdusent
 
     @MockkBean
     private lateinit var nom: NomTjeneste

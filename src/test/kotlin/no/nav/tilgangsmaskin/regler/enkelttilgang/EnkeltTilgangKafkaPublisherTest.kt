@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit.SECONDS
 class EnkeltTilgangKafkaPublisherTest : BehaviorSpec({
     val kafka = mockk<KafkaOperations<String, Any>>()
     val future = mockk<CompletableFuture<SendResult<String, Any>>>()
-    val publisher = EnkeltTilgangKafkaPublisher(kafka)
+    val publisher = EnkeltTilgangHendelseProdusent(kafka)
 
     beforeEach {
         clearMocks(kafka, future)

@@ -39,7 +39,6 @@ class EnkeltTilgangJPAAdapter(
                         EnkeltTilgang(
                             AnsattId(ansatt.navid),
                             ansatt.begrunnelse,
-                            ansatt.enhet,
                             ansatt.created,
                         )
                     },
@@ -60,7 +59,6 @@ data class EnhetEnkeltTilganger(val enhet: Enhetsnummer, val enkeltTilganger: Se
 data class EnkeltTilgang(
     val id: AnsattId,
     val begrunnelse: String,
-    val enhet: String,
     val created: Instant?,
     val ledere: Set<Leder> = emptySet(),
 )

@@ -27,7 +27,6 @@ private const val ENKELTTILGANG_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.tilg
 
 @RestController
 @RequestMapping(PROD_BASE_PATH)
-@RequireOAuth2OBOAndEnkelt
 @Tag(name = "EnkeltTilgangController", description = ENKELTTILGANG_CONTROLLER_TAG_DESCRIPTION)
 class EnkeltTilgangController(private val enkelt: EnkeltTilgangTjeneste) {
 
@@ -35,6 +34,7 @@ class EnkeltTilgangController(private val enkelt: EnkeltTilgangTjeneste) {
     @ResponseStatus(NO_CONTENT)
     @Operation(summary = SUMMARY_ENKELTTILGANG, description = DESCRIPTION_ENKELTTILGANG)
     @EnkeltTilgangApiResponse
+    @RequireOAuth2OBOAndEnkelt
     fun enkeltTilgang(@AuthenticationPrincipal principal: OAuth2AuthenticatedPrincipal, @RequestBody @EnkeltTilgangGyldig data: EnkeltTilgangData) {
         enkelt.registrerTilgang(principal.ansattId(), data)
     }

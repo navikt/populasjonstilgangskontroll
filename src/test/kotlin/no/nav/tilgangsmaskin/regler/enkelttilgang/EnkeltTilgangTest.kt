@@ -79,6 +79,7 @@ class EnkeltTilgangTest(
     lateinit var oppfølging: OppfølgingTjeneste
     private val ansatte: AnsattTjeneste = mockk()
     private val brukere: BrukerTjeneste = mockk()
+    private val kafka: EnkeltTilgangKafkaPublisher = mockk(relaxed = true)
     private lateinit var enkeltTilgang: EnkeltTilgangTjeneste
 
     init {
@@ -92,6 +93,7 @@ class EnkeltTilgangTest(
                 motor,
                 proxy,
                 Clock.systemUTC(),
+                kafka,
                 EnkeltTilgangTeller(registry, authContext),
             )
         }

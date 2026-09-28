@@ -38,6 +38,7 @@ class EnkeltTilgangTjeneste(
     private val motor: RegelMotor,
     private val proxy: EntraProxyTjeneste,
     private val clock: Clock,
+    private val kafka: EnkeltTilgangKafkaPublisher,
     private val teller: EnkeltTilgangTeller) {
 
     private val log = getLogger(javaClass)
@@ -63,6 +64,7 @@ class EnkeltTilgangTjeneste(
                 adapter.enkeltTilgang(ansattId.verdi, enhetsnummer, data)
                 teller.tell(INGEN_REGEL_TAG, ENKELTTILGANG_GITT)
                 log.info("Enkelttilgang OK. $ansattId ved enhet $enhetsnummer har fått tilgang til ${data.brukerId} til og med ${data.gyldigtil}")
+                kafka.publiser(ansattId)
                 true
             }.onFailure { e ->
                 when (e) {

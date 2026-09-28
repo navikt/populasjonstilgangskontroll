@@ -112,7 +112,8 @@ class EnkeltTilgangTjeneste(
                     ansatte.sortedWith(compareBy({ it.id.verdi }, { it.created }, { it.begrunnelse })),
                 )
             }
-            .sortedBy { it.leder.navident.verdi }
+            .sortedWith(compareBy<LederEnkeltTilganger> { it.leder == INGEN_LEDER }
+                .thenBy { it.leder.navident.verdi })
     }
 
     private fun enhetsNummerFor(ansattId: AnsattId) =

@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal
 import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -37,6 +38,10 @@ class EnkeltTilgangController(private val enkelt: EnkeltTilgangTjeneste) {
     fun enkeltTilgang(@AuthenticationPrincipal principal: OAuth2AuthenticatedPrincipal, @RequestBody @EnkeltTilgangGyldig data: EnkeltTilgangData) {
         enkelt.registrerTilgang(principal.ansattId(), data)
     }
+
+    @GetMapping("enkelt/ikkerapporterte")
+    fun ikkeRapportertePrLeder() =
+        enkelt.ikkeRapportertePrLeder()
 
     @ExceptionHandler(HandlerMethodValidationException::class)
     fun handleValidation(ex: HandlerMethodValidationException) = valideringsfeilRespons(ex)

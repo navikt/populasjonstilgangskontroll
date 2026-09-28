@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.security
 
+import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
 import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.context.annotation.Bean
@@ -25,7 +26,7 @@ import org.springframework.web.client.support.RestClientHttpServiceGroupConfigur
 import org.zalando.logbook.spring.LogbookClientHttpRequestInterceptor
 
 const val ENKELT = "ENKELT"
-private val UNPROTECTED_ENDPOINTS = arrayOf("/$DEV/**", "/swagger-ui/**", "/v3/api-docs/**", "/monitoring/**")
+private val UNPROTECTED_ENDPOINTS = arrayOf("/$DEV/**", "/swagger-ui/**", "/v3/api-docs/**", "/monitoring/**","$PROD_BASE_PATH/enkelt/**")
 
 @Configuration
 @EnableMethodSecurity

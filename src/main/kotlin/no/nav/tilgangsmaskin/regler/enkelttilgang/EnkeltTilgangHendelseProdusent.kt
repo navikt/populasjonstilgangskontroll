@@ -19,7 +19,7 @@ class EnkeltTilgangHendelseProdusent(private val kafka: KafkaOperations<String, 
             log.info("Publiserte hendelse om ny enkelttilgang for ansatt {}", ansattId)
         }.onFailure { e ->
             if (e is InterruptedException) currentThread().interrupt()
-            log.error("Kunne ikke publisere enkelttilgang til Kafka", e)
+            log.error("Kunne ikke publisere hendelse om ny enkelttilgang for ansatt {}", ansattId, e)
         }
     }
 }

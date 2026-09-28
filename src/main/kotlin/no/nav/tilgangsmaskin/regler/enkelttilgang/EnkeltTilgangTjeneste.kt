@@ -85,7 +85,7 @@ class EnkeltTilgangTjeneste(
 
     fun ikkeRapportertePrLeder(): List<LederEnkeltTilganger> {
         val ikkeRapporterte = adapter.ikkeRapporterte()
-        val ansattePrLeder = ikkeRapporterte
+        val lederePerAnsatt = ikkeRapporterte
             .map { it.id }
             .distinct()
             .associateWith { ansattId ->
@@ -97,15 +97,13 @@ class EnkeltTilgangTjeneste(
                     .mapTo(sortedSetOf(compareBy { it.navident.verdi })) { it.ressurs }
             }
 
-        val ansattePerLeder: Map<Leder, Set<EnkeltTilgang>> = ikkeRapporterte
-            .flatMap { tilgang ->
-                val ledere = ansattePrLeder.getValue(tilgang.id)
-                val ledereEllerUtenLeder =
-                    if (ledere.isEmpty()) setOf(INGEN_LEDER) else ledere
-                ledereEllerUtenLeder.map { leder -> leder to tilgang }
+        val ansattePerLeder = mutableMapOf<Leder, MutableSet<EnkeltTilgang>>()
+        ikkeRapporterte.forEach { tilgang ->
+            val ledere = lederePerAnsatt.getValue(tilgang.id).ifEmpty { setOf(INGEN_LEDER) }
+            ledere.forEach { leder ->
+                ansattePerLeder.getOrPut(leder, ::mutableSetOf).add(tilgang)
             }
-            .groupBy({ it.first }, { it.second })
-            .mapValues { (_, ansatte) -> ansatte.toSet() }
+        }
 
         return ansattePerLeder
             .map { (leder, ansatte) ->

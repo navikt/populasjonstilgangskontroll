@@ -90,7 +90,8 @@ class EnkeltTilgangTjeneste(
             .distinct()
             .associateWith { ansattId ->
                 nom.lederForAnsatt(ansattId)
-                    .orgTilknytninger
+                    ?.orgTilknytninger
+                    .orEmpty()
                     .filter { it.erDagligOppfolging }
                     .flatMapTo(mutableSetOf()) { it.orgEnhet.ledere }
                     .mapTo(sortedSetOf(compareBy { it.navident.verdi })) { it.ressurs }

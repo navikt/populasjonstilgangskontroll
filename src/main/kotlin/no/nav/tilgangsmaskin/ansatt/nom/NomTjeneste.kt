@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.ansatt.nom
 import io.micrometer.observation.annotation.Observed
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM
-import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
@@ -15,7 +14,7 @@ class NomTjeneste(private val adapter: NomJPAAdapter, private val graph: NomSync
 
 
     fun lederForAnsatt(ansattId: AnsattId) =
-        graph.leder(ansattId.verdi)
+        graph.lederForAnsatt(ansattId.verdi)
 
 
     @Transactional(readOnly = true)

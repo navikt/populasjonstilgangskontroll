@@ -29,9 +29,9 @@ class EnkeltTilgangJPAAdapter(
         }
     }
 
-    fun ikkeRapporterte(): List<EnkeltTilgang> =
+    fun ikkeRapporterte(): Set<EnkeltTilgang> =
         repo.findAllByRapportertIsNull()
-            .map { ansatt ->
+            .mapTo(mutableSetOf()) { ansatt ->
                 EnkeltTilgang(
                     AnsattId(ansatt.navid),
                     ansatt.begrunnelse,
@@ -55,4 +55,4 @@ data class EnkeltTilgang(
     val created: Instant?,
 )
 
-data class LederEnkeltTilganger(val leder: Leder?, val ansatte: List<EnkeltTilgang>)
+data class LederEnkeltTilganger(val leder: Leder, val ansatte: List<EnkeltTilgang>)

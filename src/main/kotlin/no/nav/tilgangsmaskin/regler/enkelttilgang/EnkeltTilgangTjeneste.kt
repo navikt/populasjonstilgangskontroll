@@ -6,6 +6,7 @@ import io.micrometer.observation.annotation.Observed
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
+import no.nav.tilgangsmaskin.ansatt.nom.Leder
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
@@ -84,7 +85,7 @@ class EnkeltTilgangTjeneste(
 
     fun ikkeRapportertePrLeder(): List<LederEnkeltTilganger> {
         val ikkeRapporterte = adapter.ikkeRapporterte()
-        val lederPerAnsatt = ikkeRapporterte
+        val ansattePrLeder = ikkeRapporterte
             .map { it.id }
             .distinct()
             .associateWith { ansattId ->
@@ -96,19 +97,24 @@ class EnkeltTilgangTjeneste(
                     .mapTo(sortedSetOf(compareBy { it.navident.verdi })) { it.ressurs }
             }
 
-        return ikkeRapporterte
+        val ansattePerLeder: Map<Leder, Set<EnkeltTilgang>> = ikkeRapporterte
             .flatMap { tilgang ->
-                lederPerAnsatt.getValue(tilgang.id).ifEmpty { setOf(null) }
-                    .map { leder -> leder to tilgang }
+                val ledere = ansattePrLeder.getValue(tilgang.id)
+                val ledereEllerUtenLeder =
+                    if (ledere.isEmpty()) setOf(INGEN_LEDER) else ledere
+                ledereEllerUtenLeder.map { leder -> leder to tilgang }
             }
             .groupBy({ it.first }, { it.second })
+            .mapValues { (_, ansatte) -> ansatte.toSet() }
+
+        return ansattePerLeder
             .map { (leder, ansatte) ->
                 LederEnkeltTilganger(
                     leder,
                     ansatte.sortedWith(compareBy({ it.id.verdi }, { it.created }, { it.begrunnelse })),
                 )
             }
-            .sortedBy { it.leder?.navident?.verdi.orEmpty() }
+            .sortedBy { it.leder.navident.verdi }
     }
 
     private fun enhetsNummerFor(ansattId: AnsattId) =
@@ -119,6 +125,7 @@ class EnkeltTilgangTjeneste(
 
     private companion object {
         private const val TAG = "overstyrt"
+        private val INGEN_LEDER = Leder("ingen@nav.no", AnsattId("A000000"), "Ingen leder")
         private val ENKELTTILGANG_GITT = Tag.of(TAG, "true")
         private val ENKELTTILGANG_AVVIST = Tag.of(TAG, "false")
     }

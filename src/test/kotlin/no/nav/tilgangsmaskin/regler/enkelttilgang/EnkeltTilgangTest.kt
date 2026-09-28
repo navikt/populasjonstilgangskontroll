@@ -328,7 +328,10 @@ class EnkeltTilgangTest(
 
                         val grupper = enkeltTilgang.ikkeRapportertePrLeder()
 
-                        grupper.map { it.leder } shouldBe listOf(null, leder)
+                        grupper.map { it.leder } shouldBe listOf(
+                            Leder("ingen@nav.no", AnsattId("A000000"), "Ingen leder"),
+                            leder,
+                        )
                         grupper.map { gruppe -> gruppe.ansatte.map { it.id } } shouldBe listOf(
                             listOf(ansattUtenLeder),
                             listOf(ansattMedLeder),

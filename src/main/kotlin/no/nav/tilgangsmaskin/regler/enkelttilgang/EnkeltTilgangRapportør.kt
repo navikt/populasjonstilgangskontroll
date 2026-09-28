@@ -11,7 +11,7 @@ import kotlin.time.measureTimedValue
 
 @Component
 @ConditionalOnGCP
-class EnkelttilgangRapportør : LeaderAware() {
+class EnkeltTilgangRapportør : LeaderAware() {
 
     private val log = getLogger(javaClass)
 

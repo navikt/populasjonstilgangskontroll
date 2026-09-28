@@ -12,6 +12,7 @@ class EnkeltTilgangKafkaPublisher(private val kafka: KafkaOperations<String, Any
 
     fun publiser(ansattId: AnsattId) {
         runCatching {
+            log.info("Publiserer enkelttilgang om $ansattId")
             kafka.sendDefault(ansattId.verdi, ansattId).get(10, SECONDS)
         }.onSuccess {
             log.info("Publiserte enkelttilgang til Kafka for ansatt {}", ansattId)

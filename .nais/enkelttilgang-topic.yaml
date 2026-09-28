@@ -7,6 +7,9 @@ metadata:
     team: tilgangsmaskin
 spec:
   pool: nav-{{nais.cluster.type}}
+  config:
+    cleanupPolicy: delete
+    retentionHours: 720 # 30 dager
   acl:
     - team: tilgangsmaskin
       application: populasjonstilgangskontroll

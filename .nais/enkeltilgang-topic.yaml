@@ -1,0 +1,13 @@
+apiVersion: kafka.nais.io/v1
+kind: Topic
+metadata:
+  name: enkeltilgang-v1
+  namespace: tilgangsmaskin
+  labels:
+    team: tilgangsmaskin
+spec:
+  pool: nav-{{nais.cluster.type}}
+  acl:
+    - team: tilgangsmaskin
+      application: populasjonstilgangskontroll
+      access: write

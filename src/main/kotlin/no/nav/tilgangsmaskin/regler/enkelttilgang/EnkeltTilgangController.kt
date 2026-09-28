@@ -43,7 +43,8 @@ class EnkeltTilgangController(private val enkelt: EnkeltTilgangTjeneste) {
     @GetMapping("enkelt/ikkerapporterte")
     fun ikkeRapportertePrLeder() =
         enkelt.ikkeRapportertePrLeder()
-*/:wq
+       
+     */
     @ExceptionHandler(HandlerMethodValidationException::class)
     fun handleValidation(ex: HandlerMethodValidationException) = valideringsfeilRespons(ex)
 }

@@ -16,7 +16,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus,caches
+        include: health,info,metrics,prometheus,caches, env
 
 logbook:
   filter:

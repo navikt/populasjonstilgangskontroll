@@ -38,8 +38,8 @@ class EnkeltTilgangDevController(private val enkelt: EnkeltTilgangTjeneste,
         enkelt.registrerTilgang(ansattId, data)
     
     @GetMapping("sjekk/ikkerapporterte")
-    fun ikkeRapportertePrEnhet() =
-        enkelt.ikkeRapportertePrEnhet()
+    fun ikkeRapportertePrLeder() =
+        enkelt.ikkeRapportertePrLeder()
 
     @GetMapping("sjekk/{ansattId}/{brukerId}")
     @Operation(summary = SUMMARY_HAR, description = DESCRIPTION_HAR)
@@ -54,4 +54,3 @@ class EnkeltTilgangDevController(private val enkelt: EnkeltTilgangTjeneste,
     @ExceptionHandler(HandlerMethodValidationException::class)
     fun handleValidation(ex: HandlerMethodValidationException) = valideringsfeilRespons(ex)
 }
-

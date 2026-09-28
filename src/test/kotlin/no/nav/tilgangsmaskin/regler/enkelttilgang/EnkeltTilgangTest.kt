@@ -15,6 +15,11 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyEnhet.Enhet
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
+import no.nav.tilgangsmaskin.ansatt.nom.Leder
+import no.nav.tilgangsmaskin.ansatt.nom.Ledere
+import no.nav.tilgangsmaskin.ansatt.nom.NomRessurs
+import no.nav.tilgangsmaskin.ansatt.nom.OrgEnhet
+import no.nav.tilgangsmaskin.ansatt.nom.OrgTilknytning
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålTjeneste
@@ -291,6 +296,44 @@ class EnkeltTilgangTest(
                     andre.enhet shouldBe første.enhet
                     andre.begrunnelse shouldBe første.begrunnelse
                     repo.findAll().size shouldBe 1
+                }
+            }
+
+            Given("ikke-rapporterte enkelttilganger gruppert på leder") {
+                When("en ansatt har leder og en annen mangler leder i NOM") {
+                    Then("returneres én gruppe per leder og en gruppe uten leder") {
+                        repo.deleteAll()
+                        val ansattMedLeder = AnsattId("Z100001")
+                        val ansattUtenLeder = AnsattId("Z100002")
+                        val leder = Leder("leder@nav.no", AnsattId("Z100003"), "Testleder")
+                        val brukerMedLeder = BrukerId("11111111111")
+                        val brukerUtenLeder = BrukerId("22222222222")
+
+                        adapter.enkeltTilgang(
+                            ansattMedLeder.verdi,
+                            "1234",
+                            EnkeltTilgangData(brukerMedLeder, "Begrunnelse med leder", IMORGEN),
+                        )
+                        adapter.enkeltTilgang(
+                            ansattUtenLeder.verdi,
+                            "5678",
+                            EnkeltTilgangData(brukerUtenLeder, "Begrunnelse uten leder", IMORGEN),
+                        )
+                        every { nom.lederForAnsatt(ansattMedLeder) } returns NomRessurs(
+                            ansattMedLeder,
+                            "Ansatt",
+                            setOf(OrgTilknytning(OrgEnhet("1234", "Testenhet", setOf(Ledere(leder))), true)),
+                        )
+                        every { nom.lederForAnsatt(ansattUtenLeder) } returns null
+
+                        val grupper = enkeltTilgang.ikkeRapportertePrLeder()
+
+                        grupper.map { it.leder } shouldBe listOf(null, leder)
+                        grupper.map { gruppe -> gruppe.ansatte.map { it.id } } shouldBe listOf(
+                            listOf(ansattUtenLeder),
+                            listOf(ansattMedLeder),
+                        )
+                    }
                 }
             }
         }

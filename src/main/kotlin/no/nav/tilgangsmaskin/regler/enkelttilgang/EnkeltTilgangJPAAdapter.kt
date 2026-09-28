@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.regler.enkelttilgang
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.Leder
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import org.springframework.stereotype.Repository
 import org.springframework.dao.DataIntegrityViolationException
 import java.time.Clock
@@ -30,20 +29,16 @@ class EnkeltTilgangJPAAdapter(
         }
     }
 
-    fun ikkeRapportertePrEnhet(): Set<EnhetEnkeltTilganger> =
-        repo.findByRapportertIsNullGruppert()
-            .mapTo(sortedSetOf(compareBy { it.enhet.verdi })) { (enhet, ansatte) ->
-                EnhetEnkeltTilganger(
-                    Enhetsnummer(enhet),
-                    ansatte.mapTo(sortedSetOf(compareBy { it.id.verdi })) { ansatt ->
-                        EnkeltTilgang(
-                            AnsattId(ansatt.navid),
-                            ansatt.begrunnelse,
-                            ansatt.created,
-                        )
-                    },
+    fun ikkeRapporterte(): List<EnkeltTilgang> =
+        repo.findAllByRapportertIsNull()
+            .map { ansatt ->
+                EnkeltTilgang(
+                    AnsattId(ansatt.navid),
+                    ansatt.begrunnelse,
+                    ansatt.created,
                 )
             }
+
     fun gjeldendeTilgang(ansattId: String, brukerId: String, brukerIds: List<String>) =
         repo.gjeldende(ansattId, setOf(brukerId) + brukerIds, cutoff())
 
@@ -54,11 +49,10 @@ class EnkeltTilgangJPAAdapter(
     private fun cutoff() = now(clock)
 }
 
-data class EnhetEnkeltTilganger(val enhet: Enhetsnummer, val enkeltTilganger: Set<EnkeltTilgang>)
-
 data class EnkeltTilgang(
     val id: AnsattId,
     val begrunnelse: String,
     val created: Instant?,
-    val ledere: Set<Leder> = emptySet(),
 )
+
+data class LederEnkeltTilganger(val leder: Leder?, val ansatte: List<EnkeltTilgang>)

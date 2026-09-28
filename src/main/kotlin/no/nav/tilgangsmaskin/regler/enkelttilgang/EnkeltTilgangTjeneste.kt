@@ -82,10 +82,9 @@ class EnkeltTilgangTjeneste(
             })?.expires
 
 
-    fun ikkeRapportertePrEnhet(): Set<EnhetEnkeltTilganger> {
-        val ikkeRapporterte = adapter.ikkeRapportertePrEnhet()
+    fun ikkeRapportertePrLeder(): List<LederEnkeltTilganger> {
+        val ikkeRapporterte = adapter.ikkeRapporterte()
         val lederPerAnsatt = ikkeRapporterte
-            .flatMap { it.enkeltTilganger }
             .map { it.id }
             .distinct()
             .associateWith { ansattId ->
@@ -97,15 +96,19 @@ class EnkeltTilgangTjeneste(
                     .mapTo(sortedSetOf(compareBy { it.navident.verdi })) { it.ressurs }
             }
 
-        return ikkeRapporterte.mapTo(sortedSetOf(compareBy { it.enhet.verdi })) { perEnhet ->
-            perEnhet.copy(
-                enkeltTilganger = perEnhet.enkeltTilganger.mapTo(
-                    sortedSetOf(compareBy<EnkeltTilgang> { it.id.verdi }.thenBy { it.created }),
-                ) {
-                    it.copy(ledere = lederPerAnsatt.getValue(it.id))
-                },
-            )
-        }
+        return ikkeRapporterte
+            .flatMap { tilgang ->
+                lederPerAnsatt.getValue(tilgang.id).ifEmpty { setOf(null) }
+                    .map { leder -> leder to tilgang }
+            }
+            .groupBy({ it.first }, { it.second })
+            .map { (leder, ansatte) ->
+                LederEnkeltTilganger(
+                    leder,
+                    ansatte.sortedWith(compareBy({ it.id.verdi }, { it.created }, { it.begrunnelse })),
+                )
+            }
+            .sortedBy { it.leder?.navident?.verdi.orEmpty() }
     }
 
     private fun enhetsNummerFor(ansattId: AnsattId) =

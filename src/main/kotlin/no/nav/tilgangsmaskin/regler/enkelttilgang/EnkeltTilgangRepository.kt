@@ -10,12 +10,7 @@ import java.time.Instant
 
 interface EnkeltTilgangRepository : JpaRepository<EnkeltTilgangEntity, Long> {
 
-    fun findByRapportertIsNull(pageable: Pageable): Page<EnkeltTilgangEntity>
-
     fun findAllByRapportertIsNull(): List<EnkeltTilgangEntity>
-
-    fun findByRapportertIsNullGruppert(): Map<String, List<EnkeltTilgangEntity>> =
-        findAllByRapportertIsNull().groupBy { it.enhet }
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""

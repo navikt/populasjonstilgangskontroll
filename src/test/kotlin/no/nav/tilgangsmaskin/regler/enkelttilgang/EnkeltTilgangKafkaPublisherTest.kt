@@ -24,17 +24,17 @@ class EnkeltTilgangKafkaPublisherTest : BehaviorSpec({
     Given("publisering av enkelttilgang") {
         When("en ansattident publiseres") {
             Then("sendes identen som key med null value og venter på bekreftelse") {
-                every { kafka.sendDefault("Z123456", null) } returns future
+                every { kafka.sendDefault("Z123456", AnsattId("Z123456")) } returns future
                 every { future.get(10, SECONDS) } returns mockk()
 
                 publisher.publiser(AnsattId("Z123456"))
 
-                verify(exactly = 1) { kafka.sendDefault("Z123456", null) }
+                verify(exactly = 1) { kafka.sendDefault("Z123456", AnsattId("Z123456")) }
                 verify(exactly = 1) { future.get(10, SECONDS) }
             }
 
             Then("logges feil hvis publisering feiler") {
-                every { kafka.sendDefault("Z123456", null) } returns future
+                every { kafka.sendDefault("Z123456", AnsattId("Z123456")) } returns future
                 every { future.get(10, SECONDS) } throws TimeoutException("Kafka timeout")
 
                 publisher.publiser(AnsattId("Z123456"))

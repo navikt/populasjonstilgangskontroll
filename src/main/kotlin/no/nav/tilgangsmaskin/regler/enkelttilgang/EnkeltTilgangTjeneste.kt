@@ -62,9 +62,10 @@ class EnkeltTilgangTjeneste(
                     bruker.medNærmesteFamilie(data.brukerId.verdi))
                 MDC.put(USER_ID, ansattId.verdi)
                 adapter.enkeltTilgang(ansattId.verdi, enhetsnummer, data)
-                teller.tell(INGEN_REGEL_TAG, ENKELTTILGANG_GITT)
-                log.info("Enkelttilgang OK. $ansattId ved enhet $enhetsnummer har fått tilgang til ${data.brukerId} til og med ${data.gyldigtil}")
-                kafka.publiser(ansattId)
+                kafka.publiser(ansattId).also {
+                    teller.tell(INGEN_REGEL_TAG, ENKELTTILGANG_GITT)
+                    log.info("Enkelttilgang OK. $ansattId ved enhet $enhetsnummer har fått tilgang til ${data.brukerId} til og med ${data.gyldigtil}")
+                }
                 true
             }.onFailure { e ->
                 when (e) {

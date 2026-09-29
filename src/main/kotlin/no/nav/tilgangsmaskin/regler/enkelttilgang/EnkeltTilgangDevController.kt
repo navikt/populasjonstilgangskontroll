@@ -26,8 +26,7 @@ private const val DESCRIPTION_GJELDENDE = "${MSG}openapi.dev.enkelt.gjeldende.de
 @DevController(
     value = ["/${DEV}/enkelt/"],
     name = "EnkeltTilgangDevController",
-    description = DEV_ENKELT_CONTROLLER_TAG_DESCRIPTION
-)
+    description = DEV_ENKELT_CONTROLLER_TAG_DESCRIPTION)
 class EnkeltTilgangDevController(private val enkelt: EnkeltTilgangTjeneste,
                                  private val adapter: EnkeltTilgangJPAAdapter) {
 

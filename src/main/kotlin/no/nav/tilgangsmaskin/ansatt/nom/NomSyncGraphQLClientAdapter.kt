@@ -7,9 +7,7 @@ import org.springframework.graphql.client.GraphQlClient
 import org.springframework.stereotype.Component
 
 @Component
-class NomSyncGraphQLClientAdapter(
-    cfg: NomGraphQLConfig,
-    @Qualifier(NOMGRAPH) client: GraphQlClient) : AbstractSyncGraphQLClientAdapter(cfg, client) {
+class NomSyncGraphQLClientAdapter(cfg: NomGraphQLConfig, @Qualifier(NOMGRAPH) client: GraphQlClient) : AbstractSyncGraphQLClientAdapter(cfg, client) {
 
     fun lederForAnsatt(ansattId: String) = query<NomRessurs>(LEDER_QUERY, ident(ansattId))
 

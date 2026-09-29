@@ -22,9 +22,9 @@ class RestRetryLogger {
                 t)
             else -> if (event.isRetryAborted) {
                 if (t !is RetryException) {
-                    log.warn("Aborterer metode '$metode}' grunnet ${t.javaClass.simpleName} $args")
+                    log.warn("Aborterer metode '$metode}' grunnet ${t.javaClass.simpleName} $args",t)
                 } else {
-                    log.warn("Aborterer metode '$metode' grunnet ${t.cause.javaClass.simpleName} $args", t.cause)
+                    log.warn("Aborterer metode '$metode' grunnet ${t.cause.javaClass.simpleName} $args", t)
                 }
             } else {
                 log.info("Feil i '$metode',  prøver igjen", t)

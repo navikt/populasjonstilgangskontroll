@@ -4,8 +4,8 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.clearMocks
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.tilgangsmaskin.felles.rest.notifikasjon.LocalAuditor
-import no.nav.tilgangsmaskin.felles.rest.notifikasjon.SecureAuditor
+import no.nav.sikkerhetstjenesten.felles.notifikasjon.LocalAuditor
+import no.nav.sikkerhetstjenesten.felles.notifikasjon.SecureAuditor
 import org.slf4j.Logger
 
 class AuditorTest : BehaviorSpec({

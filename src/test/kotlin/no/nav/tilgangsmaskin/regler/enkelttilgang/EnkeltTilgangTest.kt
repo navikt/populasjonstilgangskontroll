@@ -26,7 +26,7 @@ import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
-import no.nav.tilgangsmaskin.felles.rest.notifikasjon.LocalAuditor
+import no.nav.sikkerhetstjenesten.felles.notifikasjon.LocalAuditor
 import no.nav.tilgangsmaskin.felles.TimeBeanConfig
 import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
 import no.nav.tilgangsmaskin.felles.security.AuthContext

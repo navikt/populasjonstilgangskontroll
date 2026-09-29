@@ -2,10 +2,10 @@ package no.nav.tilgangsmaskin.regler
 
 import io.micrometer.core.annotation.Timed
 import io.micrometer.observation.annotation.Observed
+import no.nav.sikkerhetstjenesten.felles.notifikasjon.Auditor
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
-import no.nav.tilgangsmaskin.felles.rest.notifikasjon.Auditor
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste

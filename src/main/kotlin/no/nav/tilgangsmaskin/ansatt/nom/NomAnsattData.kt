@@ -2,7 +2,6 @@ package no.nav.tilgangsmaskin.ansatt.nom
 
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.ALLTID
 import java.time.LocalDate
 import java.time.LocalDate.EPOCH
 

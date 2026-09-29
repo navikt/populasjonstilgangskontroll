@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.felles.security
 
 import no.nav.tilgangsmaskin.felles.cache.CaffeineCacheOperations
 import no.nav.tilgangsmaskin.felles.rest.RestDefaultErrorHandler
-import no.nav.tilgangsmaskin.felles.rest.notifikasjon.logbook.LogbookBeanConfiguration
+import no.nav.tilgangsmaskin.felles.rest.notifikasjon.NotificationBeanConfig
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController
 import no.nav.tilgangsmaskin.tilgang.BulkTilgangController
 import no.nav.tilgangsmaskin.tilgang.TilgangController
@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Import
     BulkTilgangController::class,
     EnkeltTilgangController::class,
     PdlTestConfig::class,
-    LogbookBeanConfiguration::class,
+    NotificationBeanConfig::class,
     CaffeineCacheOperations::class,
     RestDefaultErrorHandler::class
 )

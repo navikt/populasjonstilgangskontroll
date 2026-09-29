@@ -1,11 +1,10 @@
 package no.nav.tilgangsmaskin
 
 import no.nav.boot.conditionals.ConditionalOnGCP
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.local
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.TimeBeanConfig.Companion.AUDITING_TIME_PROVIDER
 import no.nav.tilgangsmaskin.felles.cache.CacheSizeAware
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.profiler
-import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.local
 import no.nav.tilgangsmaskin.regler.motor.RegelSett
 import org.springframework.boot.actuate.info.Info.Builder
 import org.springframework.boot.actuate.info.InfoContributor
@@ -15,12 +14,11 @@ import org.springframework.boot.runApplication
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.Lazy
-import org.springframework.core.env.Environment
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.stereotype.Component
-
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.Companion.profiler
 @SpringBootApplication
 @ConfigurationPropertiesScan
 @EnableCaching

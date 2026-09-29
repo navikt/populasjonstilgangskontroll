@@ -17,18 +17,14 @@ class RestRetryLogger {
     fun onEvent(event: MethodRetryEvent) {
         val args = event.source.arguments.toSet()
         val metode = event.method.name
-        when (val t = cause(event)) {
+        when (val t = event.failure) {
             is NotFoundRestException -> log.info("NotFoundRestException fra '$metode' for [${t.identifikator}] mot ${t.uri}",
                 t)
-            is RetryException -> log.warn("Aborterer metode '$metode' etter ${t.exceptions.size} forsøk grunnet ${t.cause.javaClass.simpleName} $args", t)
+            is RetryException -> if (t.cause !is NotFoundRestException) {
+                log.warn("Aborterer metode '$metode' etter ${t.exceptions.size} forsøk grunnet ${t.cause.javaClass.simpleName} $args", t)
+            }
             else -> log.info("Feil i '$metode' grunnet ${t.javaClass.simpleName}", t)
         }
     }
-
-    private fun cause(event: MethodRetryEvent) =
-        listOf(event.failure, event.failure.cause)
-            .filterIsInstance<NotFoundRestException>()
-            .firstOrNull()
-            ?: event.failure
 
 }

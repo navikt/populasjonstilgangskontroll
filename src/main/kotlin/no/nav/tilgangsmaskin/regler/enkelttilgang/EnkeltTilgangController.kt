@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal
 import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -26,7 +27,6 @@ private const val ENKELTTILGANG_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.tilg
 
 @RestController
 @RequestMapping(PROD_BASE_PATH)
-@RequireOAuth2OBOAndEnkelt
 @Tag(name = "EnkeltTilgangController", description = ENKELTTILGANG_CONTROLLER_TAG_DESCRIPTION)
 class EnkeltTilgangController(private val enkelt: EnkeltTilgangTjeneste) {
 
@@ -34,10 +34,17 @@ class EnkeltTilgangController(private val enkelt: EnkeltTilgangTjeneste) {
     @ResponseStatus(NO_CONTENT)
     @Operation(summary = SUMMARY_ENKELTTILGANG, description = DESCRIPTION_ENKELTTILGANG)
     @EnkeltTilgangApiResponse
+    @RequireOAuth2OBOAndEnkelt
     fun enkeltTilgang(@AuthenticationPrincipal principal: OAuth2AuthenticatedPrincipal, @RequestBody @EnkeltTilgangGyldig data: EnkeltTilgangData) {
         enkelt.registrerTilgang(principal.ansattId(), data)
     }
 
+    /*
+    @GetMapping("enkelt/ikkerapporterte")
+    fun ikkeRapportertePrLeder() =
+        enkelt.ikkeRapportertePrLeder()
+
+     */
     @ExceptionHandler(HandlerMethodValidationException::class)
     fun handleValidation(ex: HandlerMethodValidationException) = valideringsfeilRespons(ex)
 }

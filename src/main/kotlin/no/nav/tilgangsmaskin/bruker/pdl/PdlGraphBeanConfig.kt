@@ -36,6 +36,7 @@ class PdlGraphBeanConfig {
             .build()
 
     @Bean
+    @Qualifier(PDLGRAPH)
     fun pdlGraphSyncGraphQLClient(@Qualifier(PDLGRAPH) client: RestClient, cfg: PdlGraphQLConfig) =
         builder(client)
             .url(cfg.baseUri)

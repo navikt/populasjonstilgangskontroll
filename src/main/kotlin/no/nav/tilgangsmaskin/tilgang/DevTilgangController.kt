@@ -33,10 +33,6 @@ private const val SUMMARY_OPPFOLGING_ENHET = "${MSG}openapi.dev.tilgang.oppfolgi
 private const val DESCRIPTION_OPPFOLGING_ENHET = "${MSG}openapi.dev.tilgang.oppfolging.enhet.description"
 private const val SUMMARY_SIVILSTAND = "${MSG}openapi.dev.tilgang.sivilstand.summary"
 private const val DESCRIPTION_SIVILSTAND = "${MSG}openapi.dev.tilgang.sivilstand.description"
-private const val SUMMARY_KOBLING = "${MSG}openapi.dev.tilgang.kobling.summary"
-private const val DESCRIPTION_KOBLING = "${MSG}openapi.dev.tilgang.kobling.description"
-private const val SUMMARY_NOM_FNR = "${MSG}openapi.dev.tilgang.nom.fnr.summary"
-private const val DESCRIPTION_NOM_FNR = "${MSG}openapi.dev.tilgang.nom.fnr.description"
 private const val SUMMARY_HENT_ENKELTTILGANGER = "${MSG}openapi.dev.tilgang.enkelttilganger.summary"
 private const val DESCRIPTION_HENT_ENKELTTILGANGER = "${MSG}openapi.dev.tilgang.enkelttilganger.description"
 
@@ -48,8 +44,7 @@ private const val DESCRIPTION_HENT_ENKELTTILGANGER = "${MSG}openapi.dev.tilgang.
 class DevTilgangController(
     private val graphql: PdlSyncGraphQLClientAdapter,
     private val enkeltTilgang: EnkeltTilgangTjeneste,
-    private val oppfølging: OppfølgingTjeneste,
-    private val nom: NomJPAAdapter) {
+    private val oppfølging: OppfølgingTjeneste) {
 
 
     @PostMapping("oppfolging/{uuid}/avslutt")
@@ -66,17 +61,6 @@ class DevTilgangController(
     @Operation(summary = SUMMARY_SIVILSTAND, description = DESCRIPTION_SIVILSTAND)
     fun sivilstand(@PathVariable id: String) =
         graphql.partnere(id)
-
-    @Operation(summary = SUMMARY_KOBLING, description = DESCRIPTION_KOBLING)
-    @PostMapping("ansatt/{ansattId}/{brukerId}")
-    @Transactional
-    fun nom(@PathVariable ansattId: AnsattId, @PathVariable brukerId: BrukerId) =
-        nom.upsert(NomAnsattData(ansattId, brukerId))
-
-    @GetMapping("nom/{ansattId}")
-    @Operation(summary = SUMMARY_NOM_FNR, description = DESCRIPTION_NOM_FNR)
-    fun nomFnr(@PathVariable ansattId: AnsattId) =
-        nom.fnrForAnsatt(ansattId.verdi)
 
     @PostMapping("enkelttilganger/{ansattId}")
     @ResponseStatus(ACCEPTED)

@@ -26,8 +26,7 @@ private const val DESCRIPTION_GJELDENDE = "${MSG}openapi.dev.enkelt.gjeldende.de
 @DevController(
     value = ["/${DEV}/enkelt/"],
     name = "EnkeltTilgangDevController",
-    description = DEV_ENKELT_CONTROLLER_TAG_DESCRIPTION
-)
+    description = DEV_ENKELT_CONTROLLER_TAG_DESCRIPTION)
 class EnkeltTilgangDevController(private val enkelt: EnkeltTilgangTjeneste,
                                  private val adapter: EnkeltTilgangJPAAdapter) {
 
@@ -36,6 +35,10 @@ class EnkeltTilgangDevController(private val enkelt: EnkeltTilgangTjeneste,
     @EnkeltTilgangApiResponse
     fun enkelt(@PathVariable ansattId: AnsattId, @EnkeltTilgangGyldig @RequestBody data: EnkeltTilgangData) =
         enkelt.registrerTilgang(ansattId, data)
+    
+    @GetMapping("sjekk/ikkerapporterte")
+    fun ikkeRapportertePrLeder() =
+        enkelt.ikkeRapportertePrLeder()
 
     @GetMapping("sjekk/{ansattId}/{brukerId}")
     @Operation(summary = SUMMARY_HAR, description = DESCRIPTION_HAR)
@@ -50,4 +53,3 @@ class EnkeltTilgangDevController(private val enkelt: EnkeltTilgangTjeneste,
     @ExceptionHandler(HandlerMethodValidationException::class)
     fun handleValidation(ex: HandlerMethodValidationException) = valideringsfeilRespons(ex)
 }
-

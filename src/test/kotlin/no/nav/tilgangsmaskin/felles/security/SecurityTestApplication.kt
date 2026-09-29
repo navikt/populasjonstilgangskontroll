@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.felles.security
 
 import no.nav.tilgangsmaskin.felles.cache.CaffeineCacheOperations
+import no.nav.tilgangsmaskin.felles.rest.RestDefaultErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.notifikasjon.logbook.LogbookBeanConfiguration
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController
 import no.nav.tilgangsmaskin.tilgang.BulkTilgangController
@@ -19,6 +20,7 @@ import org.springframework.context.annotation.Import
     EnkeltTilgangController::class,
     PdlTestConfig::class,
     LogbookBeanConfiguration::class,
-    CaffeineCacheOperations::class
+    CaffeineCacheOperations::class,
+    RestDefaultErrorHandler::class
 )
 class SecurityTestApplication

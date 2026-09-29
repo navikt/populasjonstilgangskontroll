@@ -1,11 +1,14 @@
 package no.nav.tilgangsmaskin.regler.enkelttilgang
 
+import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.ansatt.nom.Leder
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Repository
 import org.springframework.dao.DataIntegrityViolationException
 import java.time.Clock
+import java.time.Instant
 import java.time.Instant.now
 
 @Repository
@@ -16,7 +19,7 @@ class EnkeltTilgangJPAAdapter(
     private val log = getLogger(javaClass)
 
 
-    fun enkeltTilgang(ansattId: String, enhetsnummer: String, data: EnkeltTilgangData): EnkeltTilgangEntity {
+    fun enkeltTilgang(ansattId: String, enhetsnummer: String, data: EnkeltTilgangData, gt: String? = null): EnkeltTilgangEntity {
         val expires = data.gyldigtil.plusDays(1)
             .atStartOfDay(clock.zone)
             .toInstant()
@@ -25,7 +28,7 @@ class EnkeltTilgangJPAAdapter(
             return it
         }
 
-        val nyEnkeltTilgang = EnkeltTilgangEntity(ansattId, data.brukerId.verdi, data.begrunnelse, enhetsnummer, expires)
+        val nyEnkeltTilgang = EnkeltTilgangEntity(ansattId, data.brukerId.verdi, data.begrunnelse, enhetsnummer, expires, gt)
 
         return try {
             repo.saveAndFlush(nyEnkeltTilgang)
@@ -35,12 +38,30 @@ class EnkeltTilgangJPAAdapter(
         }
     }
 
+    fun ikkeRapporterte(): Set<EnkeltTilgang> =
+        repo.findAllByRapportertIsNull()
+            .mapTo(mutableSetOf()) { ansatt ->
+                EnkeltTilgang(
+                    AnsattId(ansatt.navid),
+                    ansatt.begrunnelse,
+                    ansatt.created,
+                    ansatt.gt,
+                )
+            }
+
     fun gjeldendeTilgang(ansattId: String, brukerId: String, brukerIds: List<String>) =
-        repo.gjeldende(ansattId, setOf(brukerId) + brukerIds, cutoff())
+        repo.gjeldende(ansattId, setOf(brukerId) + brukerIds, now(clock))
 
     fun gjeldendeTilganger(ansattId: String, brukerIds: Set<String>): Set<BrukerId> =
-        repo.gjeldendeOverstyringer(ansattId, brukerIds, cutoff())
+        repo.gjeldendeOverstyringer(ansattId, brukerIds, now(clock))
             .mapTo(mutableSetOf()) { BrukerId(it.fnr) }
-
-    private fun cutoff() = now(clock)
 }
+
+data class EnkeltTilgang(
+    val id: AnsattId,
+    val begrunnelse: String,
+    val created: Instant?,
+    val gt: String?,
+)
+
+data class LederEnkeltTilganger(val leder: Leder, val ansatte: List<EnkeltTilgang>)

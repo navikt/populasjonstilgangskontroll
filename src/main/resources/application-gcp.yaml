@@ -90,6 +90,13 @@ spring:
             authorization-grant-type: client_credentials
             scope:
               - "api://${nais.cluster.type}-fss.pdl.pdl-pip-api/.default"
+          nomgraph:
+            provider: azuread
+            client-id: ${azure.app.client.id}
+            client-secret: ${azure.app.client.secret}
+            authorization-grant-type: client_credentials
+            scope:
+              - "api://${nais.cluster.type}-gcp.nom.nom-api/.default"
           pdlgraph:
             provider: azuread
             client-id: ${azure.app.client.id}
@@ -131,6 +138,12 @@ spring:
       key-store-type: PKCS12
       key-store-password: ${kafka.credstore.password}
 
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        "[spring.json.add.type.headers]": false
+
     consumer:
       key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
@@ -141,6 +154,9 @@ spring:
         "[spring.json.trusted.packages]": no.nav.tilgangsmaskin
         "[spring.deserializer.key.delegate.class]": org.apache.kafka.common.serialization.StringDeserializer
         "[spring.deserializer.value.delegate.class]": org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+
+    template:
+      default-topic: tilgangsmaskin.enkeltilgang-v1
 
   data:
     redis:

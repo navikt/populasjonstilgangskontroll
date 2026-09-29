@@ -1,4 +1,4 @@
-package no.nav.tilgangsmaskin.bruker.pdl
+package no.nav.tilgangsmaskin.felles.graphql
 
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
@@ -7,13 +7,14 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.graphql.ResponseError
 import org.springframework.graphql.client.FieldAccessException
 import org.springframework.graphql.client.GraphQlTransportException
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.http.HttpStatus.UNAUTHORIZED
+import org.springframework.http.HttpStatus.valueOf
 import java.net.URI
-import java.util.*
+import java.util.Locale.getDefault
 
-class PdlGraphQLErrorHandler {
+class GraphQLErrorHandler {
     fun handle(uri: URI, e: Throwable): Nothing =
         when (e) {
             is FieldAccessException -> throw e.oversett(uri)
@@ -25,7 +26,7 @@ class PdlGraphQLErrorHandler {
         }
 
     companion object {
-        private val log = getLogger(PdlGraphQLErrorHandler::class.java)
+        private val log = getLogger(GraphQLErrorHandler::class.java)
         private fun FieldAccessException.oversett(uri: URI) = response.errors.oversett(message, uri)
 
         private fun List<ResponseError>.oversett(message: String?, uri: URI) = oversett(
@@ -45,7 +46,7 @@ class PdlGraphQLErrorHandler {
             }
 
         private fun String.tilStatus() =
-            if (this.uppercase() == "UNAUTHENTICATED") HttpStatus.UNAUTHORIZED else HttpStatus.valueOf(
-                this.uppercase(Locale.getDefault()))
+            if (this.uppercase() == "UNAUTHENTICATED") UNAUTHORIZED else valueOf(
+                this.uppercase(getDefault()))
     }
 }

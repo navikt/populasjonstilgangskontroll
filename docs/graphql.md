@@ -2,19 +2,20 @@
 
 Denne guiden beskriver hvordan Tilgangsmaskinen kaller en GraphQL-tjeneste (PDL sitt
 `pdl-api`) med Spring sin `HttpSyncGraphQlClient`, inkludert token-, header-, logging- og
-feiloversettelse. I dag er PDL-oppslaget via GraphQL den eneste GraphQL-integrasjonen i
-appen; mønsteret under er det som skal gjenbrukes hvis en ny GraphQL-nedstrøms legges til.
+feiloversettelse. Appen har to GraphQL-integrasjoner (PDL og NOM). Begge adapterne arver
+`felles/graphql/AbstractSyncGraphQLClientAdapter`, som eier spørringskall og feilhåndtering.
 
 ## 1. Oversikt
 
 ```
 PdlSyncGraphQLClientAdapter        (domene-API: partnere(ident): Set<FamilieMedlem>)
+  └─ AbstractSyncGraphQLClientAdapter (felles query<T>/queryRequired<T> + feilhåndtering)
   └─ GraphQlClient (Spring GraphQL, HttpSyncGraphQlClient)
        ├─ PdlGraphQLLoggingInterceptor   (logger query + variabler, CONFIDENTIAL)
        ├─ OAuth2ClientHttpRequestInterceptor (client_credentials-token)
        ├─ RestHeaderAddingRequestInterceptor (behandlingsnummer-header)
        └─ RestClient → https://<pdlgraph-host>/graphql
-  └─ PdlGraphQLErrorHandler           (oversetter GraphQL-feil til RecoverableRestException/
+  └─ GraphQLErrorHandler              (oversetter GraphQL-feil til RecoverableRestException/
                                         NotFoundRestException/IrrecoverableRestException)
 ```
 
@@ -136,37 +137,46 @@ private val SIVILSTAND_QUERY = "query-sivilstand" to "hentPerson"
 Fordeler fremfor inline query-strenger i Kotlin-kode: syntax highlighting, gjenbrukbarhet, og
 mulighet for GraphQL-tooling (schema-validering, linting) på selve `.graphql`-filene.
 
-## 6. Kalle klienten (`PdlSyncGraphQLClientAdapter`)
+## 6. Kalle klienten (`AbstractSyncGraphQLClientAdapter`)
 
 ```kotlin
-@Component
-class PdlSyncGraphQLClientAdapter(
-    private val cfg: PdlGraphQLConfig,
-    private val client: GraphQlClient,
-    private val errorHandler: PdlGraphQLErrorHandler = PdlGraphQLErrorHandler()
-) {
-    fun partnere(ident: String): Set<FamilieMedlem> =
-        runCatching {
-            query<Partnere>(SIVILSTAND_QUERY, ident(ident)).sivilstand.mapNotNullTo(mutableSetOf()) {
-                it.relatertVedSivilstand?.let { brukerId -> FamilieMedlem(BrukerId(brukerId), tilPartner(it.type)) }
-            }
-        }.recover { e ->
-            (e as? NotFoundRestException)?.let { emptySet() } ?: throw e
-        }.getOrThrow()
+abstract class AbstractSyncGraphQLClientAdapter(
+    protected val cfg: RestConfig,
+    protected val client: GraphQlClient,
+    private val errorHandler: GraphQLErrorHandler = GraphQLErrorHandler()) {
 
-    private inline fun <reified T : Any> query(query: Pair<String, String>, vars: Map<String, String>) =
+    protected inline fun <reified T : Any> query(query: Pair<String, String>, vars: Map<String, String>): T? =
+        query(query, vars, T::class.java)
+
+    protected inline fun <reified T : Any> queryRequired(query: Pair<String, String>, vars: Map<String, String>): T =
+        query<T>(query, vars) ?: throw IrrecoverableRestException(INTERNAL_SERVER_ERROR, cfg.baseUri, "Fant ikke feltet ${query.second} i responsen")
+
+    protected fun <T : Any> query(query: Pair<String, String>, vars: Map<String, String>, type: Class<T>): T? =
         runCatching {
             client.documentName(query.first)
                 .variables(vars)
                 .executeSync()
                 .field(query.second)
-                .toEntity(T::class.java)
-                ?: throw IrrecoverableRestException(INTERNAL_SERVER_ERROR, cfg.baseUri, "Fant ikke feltet ${query.second} i responsen")
+                .toEntity(type)
         }.getOrElse { errorHandler.handle(cfg.baseUri, it) }
+}
+
+@Component
+class PdlSyncGraphQLClientAdapter(cfg: PdlGraphQLConfig, @Qualifier(PDLGRAPH) client: GraphQlClient) :
+    AbstractSyncGraphQLClientAdapter(cfg, client) {
+
+    fun partnere(ident: String): Set<FamilieMedlem> =
+        runCatching {
+            queryRequired<Partnere>(SIVILSTAND_QUERY, ident(ident)).sivilstand.mapNotNullTo(mutableSetOf()) {
+                it.relatertVedSivilstand?.let { brukerId -> FamilieMedlem(BrukerId(brukerId), tilPartner(it.type)) }
+            }
+        }.recover { e ->
+            (e as? NotFoundRestException)?.let { emptySet() } ?: throw e
+        }.getOrThrow()
 }
 ```
 
-Kilde: `bruker/pdl/PdlSyncGraphQLClientAdapter.kt`
+Kilde: `felles/graphql/AbstractSyncGraphQLClientAdapter.kt`, `bruker/pdl/PdlSyncGraphQLClientAdapter.kt`
 
 Mønster:
 - `documentName(...)` slår opp `.graphql`-filen fra seksjon 5, `variables(...)` setter
@@ -174,14 +184,13 @@ Mønster:
 - `.field("hentPerson")` peker på GraphQL-response-treet der resultatet skal hentes fra (unngår
   å måtte deserialisere hele svaret manuelt), og `.toEntity(T::class.java)` mapper til domene-DTO
   (`Partnere` i dette tilfellet).
-- Hver spørring wrappes i `runCatching` + en delt privat `query<T>`-hjelpefunksjon slik at all
-  feilhåndtering (seksjon 7) er ett sted, uavhengig av hvor mange query-metoder adapteren får i
-  fremtiden.
+- Hver spørring går via `query<T>` (nullable resultat) eller `queryRequired<T>` (kaster hvis feltet
+  mangler) i baseklassen, slik at all feilhåndtering (seksjon 7) er ett sted for alle adaptere.
 - Domenemetoden (`partnere`) gjør selv om `NotFoundRestException` til et tomt resultat der det gir
   mening forretningsmessig (ingen partner er ikke en feil) — ikke noe error-handleren skal
   bestemme generelt.
 
-## 7. Feiloversettelse (`PdlGraphQLErrorHandler`)
+## 7. Feiloversettelse (`GraphQLErrorHandler`)
 
 GraphQL returnerer *alltid* HTTP 200, selv ved feil — feil kommer i stedet som en
 `errors`-liste i JSON-responsen. Spring GraphQL kaster da et
@@ -190,7 +199,7 @@ en HTTP-statuskode-basert exception. Derfor må GraphQL-feil oversettes til appe
 REST-exception-hierarki (`docs/retry.md` seksjon 3) manuelt:
 
 ```kotlin
-class PdlGraphQLErrorHandler {
+class GraphQLErrorHandler {
     fun handle(uri: URI, e: Throwable): Nothing = when (e) {
         is FieldAccessException -> throw e.oversett(uri)
         is GraphQlTransportException -> throw RecoverableRestException(INTERNAL_SERVER_ERROR, uri, e.message ?: "Uventet respons", e)
@@ -288,7 +297,7 @@ Noter:
   til samme endepunkt); bruk `.andExpect(header(...))` for å verifisere headere som
   `behandlingsnummer` (se testen "behandlingsnummer-header").
 - GraphQL-feilresponser (`errors`-array med `extensions.code`) brukes til å teste
-  `PdlGraphQLErrorHandler`-oversettelsen ende-til-ende, uten å mocke `PdlGraphQLErrorHandler`
+  `GraphQLErrorHandler`-oversettelsen ende-til-ende, uten å mocke `GraphQLErrorHandler`
   direkte — se `felles/graphql/GraphQLErrorHandlerTest.kt` for mer finkornede enhetstester av
   selve oversettelseslogikken.
 
@@ -301,9 +310,8 @@ Noter:
    `clientRegistrationIdResolver`) + evt. egne headere, og pakk den i en `HttpSyncGraphQlClient`
    pekende på samme URI.
 4. Legg til en `PingableHealthIndicator` med en `{__typename}`-spørring.
-5. Lag en adapter-klasse med domenemetoder som bruker `client.documentName(...).variables(...).executeSync().field(...).toEntity(...)`,
-   og oversett feil til `Recoverable`/`Irrecoverable`/`NotFoundRestException` via en delt
-   error-handler (se seksjon 7).
+5. Lag en adapter-klasse som arver `AbstractSyncGraphQLClientAdapter` og har domenemetoder som
+   kaller `query<T>`/`queryRequired<T>`. Feil oversettes da automatisk (se seksjon 7).
 6. Legg til `oauth2.client.registration.<id>` i `application-gcp.yaml` med riktig scope.
 7. Test med `@RestClientTest` + `MockRestServiceServer`, stub rå GraphQL JSON-responser
    (både `data`- og `errors`-varianter).

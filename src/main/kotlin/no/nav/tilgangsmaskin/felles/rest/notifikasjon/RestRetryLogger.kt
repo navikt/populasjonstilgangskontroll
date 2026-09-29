@@ -27,7 +27,7 @@ class RestRetryLogger {
                     log.warn("Aborterer metode '$metode' grunnet ${t.cause.javaClass.simpleName} $args", t.cause)
                 }
             } else {
-                log.warn("Feil i '$metode',  prøver igjen", t)
+                log.info("Feil i '$metode',  prøver igjen", t)
             }
         }
     }

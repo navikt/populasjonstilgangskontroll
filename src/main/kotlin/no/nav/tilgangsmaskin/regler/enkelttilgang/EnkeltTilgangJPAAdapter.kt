@@ -30,7 +30,7 @@ class EnkeltTilgangJPAAdapter(
         return try {
             repo.saveAndFlush(nyEnkeltTilgang)
         } catch (e: DataIntegrityViolationException) {
-            log.warn("Fant eksisterende enkelttilgang for navid=${ansattId}, fnr=${data.brukerId.verdi.maskFnr()}, expires=${expires} etter saveAndFlush")
+            log.warn("Fant eksisterende enkelttilgang for navid=${ansattId}, fnr=${data.brukerId.verdi.maskFnr()}, expires=${expires} etter saveAndFlush, returnerer denne",e)
             repo.findByNavidAndFnrAndExpires(ansattId, data.brukerId.verdi, expires) ?: throw e
         }
     }

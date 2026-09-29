@@ -21,7 +21,7 @@ interface EntraProxyClient {
                 @RequestHeader(IDENTIFIKATOR) identifikator: String = navIdent): Set<Enhet>
 
     @GetExchange(ENTRA_PROXY_PING_PATH)
-    fun ping(): Any
+    fun ping(): Any?
 
     companion object {
         const val ENTRA_PROXY_ANSATT_PATH = "/api/v1/ansatt/{navIdent}"

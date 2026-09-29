@@ -86,11 +86,11 @@ class EnkeltTilgangTjeneste(
         with(bruker.geografiskTilknytning) {
             when (this) {
                 is KommuneTilknytning -> {
-                    log.info("Enkelttilgang for ${bruker.oppslagId.maskFnr()} med kommune $kommune")
+                    log.info("Enkelttilgang for ${bruker.oppslagId.maskFnr()} med gt ${kommune.verdi}")
                     kommune.verdi
                 }
                 is BydelTilknytning -> {
-                    log.info("Enkelttilgang for ${bruker.oppslagId.maskFnr()} med bydel $bydel")
+                    log.info("Enkelttilgang for ${bruker.oppslagId.maskFnr()} med gt ${bydel.verdi}")
                     bydel.verdi
                 }
                 else -> {

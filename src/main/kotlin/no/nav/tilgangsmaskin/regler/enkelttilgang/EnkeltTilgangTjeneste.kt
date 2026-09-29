@@ -8,8 +8,11 @@ import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.Leder
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
+import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
+import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withAnsattContext
@@ -58,10 +61,11 @@ class EnkeltTilgangTjeneste(
         withAnsattContext(ansattId)  {
             runCatching {
                 val enhetsnummer = enhetsNummerFor(ansattId)
-                motor.kjerneregler(ansattTjeneste.ansatt(ansattId),
-                    bruker.medNærmesteFamilie(data.brukerId.verdi))
+                val bruker = bruker.medNærmesteFamilie(data.brukerId.verdi)
+                val gt = gt(bruker)
+                motor.kjerneregler(ansattTjeneste.ansatt(ansattId), bruker)
                 MDC.put(USER_ID, ansattId.verdi)
-                adapter.enkeltTilgang(ansattId.verdi, enhetsnummer, data)
+                adapter.enkeltTilgang(ansattId.verdi, enhetsnummer, data, gt)
                 kafka.publiser(ansattId).also {
                     teller.tell(INGEN_REGEL_TAG, ENKELTTILGANG_GITT)
                     log.info("Enkelttilgang OK. $ansattId ved enhet $enhetsnummer har fått tilgang til ${data.brukerId} til og med ${data.gyldigtil}")
@@ -77,6 +81,23 @@ class EnkeltTilgangTjeneste(
             }.getOrThrow()
         }
 
+    private fun gt(bruker: Bruker) =
+        with(bruker.geografiskTilknytning) {
+            when (this) {
+                is KommuneTilknytning -> {
+                    log.info("Enkelttilgang for ${bruker.oppslagId} med kommune $kommune")
+                    kommune.verdi
+                }
+                is BydelTilknytning -> {
+                    log.info("Enkelttilgang for ${bruker.oppslagId} med bydel $bydel")
+                    bydel.verdi
+                }
+                else -> {
+                    log.info("Enkelttilgang for ${bruker.oppslagId} med annen geografisk tilknytning")
+                    null
+                }
+            }
+        }
 
 
     private fun gjeldendeEnkeltTilgang(ansattId: AnsattId, brukerId: BrukerId): Instant? =

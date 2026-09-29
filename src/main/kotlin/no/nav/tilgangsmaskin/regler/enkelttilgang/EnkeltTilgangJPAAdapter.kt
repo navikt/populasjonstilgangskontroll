@@ -14,13 +14,13 @@ class EnkeltTilgangJPAAdapter(
     private val repo: EnkeltTilgangRepository,
     private val clock: Clock) {
 
-    fun enkeltTilgang(ansattId: String, enhetsnummer: String, data: EnkeltTilgangData): EnkeltTilgangEntity {
+    fun enkeltTilgang(ansattId: String, enhetsnummer: String, data: EnkeltTilgangData, gt: String? = null): EnkeltTilgangEntity {
         val expires = data.gyldigtil.plusDays(1)
             .atStartOfDay(clock.zone)
             .toInstant()
         repo.findByNavidAndFnrAndExpires(ansattId, data.brukerId.verdi, expires)?.let { return it }
 
-        val nyEnkeltTilgang = EnkeltTilgangEntity(ansattId, data.brukerId.verdi, data.begrunnelse, enhetsnummer, expires)
+        val nyEnkeltTilgang = EnkeltTilgangEntity(ansattId, data.brukerId.verdi, data.begrunnelse, enhetsnummer, expires, gt)
 
         return try {
             repo.saveAndFlush(nyEnkeltTilgang)
@@ -36,6 +36,7 @@ class EnkeltTilgangJPAAdapter(
                     AnsattId(ansatt.navid),
                     ansatt.begrunnelse,
                     ansatt.created,
+                    ansatt.gt,
                 )
             }
 
@@ -53,6 +54,7 @@ data class EnkeltTilgang(
     val id: AnsattId,
     val begrunnelse: String,
     val created: Instant?,
+    val gt: String?,
 )
 
 data class LederEnkeltTilganger(val leder: Leder, val ansatte: List<EnkeltTilgang>)

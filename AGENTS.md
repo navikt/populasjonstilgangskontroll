@@ -79,7 +79,7 @@ Built via `RestClientFactory` in `felles/rest/`. All outbound calls use `nav-sec
 
 ### Database (Flyway)
 
-Migrations in `src/main/resources/db/migration/`. Currently at V19. Schema centers on `enkelt_tilgang` (per-case access overrides).
+Migrations in `src/main/resources/db/migration/`. Currently at V24. Schema centers on `enkelt_tilgang` (per-case access overrides).
 
 ## Key Files
 

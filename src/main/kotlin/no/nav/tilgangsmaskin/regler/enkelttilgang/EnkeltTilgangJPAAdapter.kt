@@ -19,7 +19,6 @@ class EnkeltTilgangJPAAdapter(
     private val log = getLogger(javaClass)
 
 
-    fun enkeltTilgang(ansattId: String, enhetsnummer: String, data: EnkeltTilgangData): EnkeltTilgangEntity {
     fun enkeltTilgang(ansattId: String, enhetsnummer: String, data: EnkeltTilgangData, gt: String? = null): EnkeltTilgangEntity {
         val expires = data.gyldigtil.plusDays(1)
             .atStartOfDay(clock.zone)
@@ -51,13 +50,11 @@ class EnkeltTilgangJPAAdapter(
             }
 
     fun gjeldendeTilgang(ansattId: String, brukerId: String, brukerIds: List<String>) =
-        repo.gjeldende(ansattId, setOf(brukerId) + brukerIds, cutoff())
+        repo.gjeldende(ansattId, setOf(brukerId) + brukerIds, now(clock))
 
     fun gjeldendeTilganger(ansattId: String, brukerIds: Set<String>): Set<BrukerId> =
-        repo.gjeldendeOverstyringer(ansattId, brukerIds, cutoff())
+        repo.gjeldendeOverstyringer(ansattId, brukerIds, now(clock))
             .mapTo(mutableSetOf()) { BrukerId(it.fnr) }
-
-    private fun cutoff() = now(clock)
 }
 
 data class EnkeltTilgang(

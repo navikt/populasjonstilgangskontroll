@@ -15,6 +15,7 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withAnsattContext
 import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.diffFromNow
 import no.nav.tilgangsmaskin.regler.motor.RegelException
@@ -85,15 +86,15 @@ class EnkeltTilgangTjeneste(
         with(bruker.geografiskTilknytning) {
             when (this) {
                 is KommuneTilknytning -> {
-                    log.info("Enkelttilgang for ${bruker.oppslagId} med kommune $kommune")
+                    log.info("Enkelttilgang for ${bruker.oppslagId.maskFnr()} med kommune $kommune")
                     kommune.verdi
                 }
                 is BydelTilknytning -> {
-                    log.info("Enkelttilgang for ${bruker.oppslagId} med bydel $bydel")
+                    log.info("Enkelttilgang for ${bruker.oppslagId.maskFnr()} med bydel $bydel")
                     bydel.verdi
                 }
                 else -> {
-                    log.info("Enkelttilgang for ${bruker.oppslagId} med annen geografisk tilknytning")
+                    log.info("Enkelttilgang for ${bruker.oppslagId.maskFnr()} med annen geografisk tilknytning")
                     null
                 }
             }

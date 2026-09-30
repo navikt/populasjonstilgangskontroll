@@ -21,7 +21,7 @@ class EnkeltTilgangJPAAdapter(
 
     fun enkeltTilgang(ansattId: String, enhetsnummer: String, data: EnkeltTilgangData, gt: String? = null): EnkeltTilgangEntity {
         val expires = data.gyldigtil.plusDays(1)
-            .atStartOfDay(clock.zone)
+            .atStartOfDay(clock.zone).minusMinutes(1)
             .toInstant()
         repo.findByNavidAndFnrAndExpires(ansattId, data.brukerId.verdi, expires)?.let {
             log.warn("Fant eksisterende enkelttilgang for navid=${ansattId}, fnr=${data.brukerId.verdi.maskFnr()}, expires=${expires}")

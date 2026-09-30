@@ -1,11 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.kodeverk
 
 import io.micrometer.observation.annotation.Observed
-import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyClient
-import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyConfig.Companion.ENTRAPROXY
 import no.nav.tilgangsmaskin.ansatt.kodeverk.KodeverkConfig.Companion.KODEVERK
-import no.nav.tilgangsmaskin.ansatt.kodeverk.kodeverkConfig.Companion.KODEVERK
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.rest.RestRetryingWhenRecoverableService
 import org.springframework.web.service.registry.ImportHttpServices

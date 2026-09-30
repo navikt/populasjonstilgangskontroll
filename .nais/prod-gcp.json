@@ -2,6 +2,7 @@
   "ingresses": ["https://tilgangsmaskin.intern.nav.no", "https://tilgangsmaskin.ansatt.nav.no"],
   "pdlgraph": "pdl-api.prod-fss-pub.nais.io",
   "nomgraph": "nom-api.nom",
+  "kodeverk": "kodeverk-api.nav.no",
   "pdlpip": "pdl-pip-api.prod-fss-pub.nais.io",
   "grupper": {
     "fortrolig": "e98efc34-12d1-401f-b059-f17e62834065",

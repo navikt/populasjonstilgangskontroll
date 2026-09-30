@@ -4,7 +4,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.rest.health.HttpClientPoolMetrics
-import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.sekunder
+import org.apache.hc.core5.util.TimeValue
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.http.client.HttpComponentsClientHttpRequestFactoryBuilder
 import org.springframework.boot.http.client.autoconfigure.ClientHttpRequestFactoryBuilderCustomizer
@@ -70,7 +70,7 @@ class RestBeanConfig(
                     cm.setMaxConnPerRoute(50)
                 }
                 .withConnectionConfigCustomizer { cfg ->
-                    cfg.setValidateAfterInactivity(2.sekunder)
+                    cfg.setValidateAfterInactivity(TimeValue.ofSeconds(2))
                 }
         }
 

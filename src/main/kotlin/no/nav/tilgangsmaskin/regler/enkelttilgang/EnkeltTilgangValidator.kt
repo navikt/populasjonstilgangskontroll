@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import jakarta.validation.ConstraintValidator
 import jakarta.validation.ConstraintValidatorContext
-import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.isBetween
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.isBetween
 import java.time.LocalDate.now
 
 class EnkeltTilgangValidator : ConstraintValidator<EnkeltTilgangGyldig, EnkeltTilgangData> {

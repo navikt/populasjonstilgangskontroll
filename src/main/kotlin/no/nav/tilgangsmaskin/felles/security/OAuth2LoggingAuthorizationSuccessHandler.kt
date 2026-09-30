@@ -1,8 +1,8 @@
 package no.nav.tilgangsmaskin.felles.security
 
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.OSLO
 import no.nav.tilgangsmaskin.felles.security.OAuth2DownstreamURIContext.currentUri
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
-import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.OSLO
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.client.OAuth2AuthorizationSuccessHandler

@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.regler.enkelttilgang
 import io.micrometer.core.annotation.Timed
 import io.micrometer.core.instrument.Tag
 import io.micrometer.observation.annotation.Observed
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.diffFromNow
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
@@ -17,7 +18,6 @@ import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Compani
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withAnsattContext
-import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.diffFromNow
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.regler.motor.RegelMotorLogger.Companion.INGEN_REGEL_TAG

@@ -2,22 +2,22 @@ package no.nav.tilgangsmaskin.felles.utils.cluster
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.DEV_GCP
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.GCP
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.LOCAL
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.NAIS_CLUSTER_NAME
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.PROD_GCP
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterConstants.TEST
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.current
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isDev
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.profilerFor
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.DEV_GCP_CLUSTER
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.PROD_GCP_CLUSTER
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.TEST_CLUSTER
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterConstants.DEV
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterConstants.DEV_GCP
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterConstants.GCP
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterConstants.LOCAL
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterConstants.NAIS_CLUSTER_NAME
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterConstants.PROD
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterConstants.PROD_GCP
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterConstants.TEST
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.Companion.current
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.Companion.isDev
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.Companion.isLocalOrTest
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.Companion.isProd
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.DEV_GCP_CLUSTER
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.LOCAL_CLUSTER
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.PROD_GCP_CLUSTER
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.TEST_CLUSTER
 
 class ClusterUtilsTest : BehaviorSpec({
 
@@ -51,7 +51,7 @@ class ClusterUtilsTest : BehaviorSpec({
 
         When("cluster er LOCAL_CLUSTER") {
             Then("gir ['local'] og setter system property") {
-                val profiler = profilerFor(ClusterUtils.LOCAL_CLUSTER)
+                val profiler = profilerFor(LOCAL_CLUSTER)
                 profiler shouldBe arrayOf(LOCAL)
                 System.getProperty(NAIS_CLUSTER_NAME) shouldBe LOCAL
             }

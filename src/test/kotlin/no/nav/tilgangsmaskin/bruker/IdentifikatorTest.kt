@@ -6,8 +6,8 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.Companion.isProd
 
 class BrukerIdTest : BehaviorSpec({
 

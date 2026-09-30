@@ -17,6 +17,8 @@ import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.mockk.verify
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Familie
@@ -33,8 +35,6 @@ import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.FORTROLIG
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.UGRADERT
 import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheOperationsTest.ValkeyCacheTestConfig
 import no.nav.tilgangsmaskin.felles.security.AuthContext
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest
 import org.springframework.boot.test.context.TestConfiguration
@@ -230,10 +230,10 @@ class ValkeyCacheOperationsTest(
 
         Given("clear i prod-miljø") {
             beforeEach {
-                mockkObject(ClusterUtils.Companion)
+                mockkObject(ClusterUtils)
                 every { isProd } returns true
             }
-            afterEach { unmockkObject(ClusterUtils.Companion) }
+            afterEach { unmockkObject(ClusterUtils) }
 
             When("clear kalles") {
                 Then("kaster IllegalStateException fordi clear er blokkert i prod") {

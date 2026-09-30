@@ -11,9 +11,9 @@ import io.mockk.unmockkObject
 import no.nav.tilgangsmaskin.felles.ClusterAddingTimedAspectTest.TestConfig
 import no.nav.tilgangsmaskin.felles.security.AuthContext
 import no.nav.tilgangsmaskin.felles.rest.health.ObservabilityBeanConfig
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.DEV_GCP_CLUSTER
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.PROD_GCP_CLUSTER
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.DEV_GCP_CLUSTER
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.PROD_GCP_CLUSTER
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -37,7 +37,7 @@ class ClusterAddingTimedAspectTest(
         }
 
         afterEach {
-            unmockkObject(ClusterUtils.Companion)
+            unmockkObject(ClusterUtils)
         }
         Given("clusterAddingTimedAspect") {
             When("tjeneste kalles") {

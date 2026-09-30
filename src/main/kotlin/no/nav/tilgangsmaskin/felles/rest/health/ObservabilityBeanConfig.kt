@@ -3,9 +3,9 @@ package no.nav.tilgangsmaskin.felles.rest.health
 import io.micrometer.core.aop.TimedAspect
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.security.AuthContext
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
 import org.springframework.boot.actuate.endpoint.SanitizableData.SANITIZED_VALUE
 import org.springframework.boot.actuate.endpoint.SanitizingFunction
 import org.springframework.context.annotation.Bean

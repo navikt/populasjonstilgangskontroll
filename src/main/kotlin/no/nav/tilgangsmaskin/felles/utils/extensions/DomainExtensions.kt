@@ -1,10 +1,13 @@
 package no.nav.tilgangsmaskin.felles.utils.extensions
 
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.månederSidenIdag
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.AktørId.Companion.AKTØRID_LENGTH
 import no.nav.tilgangsmaskin.bruker.BrukerId.Companion.BRUKERID_LENGTH
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import org.slf4j.MDC
+import java.time.Clock
+import java.time.LocalDate
 
 
 object DomainExtensions {
@@ -39,5 +42,19 @@ object DomainExtensions {
             }
         }
 
+
+    enum class Dødsperiode {
+        MND_0_6,
+        MND_7_12,
+        MND_13_24,
+        MND_OVER_24
+    }
+    fun LocalDate.intervallSiden(clock: Clock) =
+        when (månederSidenIdag(clock)) {
+            in 0..6 -> Dødsperiode.MND_0_6
+            in 7..12 -> Dødsperiode.MND_7_12
+            in 13..24 -> Dødsperiode.MND_13_24
+            else -> Dødsperiode.MND_OVER_24
+        }
     const val UTILGJENGELIG = "N/A"
 }

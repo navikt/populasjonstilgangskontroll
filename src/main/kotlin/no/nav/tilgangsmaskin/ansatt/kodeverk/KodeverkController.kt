@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable
 
 @DevController(
     value = ["/${DEV}/kodeverk"],
-    name = "KideverkController")
+    name = "KodeverkController")
 class KodeverkController(
     private val kodeverk: KodeverkTjeneste) {
 

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 import java.net.URI
 
 @Component
-class kodeverkConfig(@Value("\${spring.http.serviceclient.kodeverk.base-url}") baseUrl: URI) : RestConfig(baseUrl, KODEVERK_PING_PATH, KODEVERK) {
+class KodeverkConfig(@Value("\${spring.http.serviceclient.kodeverk.base-url}") baseUrl: URI) : RestConfig(baseUrl, KODEVERK_PING_PATH, KODEVERK) {
 
     companion object {
         const val KODEVERK  = "kodeverk"

@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.ALLTID
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import java.time.LocalDate

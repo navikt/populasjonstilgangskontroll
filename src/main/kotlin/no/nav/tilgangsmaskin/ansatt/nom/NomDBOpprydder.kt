@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
-import no.nav.sikkerhetstjenesten.entraproxy.felles.leder.LeaderAware
+import no.nav.sikkerhetstjenesten.felles.leder.LeaderAware
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.util.concurrent.TimeUnit.*
@@ -15,4 +15,3 @@ class NomDBOpprydder(
             nom.ryddOpp()
         })
 }
-

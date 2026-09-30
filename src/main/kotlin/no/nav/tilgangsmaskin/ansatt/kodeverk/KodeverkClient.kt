@@ -18,8 +18,8 @@ interface KodeverkClient {
     fun ping(): Any?
 
     companion object {
-        const val KODEVERK_BYDELER_PATH = "/kodeverk/Bydeler?spraak=nb&periode=GYLDIG&status=ALLE"
-        const val KODEVERK_KOMMUNER_PATH = "kodeverk/Kommuner?spraak=nb&periode=GYLDIG&status=ALLE"
+        const val KODEVERK_BYDELER_PATH = "/api/v1/kodeverk/Bydeler/koder?inkluderUtkast=false"
+        const val KODEVERK_KOMMUNER_PATH = "/api/v1/kodeverk/Kommuner/koder?inkluderUtkast=false"
         const val KODEVERK_PING_PATH = "/internal/health/liveness"
     }
 }

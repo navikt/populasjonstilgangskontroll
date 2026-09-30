@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class KodeverkBeanConfig {
 
-    @Bean
+   // @Bean
     fun kodeverkHealthIndicator(cfg: KodeverkConfig, client: KodeverkClient) =
         PingableHealthIndicator(cfg, client::ping)
 }

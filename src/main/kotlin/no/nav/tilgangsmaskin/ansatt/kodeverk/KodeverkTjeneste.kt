@@ -13,7 +13,7 @@ class KodeverkTjeneste(private val client: KodeverkClient) {
 
     fun koderOgNavn() =
         client.bydeler().kodeOgNavn() + client.kommuner().kodeOgNavn()
-    
+
     @NoCoverageAnalysis
     override fun toString() = "${javaClass.simpleName} [client=$client]"
 }

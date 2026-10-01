@@ -23,3 +23,7 @@ logbook:
     enabled: false
   secure-filter:
     enabled: false
+
+nom:
+  kafka:
+    group-id: nom

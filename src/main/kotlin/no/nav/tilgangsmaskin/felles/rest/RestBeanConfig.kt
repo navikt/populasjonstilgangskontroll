@@ -38,15 +38,7 @@ class RestBeanConfig(
         it.enable(INCLUDE_SOURCE_IN_LOCATION)
     }
 
-    @Bean
-    fun electorWebClient(builder: WebClient.Builder): WebClient =
-        builder
-            .clientConnector(ReactorClientHttpConnector(
-                HttpClient.create().option(CONNECT_TIMEOUT_MILLIS, 3000)
-            ))
-            .build()
-
-
+    
     @Bean
     fun httpClientPoolMetrics(registry: MeterRegistry) =
         HttpClientPoolMetrics(registry)

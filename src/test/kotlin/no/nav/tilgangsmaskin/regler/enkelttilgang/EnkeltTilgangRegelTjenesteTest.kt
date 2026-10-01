@@ -17,6 +17,7 @@ import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.UTENLANDSK
+import no.nav.tilgangsmaskin.ansatt.kodeverk.KodeverkTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålTjeneste
@@ -75,6 +76,9 @@ class EnkeltTilgangRegelTjenesteTest(
 
     @MockkBean(relaxed = true)
     private lateinit var kafka: EnkeltTilgangHendelseProdusent
+
+    @MockkBean(relaxed = true)
+    private lateinit var kodeverk: KodeverkTjeneste
 
     @MockkBean
     private lateinit var nom: NomTjeneste

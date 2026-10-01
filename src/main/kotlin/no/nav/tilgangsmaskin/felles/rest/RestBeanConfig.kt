@@ -38,7 +38,7 @@ class RestBeanConfig(
         it.enable(INCLUDE_SOURCE_IN_LOCATION)
     }
 
-    
+
     @Bean
     fun httpClientPoolMetrics(registry: MeterRegistry) =
         HttpClientPoolMetrics(registry)

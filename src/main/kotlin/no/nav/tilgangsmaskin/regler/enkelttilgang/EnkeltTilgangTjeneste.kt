@@ -66,7 +66,7 @@ class EnkeltTilgangTjeneste(
                 val enhetsnummer = enhetsNummerFor(ansattId)
                 val bruker = bruker.medNærmesteFamilie(data.brukerId.verdi)
                 val gt = gt(bruker)
-                val navn = gt?.let { 
+                val navn = gt?.let {
                       kodeverk.koderOgNavn().first { it.kode == gt }.tekst
                 }
                 log.info("Enkelttilgang med gt $gt og navn ${navn ?: "ukjent"})")

@@ -15,6 +15,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyEnhet.Enhet
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
+import no.nav.tilgangsmaskin.ansatt.kodeverk.KodeverkTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.Leder
 import no.nav.tilgangsmaskin.ansatt.nom.Ledere
 import no.nav.tilgangsmaskin.ansatt.nom.NomRessurs
@@ -75,6 +76,9 @@ class EnkeltTilgangTest(
     lateinit var proxy: EntraProxyTjeneste
     @MockkBean
     lateinit var authContext: AuthContext
+
+    @MockkBean
+    lateinit var kodeverk: KodeverkTjeneste
     @MockkBean
     lateinit var oppfølging: OppfølgingTjeneste
     private val ansatte: AnsattTjeneste = mockk()
@@ -93,6 +97,7 @@ class EnkeltTilgangTest(
                 motor,
                 proxy,
                 Clock.systemUTC(),
+                kodeverk,
                 kafka,
                 EnkeltTilgangTeller(registry, authContext),
             )

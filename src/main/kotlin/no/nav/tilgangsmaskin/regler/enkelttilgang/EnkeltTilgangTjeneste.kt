@@ -66,12 +66,8 @@ class EnkeltTilgangTjeneste(
                 val enhetsnummer = enhetsNummerFor(ansattId)
                 val bruker = bruker.medNærmesteFamilie(data.brukerId.verdi)
                 val gt = gt(bruker)
-                val navn = gt?.let { tilknytning ->
-                    when (tilknytning.length) {
-                        4 -> kodeverk.kommuner().first { it.kode == gt }.tekst
-                        6 -> kodeverk.bydeler().first { it.kode == gt }.tekst
-                        else -> null
-                    }
+                val navn = gt?.let { 
+                      kodeverk.koderOgNavn().first { it.kode == gt }.tekst
                 }
                 log.info("Enkelttilgang med gt $gt og navn ${navn ?: "ukjent"})")
                 motor.kjerneregler(ansattTjeneste.ansatt(ansattId), bruker)

@@ -13,13 +13,13 @@ interface KodeverkClient {
     fun kommuner(@RequestParam(UTKAST) utkast: String = "false") : Any
 
     @GetExchange(KODEVERK_BYDELER_PATH)
-    fun bydeler(@RequestParam(UTKAST) utkast: String = "false"): Any
+    fun bydeler(@RequestParam(UTKAST) utkast: String = "false") : Any
 
     @GetExchange(KODEVERK_BYDELER_BETYDNINGER_PATH)
-    fun bydelBetydninger(@RequestParam(SPRÅK) spraak: String = BOKMÅL): KodeverkBetydninger
+    fun bydelBetydninger(@RequestParam(SPRÅK) spraak: String = BOKMÅL) : KodeverkBetydninger
 
     @GetExchange(KODEVERK_KOMMUNER_BETYDNINGER_PATH)
-    fun kommuneBetydninger(@RequestParam(SPRÅK) spraak: String = BOKMÅL): KodeverkBetydninger
+    fun kommuneBetydninger(@RequestParam(SPRÅK) spraak: String = BOKMÅL) : KodeverkBetydninger
 
     @GetExchange(KODEVERK_PING_PATH)
     fun ping(): Any?

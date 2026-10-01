@@ -15,13 +15,13 @@ class KodeverkTjeneste(private val client: KodeverkClient) {
         client.bydeler()
 
     fun bydelBetydninger() =
-        client.bydelBetydninger()
+        client.bydelBetydninger().tilKoder()
 
     fun kommuner() =
         client.kommuner()
 
     fun kommuneBetydninger() =
-        client.kommuneBetydninger()
+        client.kommuneBetydninger().tilKoder()
 
     @NoCoverageAnalysis
     override fun toString() = "${javaClass.simpleName} [client=$client]"

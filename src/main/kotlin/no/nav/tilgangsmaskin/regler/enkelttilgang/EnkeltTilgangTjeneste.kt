@@ -67,7 +67,7 @@ class EnkeltTilgangTjeneste(
                 val bruker = bruker.medNærmesteFamilie(data.brukerId.verdi)
                 val gt = gt(bruker)
                 val navn = gt?.let {
-                      kodeverk.koderOgNavn().first { it.kode == gt }.tekst
+                      kodeverk.navn(it)
                 }
                 log.info("Enkelttilgang med gt $gt og navn ${navn ?: "ukjent"})")
                 motor.kjerneregler(ansattTjeneste.ansatt(ansattId), bruker)

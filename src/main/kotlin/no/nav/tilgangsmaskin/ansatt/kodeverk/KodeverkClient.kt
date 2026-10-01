@@ -16,10 +16,10 @@ interface KodeverkClient {
     fun bydeler(@RequestParam("inkluderUtkast") spraak: String = "false"): Any
 
     @GetExchange(KODEVERK_BYDELER_BETYDNINGER_PATH)
-    fun bydelBetydninger(@RequestParam("spraak") spraak: String = "nb"): Set<KodeverkBetydningDto>
+    fun bydelBetydninger(@RequestParam("spraak") spraak: String = "nb"): KodeverkBetydningerDto
 
     @GetExchange(KODEVERK_KOMMUNER_BETYDNINGER_PATH)
-    fun kommuneBetydninger(@RequestParam("spraak") spraak: String = "nb"): Set<KodeverkBetydningDto>
+    fun kommuneBetydninger(@RequestParam("spraak") spraak: String = "nb"): KodeverkBetydningerDto
 
     @GetExchange(KODEVERK_PING_PATH)
     fun ping(): Any?

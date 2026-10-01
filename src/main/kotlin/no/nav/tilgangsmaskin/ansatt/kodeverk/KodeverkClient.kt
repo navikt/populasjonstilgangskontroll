@@ -10,10 +10,10 @@ import org.springframework.web.service.annotation.GetExchange
 interface KodeverkClient {
 
     @GetExchange(KODEVERK_BYDELER_BETYDNINGER_PATH)
-    fun bydeler(@RequestParam(SPRÅK) spraak: String = BOKMÅL) : KodeverkBetydninger
+    fun bydeler(@RequestParam(SPRÅK) spraak: String = BOKMÅL) : Betydninger
 
     @GetExchange(KODEVERK_KOMMUNER_BETYDNINGER_PATH)
-    fun kommuner(@RequestParam(SPRÅK) spraak: String = BOKMÅL) : KodeverkBetydninger
+    fun kommuner(@RequestParam(SPRÅK) spraak: String = BOKMÅL) : Betydninger
 
     @GetExchange(KODEVERK_PING_PATH)
     fun ping(): Any?

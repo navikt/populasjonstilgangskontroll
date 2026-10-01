@@ -25,9 +25,9 @@ interface KodeverkClient {
 
     companion object {
         const val KODEVERK_BYDELER_PATH = "/api/v1/kodeverk/Bydeler/koder?inkluderUtkast=false"
-        const val KODEVERK_BYDELER_BETYDNINGER_PATH = "/api/v1/kodeverk/Bydeler/koder/betydninger"
+        const val KODEVERK_BYDELER_BETYDNINGER_PATH = "/api/v1/kodeverk/Bydeler/koder/betydninger&spraak=nb"
         const val KODEVERK_KOMMUNER_PATH = "/api/v1/kodeverk/Kommuner/koder?inkluderUtkast=false"
-        const val KODEVERK_KOMMUNER_BETYDNINGER_PATH = "/api/v1/kodeverk/Kommuner/koder/betydninger"
+        const val KODEVERK_KOMMUNER_BETYDNINGER_PATH = "/api/v1/kodeverk/Kommuner/koder/betydninger&spraak=nb"
         const val KODEVERK_PING_PATH = "/internal/health/liveness"
     }
 }

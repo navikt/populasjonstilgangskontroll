@@ -11,7 +11,7 @@ data class KodeverkBetydninger(val betydninger: Map<String, List<Betydning>>) {
 
 data class KodeverkKode(val kode: String, val tekst: String)
 
-fun KodeverkBetydninger.tilKoder() =
-    betydninger.mapTo(mutableSetOf()) { (kode, betydninger) ->
+fun KodeverkBetydninger.kodeOgNavn() =
+    betydninger.mapTo(sortedSetOf(compareBy(KodeverkKode::kode))) { (kode, betydninger) ->
         KodeverkKode(kode, betydninger.single().beskrivelser.getValue(BOKMÅL).tekst)
     }

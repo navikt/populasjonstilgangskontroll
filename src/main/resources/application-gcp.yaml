@@ -37,7 +37,7 @@ spring:
   http:
     serviceclient:
         kodeverk:
-          base-url: "https://${kodeverk}"
+          base-url: "http://kodeverk-api.team-rocket"
         pdlpip:
           base-url: "https://${pdlpip}"
         verge:

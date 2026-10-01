@@ -92,10 +92,11 @@ spec:
           namespace: nom
         - application: nom-api
           namespace: nom
+        - application: kodeverk-api
+          namespace: team-rocket
         - application: logging
           namespace: nais-system
       external:
-        - host: {{kodeverk}}
         - host: hooks.slack.com
         - host: {{pdlpip}}
         - host: {{pdlgraph}}
@@ -120,8 +121,6 @@ spec:
       value: {{nomgraph}}
     - name: PDLPIP
       value: {{pdlpip}}
-    - name: KODEVERK
-      value: {{kodeverk}}
     - name: GRUPPE_ENKELTTILGANG
       value: '{{grupper.enkelttilgang}}'
     - name: GRUPPE_DEAD

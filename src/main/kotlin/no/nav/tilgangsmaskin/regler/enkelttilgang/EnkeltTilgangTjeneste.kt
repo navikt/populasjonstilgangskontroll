@@ -6,6 +6,7 @@ import io.micrometer.observation.annotation.Observed
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
+import no.nav.tilgangsmaskin.ansatt.kodeverk.KodeverkTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.Leder
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.bruker.Bruker
@@ -42,6 +43,7 @@ class EnkeltTilgangTjeneste(
     private val motor: RegelMotor,
     private val proxy: EntraProxyTjeneste,
     private val clock: Clock,
+    private val kodeverk: KodeverkTjeneste,
     private val kafka: EnkeltTilgangHendelseProdusent,
     private val teller: EnkeltTilgangTeller) {
 
@@ -64,6 +66,14 @@ class EnkeltTilgangTjeneste(
                 val enhetsnummer = enhetsNummerFor(ansattId)
                 val bruker = bruker.medNærmesteFamilie(data.brukerId.verdi)
                 val gt = gt(bruker)
+                val navn = gt?.let { tilknytning ->
+                    when (tilknytning.length) {
+                        4 -> kodeverk.kommuner().first { it.kode == gt }.tekst
+                        6 -> kodeverk.bydeler().first { it.kode == gt }.tekst
+                        else -> null
+                    }
+                }
+                log.info("Enkelttilgang med gt $gt og navn ${navn ?: "ukjent"})")
                 motor.kjerneregler(ansattTjeneste.ansatt(ansattId), bruker)
                 MDC.put(USER_ID, ansattId.verdi)
                 adapter.enkeltTilgang(ansattId.verdi, enhetsnummer, data, gt)

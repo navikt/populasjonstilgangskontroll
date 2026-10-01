@@ -11,11 +11,11 @@ import org.springframework.web.service.registry.ImportHttpServices
 @ImportHttpServices(types = [KodeverkClient::class], group = KODEVERK)
 class KodeverkTjeneste(private val client: KodeverkClient) {
 
-    fun bydelBetydninger() =
-        client.bydelBetydninger().kodeOgNavn()
+    fun bydeler() =
+        client.bydeler().kodeOgNavn()
 
-    fun kommuneBetydninger() =
-        client.kommuneBetydninger().kodeOgNavn()
+    fun kommuner() =
+        client.kommuner().kodeOgNavn()
 
     @NoCoverageAnalysis
     override fun toString() = "${javaClass.simpleName} [client=$client]"

@@ -12,10 +12,9 @@ class KodeverkController(
 
     @GetMapping("/kommuner")
     fun kommuneBetydninger() =
-        kodeverk.kommuneBetydninger()
+        kodeverk.kommuner()
 
     @GetMapping("/bydeler")
     fun bydelerBetydninger() =
-        kodeverk.bydelBetydninger()
-
+        kodeverk.bydeler()
 }

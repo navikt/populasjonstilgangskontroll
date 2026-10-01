@@ -10,11 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping
 class KodeverkController(
     private val kodeverk: KodeverkTjeneste) {
 
-    @GetMapping("/kommuner")
-    fun kommuneBetydninger() =
-        kodeverk.kommuner()
-
-    @GetMapping("/bydeler")
-    fun bydelerBetydninger() =
-        kodeverk.bydeler()
+    @GetMapping("/navn")
+    fun navn() =
+        kodeverk.koderOgNavn()
 }

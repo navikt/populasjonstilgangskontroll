@@ -25,7 +25,7 @@ import org.springframework.web.client.support.RestClientHttpServiceGroupConfigur
 import org.zalando.logbook.spring.LogbookClientHttpRequestInterceptor
 
 const val ENKELT = "ENKELT"
-private val UNPROTECTED_ENDPOINTS = arrayOf("/$DEV/**", "/swagger-ui/**", "/v3/api-docs/**", "/monitoring/**",/*"$PROD_BASE_PATH/enkelt/ikkerapporterte"*/)
+private val UNPROTECTED_ENDPOINTS = arrayOf("/$DEV/**", "/swagger-ui/**", "/v3/api-docs/**", "/monitoring/**","/cache/**")
 
 @Configuration
 @EnableMethodSecurity

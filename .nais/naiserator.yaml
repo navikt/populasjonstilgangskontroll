@@ -92,6 +92,8 @@ spec:
           namespace: nom
         - application: nom-api
           namespace: nom
+        - application: kodeverk-api
+          namespace: team-rocket
         - application: logging
           namespace: nais-system
       external:

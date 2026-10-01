@@ -33,9 +33,10 @@ class EnkeltTilgangEntity(
     @Column(length = ANSATTID_LENGTH, nullable = false) var navid: String,
     @Column(length = BRUKERID_LENGTH, nullable = false) var fnr: String,
     @Column(length = 400, nullable = false) var begrunnelse: String,
-    @Column(length = 6) var enhet: String,
+    @Column(name = "enhet_ansatt", length = 6) var enhet: String,
     @Column(nullable = false) var expires: Instant,
-    @Column(length = 6) var gt: String? = null) {
+    @Column(name = "gt_bruker", length = 6) var gt: String? = null,
+    @Column(name = "gt_navn", length = 50) var gtNavn: String? = null) {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)

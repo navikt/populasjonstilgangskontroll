@@ -1,10 +1,6 @@
-package no.nav.tilgangsmaskin.ansatt.kodeverk
+package no.nav.tilgangsmaskin.bruker.kodeverk
 
-import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyClient.Companion.ENTRA_PROXY_ANSATT_PATH
-import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyClient.Companion.ENTRA_PROXY_ENHETER_PATH
-import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyClient.Companion.ENTRA_PROXY_PING_PATH
-import no.nav.tilgangsmaskin.ansatt.kodeverk.KodeverkClient.Companion.KODEVERK_PING_PATH
-import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM
+import no.nav.tilgangsmaskin.bruker.kodeverk.KodeverkClient.Companion.KODEVERK_PING_PATH
 import no.nav.tilgangsmaskin.felles.cache.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
 import no.nav.tilgangsmaskin.felles.rest.RestConfig

@@ -1,7 +1,7 @@
-package no.nav.tilgangsmaskin.ansatt.kodeverk
+package no.nav.tilgangsmaskin.bruker.kodeverk
 
 import io.micrometer.observation.annotation.Observed
-import no.nav.tilgangsmaskin.ansatt.kodeverk.KodeverkConfig.Companion.KODEVERK
+import no.nav.tilgangsmaskin.bruker.kodeverk.KodeverkConfig.Companion.KODEVERK
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.rest.RestRetryingWhenRecoverableService
 import org.springframework.cache.annotation.Cacheable

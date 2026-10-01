@@ -1,7 +1,7 @@
-package no.nav.tilgangsmaskin.ansatt.kodeverk
+package no.nav.tilgangsmaskin.bruker.kodeverk
 
 
-import no.nav.tilgangsmaskin.ansatt.kodeverk.KodeverkConfig.Companion.KODEVERK
+import no.nav.tilgangsmaskin.bruker.kodeverk.KodeverkConfig.Companion.KODEVERK
 import org.springframework.security.oauth2.client.annotation.ClientRegistrationId
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.service.annotation.GetExchange

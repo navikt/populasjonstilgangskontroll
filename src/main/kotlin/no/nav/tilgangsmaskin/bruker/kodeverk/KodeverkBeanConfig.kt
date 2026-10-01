@@ -1,8 +1,7 @@
-package no.nav.tilgangsmaskin.ansatt.kodeverk
+package no.nav.tilgangsmaskin.bruker.kodeverk
 
 
 import no.nav.tilgangsmaskin.felles.rest.health.PingableHealthIndicator
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration

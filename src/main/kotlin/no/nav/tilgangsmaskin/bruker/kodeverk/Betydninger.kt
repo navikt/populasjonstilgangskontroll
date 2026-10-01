@@ -1,6 +1,6 @@
-package no.nav.tilgangsmaskin.ansatt.kodeverk
+package no.nav.tilgangsmaskin.bruker.kodeverk
 
-import no.nav.tilgangsmaskin.ansatt.kodeverk.KodeverkClient.Companion.BOKMÅL
+import no.nav.tilgangsmaskin.bruker.kodeverk.KodeverkClient.Companion.BOKMÅL
 import java.time.LocalDate
 
 data class Betydninger(val betydninger: Map<String, List<Betydning>>) {

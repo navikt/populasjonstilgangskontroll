@@ -1,11 +1,12 @@
 package no.nav.tilgangsmaskin.regler.enkelttilgang
 
+import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
+
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.tilgangsmaskin.ansatt.AnsattId
 import org.springframework.kafka.core.KafkaOperations
 import org.springframework.kafka.support.SendResult
 import java.util.concurrent.CompletableFuture

@@ -2,9 +2,8 @@ package no.nav.tilgangsmaskin.ansatt.entraproxy
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
-import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyEnhet.Enhet
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException

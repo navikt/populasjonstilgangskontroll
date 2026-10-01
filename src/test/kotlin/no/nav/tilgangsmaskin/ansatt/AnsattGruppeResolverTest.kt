@@ -12,6 +12,7 @@ import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.mockk.verify
+import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraAnsattGruppeResolver
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.Companion.globaleGrupper
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.FORTROLIG
@@ -22,7 +23,7 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.sikkerhetstjenesten.felles.notifikasjon.MessagePublisher
-import no.nav.tilgangsmaskin.felles.cache.CacheOperations
+import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.felles.security.AuthContext
 import no.nav.tilgangsmaskin.felles.security.TokenType

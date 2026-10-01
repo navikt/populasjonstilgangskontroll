@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin
 
 import no.nav.boot.conditionals.ConditionalOnGCP
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.Companion.profiler
 import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.local
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.TimeBeanConfig.Companion.AUDITING_TIME_PROVIDER
@@ -18,7 +19,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.stereotype.Component
-import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.Companion.profiler
+
 @SpringBootApplication
 @ConfigurationPropertiesScan
 @EnableCaching

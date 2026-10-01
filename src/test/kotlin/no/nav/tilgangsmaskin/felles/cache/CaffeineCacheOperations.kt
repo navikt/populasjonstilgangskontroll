@@ -1,5 +1,7 @@
 package no.nav.tilgangsmaskin.felles.cache
 
+import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
+import no.nav.sikkerhetstjenesten.felles.cache.CacheNøkkelConfig
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.CacheManager
 import java.time.Duration
@@ -26,12 +28,12 @@ class CaffeineCacheOperations(private val cacheManager: CacheManager) : CacheOpe
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T : Any> getMany(cache: CacheNøkkelConfig, ids: Set<String>, clazz: KClass<T>): Map<String, T?> {
+    override fun <T : Any> getMany(cache: CacheNøkkelConfig, ids: Set<String>, clazz: KClass<T>): Map<String, T> {
         if (ids.isEmpty()) return emptyMap()
         val springCache = cacheManager.getCache(cache.name) ?: return emptyMap()
-        return ids.associateWith { id ->
-            springCache.get(caffeineNøkkel(cache, id))?.get() as T?
-        }.filterValues { it != null }
+        return ids.mapNotNull { id ->
+            springCache.get(caffeineNøkkel(cache, id))?.get()?.let { id to (it as T) }
+        }.toMap()
     }
 
     override fun putMany(cache: CacheNøkkelConfig, innslag: Map<String, Any>, ttl: Duration?) {
@@ -63,16 +65,13 @@ class CaffeineCacheOperations(private val cacheManager: CacheManager) : CacheOpe
         }
     }
 
-    override fun clearAll(): Long {
-        val deleted = cacheManager.cacheNames.sumOf { cacheName ->
-            val springCache = cacheManager.getCache(cacheName) ?: return@sumOf 0L
-            val nativeCache = springCache.nativeCache as com.github.benmanes.caffeine.cache.Cache<*, *>
-            val count = nativeCache.estimatedSize()
-            springCache.clear()
-            count
-        }
-        return deleted
+    override fun putSet(nøkkel: String, verdier: Set<String>) {
+        cacheManager.getCache(SET_CACHE)?.put(nøkkel, verdier)
     }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun getSet(nøkkel: String): Set<String> =
+        cacheManager.getCache(SET_CACHE)?.get(nøkkel)?.get() as Set<String>? ?: emptySet()
 
     override fun sizes(vararg caches: CacheNøkkelConfig): Map<String, Long> =
         caches.associate { cache ->
@@ -88,4 +87,8 @@ class CaffeineCacheOperations(private val cacheManager: CacheManager) : CacheOpe
             }
             cache.fullName to count
         }
+
+    private companion object {
+        const val SET_CACHE = "cache-sets"
+    }
 }

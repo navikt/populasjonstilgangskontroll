@@ -1,16 +1,16 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
 import io.micrometer.observation.annotation.Observed
+import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
+import no.nav.sikkerhetstjenesten.felles.cache.getMany
 import no.nav.tilgangsmaskin.bruker.Familie
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
-import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.*
+import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKEN
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPerson
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPersoner
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDLPIP
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL_MED_FAMILIE_CACHE
-import no.nav.tilgangsmaskin.felles.cache.CacheOperations
-import no.nav.tilgangsmaskin.felles.cache.getMany
 import no.nav.tilgangsmaskin.felles.rest.RestRetryingWhenRecoverableService
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.cache.annotation.Cacheable

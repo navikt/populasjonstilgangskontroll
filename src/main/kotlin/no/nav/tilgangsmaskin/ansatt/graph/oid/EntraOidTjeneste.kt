@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.graph.oid
 
 import io.micrometer.observation.annotation.Observed
-import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidClient.Companion.filter
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.ENTRA_OID
@@ -11,7 +11,7 @@ import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import org.springframework.web.service.registry.ImportHttpServices
-import java.util.*
+import java.util.UUID
 
 @Observed
 @Service

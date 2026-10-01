@@ -12,7 +12,7 @@ import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Adressebeskyttelse
 import no.nav.person.pdl.leesah.adressebeskyttelse.Gradering.FORTROLIG
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL_CACHES
-import no.nav.tilgangsmaskin.felles.cache.CacheOperations
+import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.security.AuthContext
 import java.time.Instant
 

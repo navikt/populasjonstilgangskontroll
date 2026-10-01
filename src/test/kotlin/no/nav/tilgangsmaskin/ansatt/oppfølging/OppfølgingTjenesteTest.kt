@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.ansatt.`oppfølging`
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
+import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
 import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingConfig.Companion.OPPFØLGING_CACHE
@@ -12,14 +13,13 @@ import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.EndringType.
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingHendelse.Kontor
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjenesteTest.OppfølgingTestConfig
 import no.nav.tilgangsmaskin.bruker.AktørId
-import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.Identer
 import no.nav.tilgangsmaskin.bruker.Identifikator
-import no.nav.tilgangsmaskin.felles.cache.CacheOperations
+import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
-import no.nav.tilgangsmaskin.felles.cache.getMany
-import no.nav.tilgangsmaskin.felles.cache.getOne
+import no.nav.sikkerhetstjenesten.felles.cache.getMany
+import no.nav.sikkerhetstjenesten.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.security.AuthContext
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest

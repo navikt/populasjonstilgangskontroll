@@ -1,15 +1,15 @@
 package no.nav.tilgangsmaskin.tilgang
 
 import io.swagger.v3.oas.annotations.Operation
-import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
+import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.Avsluttet
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
-import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Identer
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.felles.rest.DevController
-import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
 import no.nav.tilgangsmaskin.tilgang.openapi.ProblemDetailApiResponse
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
-import java.util.*
+import java.util.UUID
 
 
 private const val DEV_TILGANG_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.dev.tilgang.tag.description"

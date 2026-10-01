@@ -1,16 +1,12 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
 import no.nav.tilgangsmaskin.ansatt.nom.NomGraphQLConfig.Companion.NOMGRAPH
 import no.nav.tilgangsmaskin.ansatt.nom.NomHendelseKonsument.Companion.NOM_FNR_FILTER_STRATEGY
-import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig
-import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
-import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLLoggingInterceptor
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.kafka.KafkaTypedDroppedMessageMeter
-import no.nav.tilgangsmaskin.felles.rest.RestHeaderAddingRequestInterceptor
 import no.nav.tilgangsmaskin.felles.security.OAuth2DownstreamUriCapturingInterceptor
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean

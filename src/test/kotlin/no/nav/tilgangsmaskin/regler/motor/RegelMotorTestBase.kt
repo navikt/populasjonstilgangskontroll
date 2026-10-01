@@ -1,17 +1,15 @@
 package no.nav.tilgangsmaskin.regler.motor
 
+import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
+
 import com.ninjasquad.springmockk.MockkBean
-import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
-import no.nav.tilgangsmaskin.ansatt.Ansatt
-import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålTjeneste
-import no.nav.tilgangsmaskin.bruker.Bruker
-import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
 import no.nav.sikkerhetstjenesten.felles.notifikasjon.LocalAuditor
 import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
 import no.nav.tilgangsmaskin.felles.security.AuthContext

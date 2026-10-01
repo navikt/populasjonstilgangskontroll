@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.cache
 
+import no.nav.sikkerhetstjenesten.felles.cache.CachableRestConfig
 import com.github.benmanes.caffeine.cache.Caffeine
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.cache.CacheManager
@@ -23,4 +24,3 @@ abstract class CacheTestConfig(vararg cacheNames: String) {
     fun cacheOperations(cacheManager: CacheManager) =
         CaffeineCacheOperations(cacheManager)
 }
-

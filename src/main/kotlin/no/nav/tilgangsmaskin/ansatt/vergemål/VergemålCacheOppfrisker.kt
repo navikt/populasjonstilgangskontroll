@@ -1,16 +1,16 @@
 package no.nav.tilgangsmaskin.ansatt.vergemål
 
-import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.sikkerhetstjenesten.felles.cache.AbstractCacheOppfrisker
+import no.nav.sikkerhetstjenesten.felles.cache.CacheNøkkel
+import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålConfig.Companion.VERGEMÅL
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
-import no.nav.tilgangsmaskin.felles.cache.AbstractCacheOppfrisker
-import no.nav.tilgangsmaskin.felles.cache.CacheNøkkel
 import org.springframework.stereotype.Component
 
 @Component
 class VergemålCacheOppfrisker(private val vergemål: VergemålTjeneste) : AbstractCacheOppfrisker() {
-    override fun doOppfrisk(nøkkel: CacheNøkkel) {
-        vergemål.alle(AnsattId(nøkkel.id))
+    override fun doOppfrisk(nøkkelElementer: CacheNøkkel) {
+        vergemål.alle(AnsattId(nøkkelElementer.id))
     }
 
     override val cacheName = VERGEMÅL

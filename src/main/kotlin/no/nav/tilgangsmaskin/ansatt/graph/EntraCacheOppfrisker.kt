@@ -1,38 +1,38 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
-import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.sikkerhetstjenesten.felles.cache.AbstractCacheOppfrisker
+import no.nav.sikkerhetstjenesten.felles.cache.CacheNøkkel
+import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
+import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
-import no.nav.tilgangsmaskin.felles.cache.AbstractCacheOppfrisker
-import no.nav.tilgangsmaskin.felles.cache.CacheNøkkel
-import no.nav.tilgangsmaskin.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
+import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withMDC
-import org.slf4j.LoggerFactory
-import org.slf4j.MDC
 import org.springframework.stereotype.Component
-import java.util.*
-import kotlin.to
+import java.util.UUID
 
 @Component
 class EntraCacheOppfrisker(private val entra: EntraTjeneste,
                            private val oidTjeneste: EntraOidTjeneste,
                            private val cache: CacheOperations) : AbstractCacheOppfrisker() {
 
-    private val log = LoggerFactory.getLogger(javaClass)
     override val cacheName = EntraGrupperConfig.GRAPH
 
-    override fun doOppfrisk(nøkkel: CacheNøkkel) {
-        val ansattId = AnsattId(nøkkel.id)
+    override fun doOppfrisk(nøkkelElementer: CacheNøkkel) {
+        val ansattId = AnsattId(nøkkelElementer.id)
         withMDC(USER_ID to ansattId.verdi) {
             val oid = oidTjeneste.oid(ansattId)
             runCatching {
-                oppfriskFor(ansattId, oid, nøkkel.metode)
+                oppfriskFor(ansattId, oid, nøkkelElementer.metode)
             }.recoverCatching { e ->
                 (e as? NotFoundRestException)?.let {
-                    tømOgOppfrisk(ansattId, oid, nøkkel.metode)
-                } ?: log.info("Oppfrisking av ${nøkkel.maskert} feilet", e)
+                    tømOgOppfrisk(ansattId, oid, nøkkelElementer.metode)
+                } ?: log.info(
+                    "Oppfrisking av ${nøkkelElementer.cacheName}::${nøkkelElementer.metode}:${nøkkelElementer.id.maskFnr()} feilet",
+                    e,
+                )
             }.getOrThrow()
         }
     }

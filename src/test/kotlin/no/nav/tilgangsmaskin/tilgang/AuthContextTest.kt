@@ -1,9 +1,10 @@
 package no.nav.tilgangsmaskin.tilgang
 
+import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
+
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
-import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.security.AuthContext
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.AZP_NAME
 import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.CLIENT_CREDENTIALS

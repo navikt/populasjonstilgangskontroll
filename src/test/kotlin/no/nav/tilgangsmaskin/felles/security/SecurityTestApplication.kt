@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.security
 
+import no.nav.sikkerhetstjenesten.felles.cache.CacheBeanConfig
 import no.nav.tilgangsmaskin.felles.cache.CaffeineCacheOperations
 import no.nav.tilgangsmaskin.felles.rest.RestDefaultErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.notifikasjon.NotificationBeanConfig
@@ -12,7 +13,7 @@ import org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfigur
 import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration
 import org.springframework.context.annotation.Import
 
-@SpringBootApplication(exclude = [DataSourceAutoConfiguration::class, HibernateJpaAutoConfiguration::class, FlywayAutoConfiguration::class])
+@SpringBootApplication(exclude = [DataSourceAutoConfiguration::class, HibernateJpaAutoConfiguration::class, FlywayAutoConfiguration::class, CacheBeanConfig::class])
 @Import(
     OAuth2SecurityBeanConfig::class,
     TilgangController::class,

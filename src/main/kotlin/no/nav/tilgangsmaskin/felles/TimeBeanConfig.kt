@@ -4,9 +4,8 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.auditing.DateTimeProvider
 import java.time.Clock
-import java.time.Clock.systemDefaultZone
 import java.time.Instant.now
-import java.util.*
+import java.util.Optional
 
 @Configuration
 @NoCoverageAnalysis

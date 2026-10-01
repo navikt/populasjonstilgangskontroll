@@ -1,5 +1,13 @@
 package no.nav.tilgangsmaskin.felles.cache
 
+import no.nav.sikkerhetstjenesten.felles.cache.CacheNøkkelMessageConverter
+import no.nav.sikkerhetstjenesten.felles.cache.CacheOppfrisker
+import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
+import no.nav.sikkerhetstjenesten.felles.cache.CachableRestConfig
+import no.nav.sikkerhetstjenesten.felles.cache.getMany
+import no.nav.sikkerhetstjenesten.felles.cache.getOne
+import no.nav.sikkerhetstjenesten.entraproxy.felles.cache.ValkeyCacheOperations
+import no.nav.sikkerhetstjenesten.entraproxy.felles.cache.ValkeyEventListeningCacheOppfrisker
 import com.ninjasquad.springmockk.MockkBean
 import com.redis.testcontainers.RedisContainer
 import com.redis.testcontainers.RedisContainer.DEFAULT_IMAGE_NAME
@@ -17,10 +25,10 @@ import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.mockk.verify
+import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.bruker.AktørId
-import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Familie
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.MOR
@@ -54,7 +62,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
 
 @DataRedisTest
-@TestPropertySource(properties = ["logging.level.no.nav.tilgangsmaskin.felles.cache.ValkeyEventListeningCacheOppfrisker=INFO"])
+@TestPropertySource(properties = ["logging.level.no.nav.sikkerhetstjenesten.entraproxy.felles.cache.ValkeyEventListeningCacheOppfrisker=INFO"])
 @ContextConfiguration(classes = [ValkeyCacheTestConfig::class,ValkeyEventListeningCacheOppfrisker::class])
 @EnableAutoConfiguration
 class ValkeyCacheOperationsTest(

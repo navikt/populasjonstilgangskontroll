@@ -1,7 +1,5 @@
 package no.nav.tilgangsmaskin.felles.security
 
-import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
-import tools.jackson.databind.json.JsonMapper
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import no.nav.tilgangsmaskin.regler.enkelttilgang.ENKELTTILGANG_PATH
@@ -11,6 +9,7 @@ import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.stereotype.Component
+import tools.jackson.databind.json.JsonMapper
 
 
 @Component

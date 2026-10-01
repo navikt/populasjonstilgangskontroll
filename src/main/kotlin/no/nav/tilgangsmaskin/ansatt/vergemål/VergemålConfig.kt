@@ -1,8 +1,8 @@
 package no.nav.tilgangsmaskin.ansatt.vergemål
 
+import no.nav.sikkerhetstjenesten.felles.cache.CachableRestConfig
+import no.nav.sikkerhetstjenesten.felles.cache.CacheNøkkelConfig
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålClient.Companion.VERGEMÅL_PING_PATH
-import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
-import no.nav.tilgangsmaskin.felles.cache.CachableRestConfig
 import no.nav.tilgangsmaskin.felles.rest.RestConfig
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component

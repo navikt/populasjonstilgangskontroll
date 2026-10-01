@@ -4,7 +4,7 @@ import no.nav.tilgangsmaskin.felles.security.AuthContext
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import org.springframework.data.domain.AuditorAware
 import org.springframework.stereotype.Component
-import java.util.*
+import java.util.Optional
 
 
 @Component

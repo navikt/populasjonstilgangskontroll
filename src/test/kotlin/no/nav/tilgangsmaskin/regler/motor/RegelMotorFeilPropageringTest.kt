@@ -1,11 +1,12 @@
 package no.nav.tilgangsmaskin.regler.motor
 
+import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
+
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.assertions.throwables.shouldThrow
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KJERNE_REGELTYPE

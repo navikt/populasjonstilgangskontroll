@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.ansatt
 import io.micrometer.core.instrument.Tags
 import io.micrometer.observation.annotation.Observed
 import no.nav.boot.conditionals.ConditionalOnGCP
+import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraAnsattGruppeResolver
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste

@@ -8,7 +8,7 @@ import org.springframework.context.MessageSource
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.method.HandlerMethod
-import java.util.Locale.*
+import java.util.Locale.getDefault
 
 const val MSG = "msg:"
 

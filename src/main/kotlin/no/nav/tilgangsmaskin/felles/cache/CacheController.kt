@@ -1,12 +1,16 @@
 package no.nav.tilgangsmaskin.felles.cache
 
 import io.swagger.v3.oas.annotations.Operation
+import no.nav.sikkerhetstjenesten.felles.cache.CachableRestConfig
+import no.nav.sikkerhetstjenesten.felles.cache.CacheNøkkelConfig
+import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
+import no.nav.sikkerhetstjenesten.felles.cache.getMany
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL
 import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.felles.rest.DevController
-import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.NOT_FOUND
@@ -67,7 +71,7 @@ class CacheController(
     @DeleteMapping("flushDB")
     @Operation(summary = SUMMARY_CACHE_FLUSH_DB, description = DESCRIPTION_CACHE_FLUSH_DB)
     fun flushDB() =
-        cache.clearAll().also {
+        cacheConfigs.flatMap { it.caches }.distinct().sumOf(cache::clear).also {
             log.info("Tømte hele databasen og slettet {} nøkler", it)
         }
 

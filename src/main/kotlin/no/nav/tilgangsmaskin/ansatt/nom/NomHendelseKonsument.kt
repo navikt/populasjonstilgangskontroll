@@ -1,11 +1,10 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
+import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
 import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.ALLTID
-import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
-import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM
-import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger

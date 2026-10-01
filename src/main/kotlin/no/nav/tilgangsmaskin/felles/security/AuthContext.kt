@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.felles.security
 
-import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
 import no.nav.tilgangsmaskin.felles.security.TokenType.CCF
 import no.nav.tilgangsmaskin.felles.security.TokenType.OBO
 import no.nav.tilgangsmaskin.felles.security.TokenType.UNAUTHENTICATED

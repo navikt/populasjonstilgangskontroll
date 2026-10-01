@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.entraproxy
 
 import io.micrometer.observation.annotation.Observed
-import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyConfig.Companion.ENTRAPROXY
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.rest.RestRetryingWhenRecoverableService

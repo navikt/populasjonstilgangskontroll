@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import io.swagger.v3.oas.annotations.media.Schema
-import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
 import java.time.LocalDate
 import java.time.LocalDate.now
 

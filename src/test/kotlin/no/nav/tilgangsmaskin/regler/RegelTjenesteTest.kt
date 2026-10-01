@@ -1,5 +1,7 @@
 package no.nav.tilgangsmaskin.regler
 
+import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
+
 import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
@@ -10,9 +12,8 @@ import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
-import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.sikkerhetstjenesten.felles.notifikasjon.LocalAuditor
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException

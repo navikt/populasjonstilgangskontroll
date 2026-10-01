@@ -6,28 +6,32 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.sikkerhetstjenesten.felles.cache.CachePingable
+import org.springframework.boot.data.redis.autoconfigure.DataRedisProperties
 import org.springframework.data.redis.connection.RedisConnection
-import org.springframework.data.redis.connection.RedisConnectionFactory
+import org.springframework.data.redis.core.RedisCallback
+import org.springframework.data.redis.core.StringRedisTemplate
 
 class CachePingableTest : BehaviorSpec({
 
     val connection = mockk<RedisConnection>(relaxed = true)
-    val connectionFactory = mockk<RedisConnectionFactory> {
-        every { this@mockk.connection } returns connection
+    val valkey = mockk<StringRedisTemplate>()
+    every { valkey.execute<Unit>(any<RedisCallback<Unit>>()) } answers {
+        firstArg<RedisCallback<Unit>>().doInRedis(connection)
     }
-    val pingable = CachePingable(connectionFactory, "localhost", 6379)
+    val pingable = CachePingable(valkey, DataRedisProperties().apply {
+        host = "localhost"
+        port = 6379
+    })
 
     Given("ping mot cache-tilkobling") {
         When("Redis returnerer PONG") {
-            Then("kaster ingen feil og lukker connection") {
+            Then("kaster ingen feil") {
                 every {
                     connection.ping()
                 } returns "PONG"
                 shouldNotThrowAny {
                     pingable.ping()
-                }
-                verify {
-                    connection.close()
                 }
             }
         }

@@ -72,7 +72,7 @@ class EnkeltTilgangTjeneste(
                 log.info("Enkelttilgang med gt $gt og navn ${navn ?: "ukjent"})")
                 motor.kjerneregler(ansattTjeneste.ansatt(ansattId), bruker)
                 MDC.put(USER_ID, ansattId.verdi)
-                adapter.enkeltTilgang(ansattId.verdi, enhetsnummer, data, gt)
+                adapter.enkeltTilgang(ansattId.verdi, enhetsnummer, data, gt,navn)
                 kafka.publiser(ansattId).also {
                     teller.tell(INGEN_REGEL_TAG, ENKELTTILGANG_GITT)
                     log.info("Enkelttilgang OK. $ansattId ved enhet $enhetsnummer har fått tilgang til ${data.brukerId} til og med ${data.gyldigtil}")

@@ -19,6 +19,6 @@ class KodeverkConfig(@Value($$"${spring.http.serviceclient.kodeverk.base-url}") 
 
     companion object {
         const val KODEVERK  = "kodeverk"
-        val KODEVERK_CACHE = CacheNøkkelConfig(KODEVERK)
+        private val KODEVERK_CACHE = CacheNøkkelConfig(KODEVERK)
     }
 }

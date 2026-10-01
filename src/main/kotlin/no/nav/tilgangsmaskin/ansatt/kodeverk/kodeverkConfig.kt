@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component
 import java.net.URI
 
 @Component
-class KodeverkConfig(@Value("\${spring.http.serviceclient.kodeverk.base-url}") baseUrl: URI) : RestConfig(baseUrl, KODEVERK_PING_PATH, KODEVERK), CachableRestConfig {
+class KodeverkConfig(@Value($$"${spring.http.serviceclient.kodeverk.base-url}") baseUrl: URI) : RestConfig(baseUrl, KODEVERK_PING_PATH, KODEVERK), CachableRestConfig {
     override val navn = KODEVERK
     override val caches = setOf(KODEVERK_CACHE)
 

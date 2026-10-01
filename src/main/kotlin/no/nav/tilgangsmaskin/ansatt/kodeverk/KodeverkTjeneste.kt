@@ -11,14 +11,8 @@ import org.springframework.web.service.registry.ImportHttpServices
 @ImportHttpServices(types = [KodeverkClient::class], group = KODEVERK)
 class KodeverkTjeneste(private val client: KodeverkClient) {
 
-    fun bydeler() =
-        client.bydeler()
-
     fun bydelBetydninger() =
         client.bydelBetydninger().kodeOgNavn()
-
-    fun kommuner() =
-        client.kommuner()
 
     fun kommuneBetydninger() =
         client.kommuneBetydninger().kodeOgNavn()

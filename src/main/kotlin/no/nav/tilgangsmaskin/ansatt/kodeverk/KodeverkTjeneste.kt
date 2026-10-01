@@ -12,10 +12,14 @@ import org.springframework.web.service.registry.ImportHttpServices
 class KodeverkTjeneste(private val client: KodeverkClient) {
 
     private fun koderOgNavn() =
-        client.bydeler().kodeOgNavn() + client.kommuner().kodeOgNavn()
+        runCatching {
+            client.bydeler().kodeOgNavn() + client.kommuner().kodeOgNavn()
+        }.getOrElse { emptySet() }
 
     fun navn(kode: String) =
-        koderOgNavn().singleOrNull { it.kode == kode }?.tekst
+         runCatching {
+             koderOgNavn().singleOrNull { it.kode == kode }?.tekst
+         }.getOrNull()
 
     @NoCoverageAnalysis
     override fun toString() = "${javaClass.simpleName} [client=$client]"

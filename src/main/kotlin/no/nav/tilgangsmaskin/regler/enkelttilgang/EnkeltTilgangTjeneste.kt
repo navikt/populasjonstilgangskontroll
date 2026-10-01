@@ -6,6 +6,7 @@ import io.micrometer.observation.annotation.Observed
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
+import no.nav.tilgangsmaskin.bruker.kodeverk.KodeverkTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.Leder
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.bruker.Bruker
@@ -42,6 +43,7 @@ class EnkeltTilgangTjeneste(
     private val motor: RegelMotor,
     private val proxy: EntraProxyTjeneste,
     private val clock: Clock,
+    private val kodeverk: KodeverkTjeneste,
     private val kafka: EnkeltTilgangHendelseProdusent,
     private val teller: EnkeltTilgangTeller) {
 
@@ -64,9 +66,13 @@ class EnkeltTilgangTjeneste(
                 val enhetsnummer = enhetsNummerFor(ansattId)
                 val bruker = bruker.medNærmesteFamilie(data.brukerId.verdi)
                 val gt = gt(bruker)
+                val navn = gt?.let {
+                      kodeverk.navn(it)
+                }
+                log.info("Enkelttilgang med gt $gt og navn ${navn ?: "ukjent"})")
                 motor.kjerneregler(ansattTjeneste.ansatt(ansattId), bruker)
                 MDC.put(USER_ID, ansattId.verdi)
-                adapter.enkeltTilgang(ansattId.verdi, enhetsnummer, data, gt)
+                adapter.enkeltTilgang(ansattId.verdi, enhetsnummer, data, gt,navn)
                 kafka.publiser(ansattId).also {
                     teller.tell(INGEN_REGEL_TAG, ENKELTTILGANG_GITT)
                     log.info("Enkelttilgang OK. $ansattId ved enhet $enhetsnummer har fått tilgang til ${data.brukerId} til og med ${data.gyldigtil}")

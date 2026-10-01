@@ -29,3 +29,7 @@ management:
         include: '*'
 info:
   client-id: ${azure.app.client.id}
+
+nom:
+  kafka:
+    group-id: nom-dev

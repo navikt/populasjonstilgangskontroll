@@ -19,7 +19,7 @@ class EnkeltTilgangJPAAdapter(
     private val log = getLogger(javaClass)
 
 
-    fun enkeltTilgang(ansattId: String, enhetsnummer: String, data: EnkeltTilgangData, gt: String? = null): EnkeltTilgangEntity {
+    fun enkeltTilgang(ansattId: String, enhetsnummer: String, data: EnkeltTilgangData, gt: String? = null, gt_navn: String? = null): EnkeltTilgangEntity {
         val expires = data.gyldigtil.plusDays(1)
             .atStartOfDay(clock.zone).minusMinutes(1)
             .toInstant()
@@ -28,7 +28,7 @@ class EnkeltTilgangJPAAdapter(
             return it
         }
 
-        val nyEnkeltTilgang = EnkeltTilgangEntity(ansattId, data.brukerId.verdi, data.begrunnelse, enhetsnummer, expires, gt)
+        val nyEnkeltTilgang = EnkeltTilgangEntity(ansattId, data.brukerId.verdi, data.begrunnelse, enhetsnummer, expires, gt,gt_navn)
 
         return try {
             repo.saveAndFlush(nyEnkeltTilgang)

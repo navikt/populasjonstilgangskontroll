@@ -36,6 +36,8 @@ spring:
     open-in-view: false
   http:
     serviceclient:
+        kodeverk:
+          base-url: "http://kodeverk-api.team-rocket"
         pdlpip:
           base-url: "https://${pdlpip}"
         verge:
@@ -62,6 +64,13 @@ spring:
           azuread:
             issuer-uri: ${azure.openid.config.issuer}
         registration:
+          kodeverk:
+            provider: azuread
+            client-id: ${azure.app.client.id}
+            client-secret: ${azure.app.client.secret}
+            authorization-grant-type: client_credentials
+            scope:
+              - "api://${nais.cluster.type}-gcp.team-rocket.kodeverk-api/.default"
           skjerming:
             provider: azuread
             client-id: ${azure.app.client.id}

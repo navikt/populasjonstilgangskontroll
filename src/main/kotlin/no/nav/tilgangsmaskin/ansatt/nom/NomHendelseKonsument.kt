@@ -25,7 +25,7 @@ class NomHendelseKonsument(private val nom: NomTjeneste) {
     @KafkaListener(
         topics = [NOM_TOPIC],
         properties = ["spring.json.value.default.type=no.nav.tilgangsmaskin.ansatt.nom.NomHendelse"],
-        groupId = NOM, filter = NOM_FNR_FILTER_STRATEGY)
+        groupId = $$"${nom.kafka.group-id}", filter = NOM_FNR_FILTER_STRATEGY)
     fun listen(hendelse: NomHendelse,
                @Header(OFFSET) offset: Long,
                @Header(RECEIVED_PARTITION) partition: Int) =

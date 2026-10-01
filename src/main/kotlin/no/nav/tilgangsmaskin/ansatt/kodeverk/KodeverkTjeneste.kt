@@ -15,12 +15,16 @@ class KodeverkTjeneste(private val client: KodeverkClient) {
     private fun koderOgNavn() =
         runCatching {
             client.bydeler().kodeOgNavn() + client.kommuner().kodeOgNavn()
-        }.getOrElse { emptySet() }
+        }.getOrElse {
+            emptySet()
+        }
 
     @Cacheable(cacheNames = [KODEVERK], key = "#kode")
     fun navn(kode: String) =
          runCatching {
-             koderOgNavn().singleOrNull { it.kode == kode }?.tekst
+             koderOgNavn().singleOrNull {
+                 it.kode == kode
+             }?.tekst
          }.getOrNull()
 
     @NoCoverageAnalysis

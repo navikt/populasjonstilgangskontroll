@@ -26,6 +26,7 @@ import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.mockk.verify
 import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.bruker.AktørId
@@ -42,7 +43,6 @@ import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.FORTROLIG
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.UGRADERT
 import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheOperationsTest.ValkeyCacheTestConfig
-import no.nav.tilgangsmaskin.felles.security.AuthContext
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest
 import org.springframework.boot.test.context.TestConfiguration

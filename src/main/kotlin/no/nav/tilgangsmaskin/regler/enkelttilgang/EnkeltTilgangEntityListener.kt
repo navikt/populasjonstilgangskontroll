@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.regler.enkelttilgang
 import io.opentelemetry.api.trace.Span
 import jakarta.persistence.PrePersist
 import jakarta.persistence.PreUpdate
-import no.nav.tilgangsmaskin.felles.security.AuthContext
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext
 import org.springframework.stereotype.Component
 
 @Component

@@ -2,6 +2,7 @@ package no.nav.tilgangsmaskin.felles.security
 
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext
 import no.nav.tilgangsmaskin.regler.enkelttilgang.ENKELTTILGANG_PATH
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.FORBIDDEN

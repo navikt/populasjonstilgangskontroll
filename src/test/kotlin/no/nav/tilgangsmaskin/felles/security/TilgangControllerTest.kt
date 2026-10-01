@@ -7,10 +7,10 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.verify
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.CLIENT_CREDENTIALS
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterConstants.PROD_GCP
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
-import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.CLIENT_CREDENTIALS
-import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.ROLES
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.ROLES
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData

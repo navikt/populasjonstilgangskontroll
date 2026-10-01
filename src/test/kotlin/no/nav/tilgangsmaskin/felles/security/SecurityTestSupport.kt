@@ -6,8 +6,8 @@ import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterConstants.NAIS_CLUSTER_NAME
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
-import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.NAVIDENT
-import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.OID
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.OID
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.NAVIDENT
 import no.nav.tilgangsmaskin.felles.security.SecurityTestOAuth2.server
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry

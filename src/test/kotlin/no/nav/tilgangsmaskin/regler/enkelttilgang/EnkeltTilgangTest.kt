@@ -29,12 +29,12 @@ import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.sikkerhetstjenesten.felles.notifikasjon.LocalAuditor
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext
+import no.nav.sikkerhetstjenesten.felles.security.TokenType.CCF
 import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.IGÅR
 import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.felles.TimeBeanConfig
 import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
-import no.nav.tilgangsmaskin.felles.security.AuthContext
-import no.nav.tilgangsmaskin.felles.security.TokenType.CCF
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor

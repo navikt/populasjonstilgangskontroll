@@ -3,15 +3,15 @@ package no.nav.tilgangsmaskin.ansatt.graph
 import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
 import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
 import no.nav.sikkerhetstjenesten.felles.notifikasjon.MessagePublisher
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext
+import no.nav.sikkerhetstjenesten.felles.security.TokenType.CCF
+import no.nav.sikkerhetstjenesten.felles.security.TokenType.OBO
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.Companion.girNasjonalTilgang
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.Companion.globaleGrupper
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
-import no.nav.tilgangsmaskin.felles.security.AuthContext
-import no.nav.tilgangsmaskin.felles.security.TokenType.CCF
-import no.nav.tilgangsmaskin.felles.security.TokenType.OBO
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 

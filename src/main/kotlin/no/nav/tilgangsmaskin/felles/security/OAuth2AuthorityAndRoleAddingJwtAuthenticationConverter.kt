@@ -1,10 +1,10 @@
 package no.nav.tilgangsmaskin.felles.security
 
-import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.CLIENT_CREDENTIALS
-import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.GROUPS
-import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.NAVIDENT
-import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.OID
-import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.ROLES
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.CLIENT_CREDENTIALS
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.GROUPS
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.NAVIDENT
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.OID
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.ROLES
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.convert.converter.Converter

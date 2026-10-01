@@ -14,7 +14,7 @@ import no.nav.tilgangsmaskin.ansatt.nom.NomTjenesteTest.NomTestConfig
 import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.sikkerhetstjenesten.felles.cache.getOne
-import no.nav.tilgangsmaskin.felles.security.AuthContext
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration

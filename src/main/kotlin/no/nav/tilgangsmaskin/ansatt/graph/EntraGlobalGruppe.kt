@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
-import no.nav.tilgangsmaskin.felles.security.AuthContext
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata
 import no.nav.tilgangsmaskin.regler.motor.GruppeMetadata.AVDØD_MER_ENN_ETT_ÅR
 import java.util.UUID

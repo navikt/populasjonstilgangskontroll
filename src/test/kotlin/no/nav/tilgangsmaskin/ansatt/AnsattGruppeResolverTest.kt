@@ -4,7 +4,6 @@ import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.IsolationMode.InstancePerTest
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import io.mockk.every
@@ -24,11 +23,11 @@ import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.sikkerhetstjenesten.felles.notifikasjon.MessagePublisher
 import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext
+import no.nav.sikkerhetstjenesten.felles.security.TokenType
+import no.nav.sikkerhetstjenesten.felles.security.TokenType.CCF
+import no.nav.sikkerhetstjenesten.felles.security.TokenType.UNAUTHENTICATED
 import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
-import no.nav.tilgangsmaskin.felles.security.AuthContext
-import no.nav.tilgangsmaskin.felles.security.TokenType
-import no.nav.tilgangsmaskin.felles.security.TokenType.CCF
-import no.nav.tilgangsmaskin.felles.security.TokenType.UNAUTHENTICATED
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.Companion.isProd
 import java.net.URI

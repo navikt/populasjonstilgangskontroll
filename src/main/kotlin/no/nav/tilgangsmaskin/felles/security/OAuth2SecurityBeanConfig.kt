@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.security
 
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterConstants.DEV
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.context.annotation.Bean
@@ -32,6 +33,8 @@ private val UNPROTECTED_ENDPOINTS = arrayOf("/$DEV/**", "/swagger-ui/**", "/v3/a
 class OAuth2SecurityBeanConfig( private val handler: ErrorHandler,
                                 private val logbookInterceptor: ObjectProvider<LogbookClientHttpRequestInterceptor>){
 
+    @Bean
+    fun authContext() = AuthContext()
     @Bean
     fun securityFilterChain(http: HttpSecurity,
                             converter: OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter,

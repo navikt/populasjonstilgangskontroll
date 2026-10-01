@@ -11,9 +11,9 @@ import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålTjeneste
 import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
 import no.nav.sikkerhetstjenesten.felles.notifikasjon.LocalAuditor
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext
 import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
-import no.nav.tilgangsmaskin.felles.security.AuthContext
-import no.nav.tilgangsmaskin.felles.security.TokenType.CCF
+import no.nav.sikkerhetstjenesten.felles.security.TokenType.CCF
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.test.context.ContextConfiguration

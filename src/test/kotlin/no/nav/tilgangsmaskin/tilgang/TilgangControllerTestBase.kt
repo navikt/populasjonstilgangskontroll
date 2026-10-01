@@ -6,7 +6,7 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.clearAllMocks
 import io.mockk.mockk
 import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
-import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.NAVIDENT
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.NAVIDENT
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.module.kotlin.KotlinModule
 import no.nav.tilgangsmaskin.regler.RegelTjeneste

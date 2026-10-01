@@ -3,8 +3,8 @@ package no.nav.tilgangsmaskin.bruker.pdl
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import no.nav.sikkerhetstjenesten.felles.cache.CacheNøkkelConfig
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext
 import no.nav.tilgangsmaskin.felles.AbstractTeller
-import no.nav.tilgangsmaskin.felles.security.AuthContext
 import org.springframework.stereotype.Component
 import java.util.Locale.getDefault
 

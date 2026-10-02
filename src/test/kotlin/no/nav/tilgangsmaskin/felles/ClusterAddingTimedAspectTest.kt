@@ -9,7 +9,6 @@ import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import no.nav.tilgangsmaskin.felles.ClusterAddingTimedAspectTest.TestConfig
-import no.nav.tilgangsmaskin.felles.rest.health.ObservabilityBeanConfig
 import no.nav.sikkerhetstjenesten.felles.security.AuthContext
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.DEV_GCP_CLUSTER
@@ -18,6 +17,7 @@ import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfig
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.test.context.ContextConfiguration
+import no.nav.sikkerhetstjenesten.felles.rest.health.ObservabilityBeanConfig
 
 @ContextConfiguration(classes = [TestConfig::class, ObservabilityBeanConfig::class])
 @AutoConfigureMetrics

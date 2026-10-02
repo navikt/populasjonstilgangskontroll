@@ -6,8 +6,6 @@ import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
 import no.nav.sikkerhetstjenesten.felles.cache.CachableRestConfig
 import no.nav.sikkerhetstjenesten.felles.cache.getMany
 import no.nav.sikkerhetstjenesten.felles.cache.getOne
-import no.nav.sikkerhetstjenesten.entraproxy.felles.cache.ValkeyCacheOperations
-import no.nav.sikkerhetstjenesten.entraproxy.felles.cache.ValkeyEventListeningCacheOppfrisker
 import com.ninjasquad.springmockk.MockkBean
 import com.redis.testcontainers.RedisContainer
 import com.redis.testcontainers.RedisContainer.DEFAULT_IMAGE_NAME
@@ -25,6 +23,7 @@ import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.mockk.verify
+import no.nav.sikkerhetstjenesten.felles.cache.ValkeyCacheOperations
 import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
 import no.nav.sikkerhetstjenesten.felles.security.AuthContext
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils
@@ -60,6 +59,7 @@ import java.time.Duration.ofSeconds
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
+import no.nav.sikkerhetstjenesten.felles.cache.ValkeyEventListeningCacheOppfrisker
 
 @DataRedisTest
 @TestPropertySource(properties = ["logging.level.no.nav.sikkerhetstjenesten.entraproxy.felles.cache.ValkeyEventListeningCacheOppfrisker=INFO"])

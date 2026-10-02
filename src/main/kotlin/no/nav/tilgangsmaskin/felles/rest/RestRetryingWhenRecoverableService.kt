@@ -13,6 +13,7 @@ import kotlin.annotation.AnnotationTarget.CLASS
 import kotlin.annotation.AnnotationTarget.FUNCTION
 import kotlin.reflect.KClass
 
+import no.nav.sikkerhetstjenesten.felles.rest.RecoverableRestException
 @Retryable(delayString = "\${retry.delay:1s}")
 @Target(FUNCTION, CLASS)
 @Retention(RUNTIME)

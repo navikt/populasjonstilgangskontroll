@@ -1,5 +1,8 @@
 package no.nav.tilgangsmaskin.felles.rest
 
+import no.nav.sikkerhetstjenesten.felles.rest.IrrecoverableRestException
+import no.nav.sikkerhetstjenesten.felles.rest.NotFoundRestException
+import no.nav.sikkerhetstjenesten.felles.rest.RecoverableRestException
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatus.NOT_FOUND

@@ -1,9 +1,9 @@
 package no.nav.tilgangsmaskin.felles.rest
 
 import io.micrometer.core.instrument.MeterRegistry
-import io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS
+import no.nav.sikkerhetstjenesten.entraproxy.felles.rest.ConsumerAwareHandlerInterceptor
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
-import no.nav.tilgangsmaskin.felles.rest.health.HttpClientPoolMetrics
 import org.apache.hc.core5.util.TimeValue
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.http.client.HttpComponentsClientHttpRequestFactoryBuilder
@@ -14,21 +14,19 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
-import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import org.zalando.logbook.spring.LogbookClientHttpRequestInterceptor
-import reactor.netty.http.client.HttpClient
 import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
 
 
 @Configuration
 @NoCoverageAnalysis
 class RestBeanConfig(
-    private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor,
+    private val ctx: AuthContext,
+    private val meterRegistry: MeterRegistry,
     private val handler: ErrorHandler,
     private val logbookInterceptor: ObjectProvider<LogbookClientHttpRequestInterceptor>,
 ) : WebMvcConfigurer {
@@ -38,10 +36,6 @@ class RestBeanConfig(
         it.enable(INCLUDE_SOURCE_IN_LOCATION)
     }
 
-
-    @Bean
-    fun httpClientPoolMetrics(registry: MeterRegistry) =
-        HttpClientPoolMetrics(registry)
 
     @Bean
     fun restClientCustomizer() =
@@ -67,7 +61,8 @@ class RestBeanConfig(
         }
 
     override fun addInterceptors(registry: InterceptorRegistry) {
-        registry.addInterceptor(ansattIdAddingInterceptor)
+        registry.addInterceptor(ConsumerAwareHandlerInterceptor(ctx,
+              meterRegistry))
     }
 
     override fun configureContentNegotiation(configurer: ContentNegotiationConfigurer) {

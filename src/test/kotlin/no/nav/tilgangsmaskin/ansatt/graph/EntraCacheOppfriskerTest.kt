@@ -12,7 +12,7 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO_OG_
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
-import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
+import no.nav.sikkerhetstjenesten.felles.rest.NotFoundRestException
 import org.springframework.test.context.ContextConfiguration
 import java.net.URI
 import java.util.*

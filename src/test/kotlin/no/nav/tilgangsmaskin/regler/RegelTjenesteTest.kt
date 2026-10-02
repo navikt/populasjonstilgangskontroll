@@ -16,7 +16,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.sikkerhetstjenesten.felles.notifikasjon.LocalAuditor
-import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
+import no.nav.sikkerhetstjenesten.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat

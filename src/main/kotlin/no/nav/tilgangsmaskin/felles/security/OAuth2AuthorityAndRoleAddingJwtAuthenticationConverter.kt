@@ -15,7 +15,6 @@ import org.springframework.security.oauth2.core.DefaultOAuth2AuthenticatedPrinci
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
-import org.springframework.stereotype.Component
 import java.util.UUID
 
 private const val ROLLE = "ROLE_"
@@ -24,7 +23,6 @@ private const val PREFIX = "TOKEN_"
 const val OBO_AUTHORITY = "${PREFIX}OBO"
 const val CCF_AUTHORITY = "${PREFIX}CCF"
 
-@Component
 class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(
     @param:Value($$"${gruppe.enkelttilgang:}") private val gruppeEnkeltTilgang: UUID) : Converter<Jwt, AbstractAuthenticationToken> {
 

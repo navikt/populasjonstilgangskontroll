@@ -17,11 +17,11 @@ import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålTjenesteTest.VergemålTes
 import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
 import no.nav.sikkerhetstjenesten.felles.cache.getOne
-import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
-import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
+import no.nav.sikkerhetstjenesten.felles.rest.IrrecoverableRestException
+import no.nav.sikkerhetstjenesten.felles.rest.NotFoundRestException
+import no.nav.sikkerhetstjenesten.felles.rest.RecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
-import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Import

@@ -4,8 +4,8 @@ import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPartner
-import no.nav.tilgangsmaskin.felles.graphql.AbstractSyncGraphQLClientAdapter
-import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
+import no.nav.sikkerhetstjenesten.felles.graphql.AbstractSyncGraphQLClientAdapter
+import no.nav.sikkerhetstjenesten.felles.rest.NotFoundRestException
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.graphql.client.GraphQlClient
 import org.springframework.stereotype.Component

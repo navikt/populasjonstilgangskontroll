@@ -9,11 +9,9 @@ import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.web.access.AccessDeniedHandler
-import org.springframework.stereotype.Component
 import tools.jackson.databind.json.JsonMapper
 
 
-@Component
 class OAuth2JsonAccessDeniedHandler(private val mapper: JsonMapper, private val authContext: AuthContext) : AccessDeniedHandler {
     private val log = getLogger(javaClass)
 

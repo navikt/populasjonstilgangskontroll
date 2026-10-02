@@ -6,6 +6,9 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.matchers.types.shouldNotBeInstanceOf
+import no.nav.sikkerhetstjenesten.felles.rest.IrrecoverableRestException
+import no.nav.sikkerhetstjenesten.felles.rest.NotFoundRestException
+import no.nav.sikkerhetstjenesten.felles.rest.RecoverableRestException
 import no.nav.tilgangsmaskin.felles.rest.RestDefaultErrorHandler.Companion.IDENTIFIKATOR
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.HttpStatus

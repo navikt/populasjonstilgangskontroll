@@ -5,8 +5,9 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilgangsmaskin.felles.rest.IrrecoverableRestException
-import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
+import no.nav.sikkerhetstjenesten.felles.graphql.GraphQLErrorHandler
+import no.nav.sikkerhetstjenesten.felles.rest.IrrecoverableRestException
+import no.nav.sikkerhetstjenesten.felles.rest.RecoverableRestException
 import org.springframework.graphql.ResponseError
 import org.springframework.graphql.client.ClientGraphQlResponse
 import org.springframework.graphql.client.FieldAccessException
@@ -18,7 +19,7 @@ import java.net.URI
 
 class GraphQLErrorHandlerTest : BehaviorSpec({
 
-    val handler =  GraphQLErrorHandler()
+    val handler = GraphQLErrorHandler()
     val uri = URI.create("http://test/graphql")
 
     fun fieldAccessException(vararg errors: ResponseError): FieldAccessException {

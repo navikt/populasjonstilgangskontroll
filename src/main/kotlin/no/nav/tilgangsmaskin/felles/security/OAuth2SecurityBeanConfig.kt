@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.felles.security
 import no.nav.sikkerhetstjenesten.felles.security.AuthContext
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterConstants.DEV
 import org.springframework.beans.factory.ObjectProvider
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatusCode
@@ -24,6 +25,8 @@ import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer
 import org.zalando.logbook.spring.LogbookClientHttpRequestInterceptor
+import tools.jackson.databind.json.JsonMapper
+import java.util.UUID
 
 const val ENKELT = "ENKELT"
 private val UNPROTECTED_ENDPOINTS = arrayOf("/$DEV/**", "/swagger-ui/**", "/v3/api-docs/**", "/monitoring/**","/cache/**")
@@ -35,6 +38,16 @@ class OAuth2SecurityBeanConfig( private val handler: ErrorHandler,
 
     @Bean
     fun authContext() = AuthContext()
+
+    @Bean
+    fun oauth2JsonAccessDeniedHandler(mapper: JsonMapper, authContext: AuthContext) =
+        OAuth2JsonAccessDeniedHandler(mapper, authContext)
+
+    @Bean
+    fun oauth2AuthorityAndRoleAddingJwtAuthenticationConverter(
+        @Value($$"${gruppe.enkelttilgang:}") gruppeEnkeltTilgang: UUID
+    ) = OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(gruppeEnkeltTilgang)
+
     @Bean
     fun securityFilterChain(http: HttpSecurity,
                             converter: OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter,

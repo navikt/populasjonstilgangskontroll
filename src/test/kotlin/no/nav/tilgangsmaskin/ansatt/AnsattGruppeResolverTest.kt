@@ -23,11 +23,11 @@ import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.sikkerhetstjenesten.felles.notifikasjon.MessagePublisher
 import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
+import no.nav.sikkerhetstjenesten.felles.rest.NotFoundRestException
 import no.nav.sikkerhetstjenesten.felles.security.AuthContext
 import no.nav.sikkerhetstjenesten.felles.security.TokenType
 import no.nav.sikkerhetstjenesten.felles.security.TokenType.CCF
 import no.nav.sikkerhetstjenesten.felles.security.TokenType.UNAUTHENTICATED
-import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.Companion.isProd
 import java.net.URI
@@ -96,7 +96,8 @@ class AnsattGruppeResolverTest : BehaviorSpec({
             Then("sletter cache, henter ny oid og gjør retry") {
                 val nyOid = UUID.randomUUID()
                 val forventet = setOf(geoGruppe)
-                every { entra.geoOgGlobaleGrupper(ansattId, oid) } throws NotFoundRestException(URI("http://graph"), ansattId.verdi)
+                every { entra.geoOgGlobaleGrupper(ansattId, oid) } throws NotFoundRestException(URI("http://graph"),
+                    ansattId.verdi)
                 every { oidTjeneste.oid(ansattId) } returnsMany listOf(oid, nyOid)
                 every { entra.geoOgGlobaleGrupper(ansattId, nyOid) } returns forventet
 

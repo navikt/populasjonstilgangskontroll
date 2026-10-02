@@ -28,7 +28,6 @@ import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
 class RestBeanConfig(
     private val ctx: AuthContext,
     private val meterRegistry: MeterRegistry,
-    private val handler: ErrorHandler = DefaultRestErrorHandler(),
     private val logbookInterceptor: ObjectProvider<LogbookClientHttpRequestInterceptor>) : WebMvcConfigurer {
 
     @Bean
@@ -36,9 +35,12 @@ class RestBeanConfig(
         it.enable(INCLUDE_SOURCE_IN_LOCATION)
     }
 
+    @Bean
+    fun handler() = DefaultRestErrorHandler()
+
 
     @Bean
-    fun restClientCustomizer() =
+    fun restClientCustomizer(handler: ErrorHandler) =
         RestClientCustomizer { c ->
             c.requestInterceptors {
                 logbookInterceptor.ifAvailable { interceptor -> it.add(interceptor) }

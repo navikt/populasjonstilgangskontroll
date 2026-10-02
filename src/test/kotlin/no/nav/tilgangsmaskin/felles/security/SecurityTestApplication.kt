@@ -1,8 +1,8 @@
 package no.nav.tilgangsmaskin.felles.security
 
 import no.nav.sikkerhetstjenesten.felles.cache.CacheBeanConfig
+import no.nav.sikkerhetstjenesten.felles.rest.DefaultRestErrorHandler
 import no.nav.tilgangsmaskin.felles.cache.CaffeineCacheOperations
-import no.nav.tilgangsmaskin.felles.rest.RestDefaultErrorHandler
 import no.nav.tilgangsmaskin.felles.rest.notifikasjon.NotificationBeanConfig
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController
 import no.nav.tilgangsmaskin.tilgang.BulkTilgangController
@@ -22,6 +22,6 @@ import org.springframework.context.annotation.Import
     PdlTestConfig::class,
     NotificationBeanConfig::class,
     CaffeineCacheOperations::class,
-    RestDefaultErrorHandler::class
+    DefaultRestErrorHandler::class
 )
 class SecurityTestApplication

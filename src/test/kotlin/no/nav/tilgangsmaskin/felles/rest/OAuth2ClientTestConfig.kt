@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.rest
 
+import no.nav.sikkerhetstjenesten.felles.rest.DefaultRestErrorHandler
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.restclient.RestClientCustomizer
 import org.springframework.boot.test.context.TestConfiguration
@@ -17,7 +18,7 @@ class OAuth2ClientTestConfig {
     fun restClientCustomizer() =
         RestClientCustomizer { c ->
             c.requestInterceptors { it.add(LogbookClientHttpRequestInterceptor(Logbook.builder().build())) }
-            c.defaultStatusHandler(HttpStatusCode::isError, RestDefaultErrorHandler()::handle)
+            c.defaultStatusHandler(HttpStatusCode::isError, DefaultRestErrorHandler()::handle)
         }
 
     @Bean

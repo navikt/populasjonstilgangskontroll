@@ -1,8 +1,8 @@
 package no.nav.tilgangsmaskin.felles.utils.extensions
 
-import no.nav.sikkerhetstjenesten.entraproxy.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
 import no.nav.sikkerhetstjenesten.felles.domain.BrukerId.Companion.BRUKERID_LENGTH
+import no.nav.sikkerhetstjenesten.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.månederSidenIdag
 import no.nav.tilgangsmaskin.bruker.AktørId.Companion.AKTØRID_LENGTH
 import org.slf4j.MDC

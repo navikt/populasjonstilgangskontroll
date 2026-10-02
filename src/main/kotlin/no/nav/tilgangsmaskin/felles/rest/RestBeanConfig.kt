@@ -1,7 +1,8 @@
 package no.nav.tilgangsmaskin.felles.rest
 
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.sikkerhetstjenesten.entraproxy.felles.rest.ConsumerAwareHandlerInterceptor
+import no.nav.sikkerhetstjenesten.felles.rest.ConsumerAwareHandlerInterceptor
+import no.nav.sikkerhetstjenesten.felles.rest.DefaultRestErrorHandler
 import no.nav.sikkerhetstjenesten.felles.security.AuthContext
 import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import org.apache.hc.core5.util.TimeValue
@@ -27,7 +28,7 @@ import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
 class RestBeanConfig(
     private val ctx: AuthContext,
     private val meterRegistry: MeterRegistry,
-    private val handler: ErrorHandler,
+    private val handler: ErrorHandler = DefaultRestErrorHandler(),
     private val logbookInterceptor: ObjectProvider<LogbookClientHttpRequestInterceptor>,
 ) : WebMvcConfigurer {
 
@@ -62,7 +63,7 @@ class RestBeanConfig(
 
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(ConsumerAwareHandlerInterceptor(ctx,
-              meterRegistry))
+            meterRegistry))
     }
 
     override fun configureContentNegotiation(configurer: ContentNegotiationConfigurer) {

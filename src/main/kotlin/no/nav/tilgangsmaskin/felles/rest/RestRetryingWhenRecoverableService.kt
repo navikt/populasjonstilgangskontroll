@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.felles.rest
 
 import io.lettuce.core.RedisCommandTimeoutException
+import no.nav.sikkerhetstjenesten.felles.rest.RecoverableRestException
 import org.springframework.core.annotation.AliasFor
 import org.springframework.dao.QueryTimeoutException
 import org.springframework.resilience.annotation.Retryable
@@ -13,7 +14,6 @@ import kotlin.annotation.AnnotationTarget.CLASS
 import kotlin.annotation.AnnotationTarget.FUNCTION
 import kotlin.reflect.KClass
 
-import no.nav.sikkerhetstjenesten.felles.rest.RecoverableRestException
 @Retryable(delayString = "\${retry.delay:1s}")
 @Target(FUNCTION, CLASS)
 @Retention(RUNTIME)

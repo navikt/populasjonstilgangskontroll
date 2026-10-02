@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.ansatt.skjerming
 import io.micrometer.observation.annotation.Observed
 import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
 import no.nav.sikkerhetstjenesten.felles.cache.getMany
-import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingConfig.Companion.SKJERMING_CACHE
 import no.nav.tilgangsmaskin.felles.rest.RestRetryingWhenRecoverableService

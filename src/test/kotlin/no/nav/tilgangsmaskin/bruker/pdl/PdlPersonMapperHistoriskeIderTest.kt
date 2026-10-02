@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.bruker.pdl
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
-import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPerson
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapperTestFixture.BRUKER_ID
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapperTestFixture.identer

@@ -1,8 +1,8 @@
 package no.nav.tilgangsmaskin.tilgang
 
 import io.swagger.v3.oas.annotations.Operation
-import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
-import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
+import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.Avsluttet
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste

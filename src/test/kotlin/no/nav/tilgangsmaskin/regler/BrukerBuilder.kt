@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.regler
 
-import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
-import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
+import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe

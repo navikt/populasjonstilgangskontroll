@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.graph
 
 import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
-import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.sikkerhetstjenesten.felles.notifikasjon.MessagePublisher
 import no.nav.sikkerhetstjenesten.felles.rest.NotFoundRestException
 import no.nav.sikkerhetstjenesten.felles.security.AuthContext

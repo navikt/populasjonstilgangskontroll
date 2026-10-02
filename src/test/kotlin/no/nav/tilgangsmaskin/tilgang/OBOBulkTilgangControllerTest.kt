@@ -1,10 +1,10 @@
 package no.nav.tilgangsmaskin.tilgang
 
-import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 
 import io.mockk.every
-import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
-import no.nav.sikkerhetstjenesten.felles.domain.BrukerId.Companion.BRUKERID_LENGTH
+import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.bruker.BrukerId.Companion.BRUKERID_LENGTH
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder

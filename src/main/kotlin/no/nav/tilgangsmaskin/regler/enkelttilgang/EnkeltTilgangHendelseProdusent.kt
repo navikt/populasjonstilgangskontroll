@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.regler.enkelttilgang
 
-import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.core.KafkaOperations
 import org.springframework.stereotype.Component

@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.regler.enkelttilgang
 
-import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.assertions.assertSoftly
@@ -25,7 +25,7 @@ import no.nav.tilgangsmaskin.ansatt.nom.OrgTilknytning
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålTjeneste
-import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.sikkerhetstjenesten.felles.notifikasjon.LocalAuditor
@@ -360,7 +360,7 @@ class EnkeltTilgangTest(
         every { vergemål.alle(any()) } returns emptySet()
         every { authContext.type } returns CCF
         every { authContext.system } returns "test"
-        every { authContext.ansattId } returns ansattId
+        every { authContext.navIdent } returns "Z999999"
         every { authContext.systemNavn } returns "test"
         every { authContext.clusterAndSystem } returns "cluster:test"
         every { proxy.enhet(ansattId) } returns Enhet(Enhetsnummer("1234"), "Testenhet")

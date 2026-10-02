@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.graph.oid
 
-import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.PARAM_NAME_COUNT
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.PARAM_NAME_FILTER

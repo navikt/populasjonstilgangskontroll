@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.bruker
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
 import no.nav.tilgangsmaskin.bruker.Familie.Companion.INGEN_FAMILIE
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted

@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.tilgang
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
-import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.rest.ProdController
 import no.nav.tilgangsmaskin.felles.security.OAuth2RequireCCF
 import no.nav.tilgangsmaskin.felles.security.OAuth2RequireOBO

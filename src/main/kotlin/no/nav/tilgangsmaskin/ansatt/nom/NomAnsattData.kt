@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
-import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
-import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
+import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.ALLTID
 import java.time.LocalDate
 import java.time.LocalDate.EPOCH

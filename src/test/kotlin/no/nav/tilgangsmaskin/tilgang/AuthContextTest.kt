@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.tilgang
 
-import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldBeEmpty
@@ -65,17 +64,17 @@ class AuthContextTest : BehaviorSpec({
         }
     }
 
-    Given("ansattId") {
+    Given("navIdent") {
         When("NAVident finnes") {
-            Then("returnerer AnsattId") {
+            Then("returnerer navIdent") {
                 setClaims(NAVIDENT to "Z999999")
-                authContext.ansattId shouldBe AnsattId("Z999999")
+                authContext.navIdent shouldBe "Z999999"
             }
         }
 
         When("NAVident mangler") {
             Then("returnerer null") {
-                authContext.ansattId shouldBe null
+                authContext.navIdent shouldBe null
             }
         }
     }

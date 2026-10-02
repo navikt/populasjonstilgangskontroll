@@ -9,8 +9,8 @@ import jakarta.persistence.Id
 import jakarta.persistence.Index
 import jakarta.persistence.Table
 import jakarta.persistence.UniqueConstraint
-import no.nav.sikkerhetstjenesten.felles.domain.AnsattId.Companion.ANSATTID_LENGTH
-import no.nav.sikkerhetstjenesten.felles.domain.BrukerId.Companion.BRUKERID_LENGTH
+import no.nav.tilgangsmaskin.ansatt.AnsattId.Companion.ANSATTID_LENGTH
+import no.nav.tilgangsmaskin.bruker.BrukerId.Companion.BRUKERID_LENGTH
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener

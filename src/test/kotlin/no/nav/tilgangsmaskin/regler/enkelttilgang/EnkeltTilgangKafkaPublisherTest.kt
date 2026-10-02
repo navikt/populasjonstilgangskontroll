@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.regler.enkelttilgang
 
-import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.clearMocks

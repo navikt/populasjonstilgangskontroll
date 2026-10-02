@@ -18,7 +18,7 @@ class EnkeltTilgangEntityListener(private val authContext: AuthContext) {
 
     private fun setSource(entity: EnkeltTilgangEntity) {
         entity.system = authContext.system
-        entity.oppretter = authContext.ansattId?.verdi ?: authContext.system
+        entity.oppretter = authContext.navIdent ?: authContext.system
         entity.span = Span.current().spanContext.spanId
     }
 }

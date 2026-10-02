@@ -6,8 +6,8 @@ import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.SKJERMING
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
-import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
-import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
+import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.Bydel
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning

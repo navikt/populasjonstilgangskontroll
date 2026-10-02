@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
 import io.micrometer.observation.annotation.Observed
-import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomConfig.Companion.NOM
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable

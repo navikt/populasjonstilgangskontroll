@@ -17,7 +17,7 @@ class OAuth2JsonAccessDeniedHandler(private val mapper: JsonMapper, private val 
 
     override fun handle(req: HttpServletRequest, res: HttpServletResponse, e: AccessDeniedException) {
         if (req.requestURI == ENKELTTILGANG_PATH) {
-            log.info("Enkelttilgang avvist, ${authContext.ansattId} er ikke medlem av GA-Enkelttilgang")
+            log.info("Enkelttilgang avvist, ${authContext.navIdent} er ikke medlem av GA-Enkelttilgang")
         }
         with(res) {
             status = FORBIDDEN.value()

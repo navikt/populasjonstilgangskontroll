@@ -6,8 +6,8 @@ import io.micrometer.core.instrument.Tags
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
-import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
+import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraAnsattGruppeResolver
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste

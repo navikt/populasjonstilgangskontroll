@@ -6,7 +6,6 @@ import io.kotest.matchers.shouldBe
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
 import no.nav.sikkerhetstjenesten.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.sikkerhetstjenesten.felles.rest.ConsumerAwareHandlerInterceptor.Companion.CONSUMER_ID
 import no.nav.sikkerhetstjenesten.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
@@ -26,7 +25,7 @@ class ConsumerAwareHandlerInterceptorTest : BehaviorSpec({
         interceptor = ConsumerAwareHandlerInterceptor(authContext, registry)
         every { authContext.systemAndNs } returns "tilgangsmaskin:my-app"
         every { authContext.systemNavn } returns "my-app"
-        every { authContext.ansattId } returns null
+        every { authContext.navIdent } returns null
         MDC.clear()
     }
 
@@ -47,7 +46,7 @@ class ConsumerAwareHandlerInterceptorTest : BehaviorSpec({
 
         When("token har ansattId (OBO)") {
             Then("settes userId fra tokenet") {
-                every { authContext.ansattId } returns AnsattId("Z999999")
+                every { authContext.navIdent } returns "Z999999"
                 interceptor.preHandle(MockHttpServletRequest(), MockHttpServletResponse(), Any())
                 MDC.get(USER_ID) shouldBe "Z999999"
             }
@@ -64,7 +63,7 @@ class ConsumerAwareHandlerInterceptorTest : BehaviorSpec({
     Given("afterCompletion") {
         When("request er ferdig") {
             Then("ryddes både consumerId og userId fra MDC") {
-                every { authContext.ansattId } returns AnsattId("Z999999")
+                every { authContext.navIdent } returns "Z999999"
                 val request = MockHttpServletRequest()
                 val response = MockHttpServletResponse()
                 interceptor.preHandle(request, response, Any())

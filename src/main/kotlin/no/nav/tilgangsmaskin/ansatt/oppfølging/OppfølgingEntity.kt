@@ -6,7 +6,7 @@ import jakarta.persistence.EntityListeners
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import jakarta.persistence.UniqueConstraint
-import no.nav.sikkerhetstjenesten.felles.domain.BrukerId.Companion.BRUKERID_LENGTH
+import no.nav.tilgangsmaskin.bruker.BrukerId.Companion.BRUKERID_LENGTH
 import no.nav.tilgangsmaskin.bruker.AktørId.Companion.AKTØRID_LENGTH
 import org.hibernate.annotations.NaturalId
 import org.springframework.data.annotation.CreatedDate

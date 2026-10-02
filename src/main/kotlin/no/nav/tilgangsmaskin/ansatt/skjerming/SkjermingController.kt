@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.skjerming
 
 import io.swagger.v3.oas.annotations.Operation
-import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.felles.rest.DevController
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG

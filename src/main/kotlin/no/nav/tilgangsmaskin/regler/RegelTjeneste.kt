@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.regler
 
 import io.micrometer.core.annotation.Timed
 import io.micrometer.observation.annotation.Observed
-import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.sikkerhetstjenesten.felles.notifikasjon.Auditor
 import no.nav.sikkerhetstjenesten.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste

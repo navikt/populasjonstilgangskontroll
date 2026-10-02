@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
-import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 
 data class Leder(
     val epost: String,

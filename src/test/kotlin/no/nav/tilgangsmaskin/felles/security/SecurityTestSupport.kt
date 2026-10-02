@@ -1,8 +1,8 @@
 package no.nav.tilgangsmaskin.felles.security
 
 import no.nav.security.mock.oauth2.MockOAuth2Server
-import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
-import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
+import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterConstants.NAIS_CLUSTER_NAME
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig

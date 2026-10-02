@@ -9,5 +9,5 @@ import java.util.Optional
 
 @Component
 class EnkeltTilgangAzureAdTokenAuditorAware(private val authContext: AuthContext) : AuditorAware<String> {
-    override fun getCurrentAuditor() = Optional.of(authContext.ansattId?.verdi ?: UTILGJENGELIG)
+    override fun getCurrentAuditor() = Optional.of(authContext.navIdent ?: UTILGJENGELIG)
 }

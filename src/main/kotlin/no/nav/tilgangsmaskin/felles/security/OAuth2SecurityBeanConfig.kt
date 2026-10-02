@@ -33,8 +33,7 @@ private val UNPROTECTED_ENDPOINTS = arrayOf("/$DEV/**", "/swagger-ui/**", "/v3/a
 
 @Configuration
 @EnableMethodSecurity
-class OAuth2SecurityBeanConfig( private val handler: ErrorHandler,
-                                private val logbookInterceptor: ObjectProvider<LogbookClientHttpRequestInterceptor>){
+class OAuth2SecurityBeanConfig( private val logbookInterceptor: ObjectProvider<LogbookClientHttpRequestInterceptor>){
 
     @Bean
     fun authContext() = AuthContext()
@@ -75,7 +74,7 @@ class OAuth2SecurityBeanConfig( private val handler: ErrorHandler,
             .build()
 
     @Bean
-    fun oauth2GroupConfigurer(manager: OAuth2AuthorizedClientManager) =
+    fun oauth2GroupConfigurer(manager: OAuth2AuthorizedClientManager, handler: ErrorHandler) =
         RestClientHttpServiceGroupConfigurer { groups ->
             from(manager).configureGroups(groups)
             groups.forEachClient { _, builder ->

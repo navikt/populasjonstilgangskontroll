@@ -5,7 +5,7 @@ import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
 import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
 import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.ALLTID
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode
-import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
+import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener

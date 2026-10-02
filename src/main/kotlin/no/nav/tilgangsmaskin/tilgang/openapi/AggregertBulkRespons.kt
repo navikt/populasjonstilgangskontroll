@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
-import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
+import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import org.springframework.http.HttpStatus

@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.bruker
 
 import com.fasterxml.jackson.annotation.JsonValue
-import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
+import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.requireDigits
 
 data class AktørId(@JsonValue val verdi: String) {

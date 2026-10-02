@@ -6,7 +6,7 @@ import no.nav.sikkerhetstjenesten.felles.domain.BrukerId
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålClient.VergemålIdent
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålConfig.Companion.VERGEMÅL
-import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
+import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.rest.RestRetryingWhenRecoverableService
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.web.service.registry.ImportHttpServices
@@ -28,5 +28,4 @@ class VergemålTjeneste(private val nom: NomTjeneste, private val client: Vergem
     override fun toString() =
         "${javaClass.simpleName} [client=$client]"
 }
-
 

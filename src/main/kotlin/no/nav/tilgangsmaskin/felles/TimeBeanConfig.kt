@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles
 
+import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.auditing.DateTimeProvider

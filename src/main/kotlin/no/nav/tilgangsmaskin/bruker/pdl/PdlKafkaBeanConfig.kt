@@ -11,7 +11,7 @@ import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.tilgangsmaskin.bruker.pdl.PdlAvroEnvExtensions.schemaRegistryUrl
 import no.nav.tilgangsmaskin.bruker.pdl.PdlAvroEnvExtensions.userInfo
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL
-import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
+import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.kafka.KafkaTypedDroppedMessageMeter
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG

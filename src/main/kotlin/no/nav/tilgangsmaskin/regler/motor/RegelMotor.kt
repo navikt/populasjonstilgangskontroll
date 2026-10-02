@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.regler.motor
 import io.micrometer.observation.annotation.Observed
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
-import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
+import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat.Companion.avvist
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat.Companion.ok

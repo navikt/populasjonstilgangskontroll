@@ -4,7 +4,7 @@ import no.nav.sikkerhetstjenesten.felles.rest.PingableHealthIndicator
 import no.nav.sikkerhetstjenesten.felles.rest.RestHeaderAddingRequestInterceptor
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDLPIP
-import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
+import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer

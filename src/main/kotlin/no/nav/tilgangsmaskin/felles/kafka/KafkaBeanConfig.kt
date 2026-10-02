@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.felles.kafka
 
-import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
+import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.kafka.listener.DefaultErrorHandler
@@ -38,4 +38,3 @@ class KafkaBeanConfig {
             }
     }
 }
-

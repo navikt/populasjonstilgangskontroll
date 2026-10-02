@@ -4,7 +4,7 @@ import no.nav.sikkerhetstjenesten.felles.cache.AbstractCacheOppfrisker
 import no.nav.sikkerhetstjenesten.felles.cache.CacheNøkkel
 import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålConfig.Companion.VERGEMÅL
-import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
+import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
 import org.springframework.stereotype.Component
 
 @Component

@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.ansatt.graph
 import io.micrometer.observation.annotation.Observed
 import no.nav.sikkerhetstjenesten.felles.domain.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GRAPH
-import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
+import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.rest.RestRetryingWhenRecoverableService
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.web.service.registry.ImportHttpServices
@@ -32,4 +32,3 @@ class EntraTjeneste(
     @NoCoverageAnalysis
     override fun toString() = "${javaClass.simpleName} [client=$client, config=$cfg]"
 }
-

@@ -1,10 +1,10 @@
 package no.nav.tilgangsmaskin.felles.rest
 
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
 import no.nav.sikkerhetstjenesten.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.sikkerhetstjenesten.felles.rest.DefaultRestErrorHandler
 import no.nav.sikkerhetstjenesten.felles.security.AuthContext
-import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
 import org.apache.hc.core5.util.TimeValue
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.http.client.HttpComponentsClientHttpRequestFactoryBuilder
@@ -29,8 +29,7 @@ class RestBeanConfig(
     private val ctx: AuthContext,
     private val meterRegistry: MeterRegistry,
     private val handler: ErrorHandler = DefaultRestErrorHandler(),
-    private val logbookInterceptor: ObjectProvider<LogbookClientHttpRequestInterceptor>,
-) : WebMvcConfigurer {
+    private val logbookInterceptor: ObjectProvider<LogbookClientHttpRequestInterceptor>) : WebMvcConfigurer {
 
     @Bean
     fun jackson3Customizer() = JsonMapperBuilderCustomizer {

@@ -6,7 +6,7 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
 import no.nav.tilgangsmaskin.bruker.Familie.Companion.INGEN_FAMILIE
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
-import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
+import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import java.time.LocalDate
 import java.time.LocalDate.now

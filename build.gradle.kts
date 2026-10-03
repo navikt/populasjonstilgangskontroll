@@ -9,6 +9,9 @@ val javaVersion = JavaLanguageVersion.of(26)
 group = "no.nav.tilgangsmaskin.populasjonstilgangskontroll"
 version = "1.0.1"
 
+extra["jackson-bom.version"] = "3.2.2"
+extra["jackson-2-bom.version"] = "2.22.1"
+
 plugins {
     jacoco
     alias(libs.plugins.kotlin.jvm)
@@ -57,6 +60,7 @@ dependencies {
         implementation("at.yawk.lz4:lz4-java:1.11.1")
         testImplementation("at.yawk.lz4:lz4-java:1.11.1")
     }
+    implementation("no.nav.felles:sikkerhetstjenesten-lib:0.0.42")
     implementation(libs.contract.pdl.avro)
     implementation(libs.boot.conditionals)
     implementation(libs.bundles.observability)

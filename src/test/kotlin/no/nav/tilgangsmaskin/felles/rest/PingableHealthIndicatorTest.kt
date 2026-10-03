@@ -4,9 +4,9 @@ import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldExist
 import io.kotest.matchers.shouldBe
-import no.nav.tilgangsmaskin.felles.rest.health.Pingable
-import no.nav.tilgangsmaskin.felles.rest.health.PingableHealthIndicator
-import no.nav.tilgangsmaskin.felles.rest.health.PingableHealthIndicator.Companion.ENDPOINT
+import no.nav.sikkerhetstjenesten.felles.rest.Pingable
+import no.nav.sikkerhetstjenesten.felles.rest.PingableHealthIndicator
+import no.nav.sikkerhetstjenesten.felles.rest.PingableHealthIndicator.Companion.ENDPOINT
 import org.springframework.boot.health.contributor.Status.DOWN
 import org.springframework.boot.health.contributor.Status.UP
 import java.net.URI
@@ -27,7 +27,7 @@ class PingableHealthIndicatorTest : BehaviorSpec({
                 val pingable = StubPingable()
                 val health = PingableHealthIndicator(pingable).health()
                 health.status shouldBe UP
-                health.details[ENDPOINT] shouldBe "http://example.com/ping"
+                health.details[ENDPOINT].toString() shouldBe "http://example.com/ping"
                 pingable.pinged shouldBe true
             }
         }
@@ -37,7 +37,7 @@ class PingableHealthIndicatorTest : BehaviorSpec({
                 val health = PingableHealthIndicator(pingable).health()
                 assertSoftly(health) {
                     status shouldBe DOWN
-                    details[ENDPOINT] shouldBe "http://example.com/ping"
+                    details[ENDPOINT].toString() shouldBe "http://example.com/ping"
                     details.values.map { it.toString() }.shouldExist { it.contains("Connection refused") }
                 }
 
@@ -49,7 +49,7 @@ class PingableHealthIndicatorTest : BehaviorSpec({
                     pingEndpoint = URI.create("http://other.com/health"),
                     onPing = { throw RuntimeException("timeout") }
                 )
-                PingableHealthIndicator(pingable).health().details[ENDPOINT] shouldBe "http://other.com/health"
+                PingableHealthIndicator(pingable).health().details[ENDPOINT].toString() shouldBe "http://other.com/health"
             }
         }
     }

@@ -1,9 +1,9 @@
 package no.nav.tilgangsmaskin.bruker.kodeverk
 
+import no.nav.sikkerhetstjenesten.felles.cache.CachableRestConfig
+import no.nav.sikkerhetstjenesten.felles.cache.CacheNøkkelConfig
+import no.nav.sikkerhetstjenesten.felles.rest.RestConfig
 import no.nav.tilgangsmaskin.bruker.kodeverk.KodeverkClient.Companion.KODEVERK_PING_PATH
-import no.nav.tilgangsmaskin.felles.cache.CachableRestConfig
-import no.nav.tilgangsmaskin.felles.cache.CacheNøkkelConfig
-import no.nav.tilgangsmaskin.felles.rest.RestConfig
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.net.URI
@@ -15,6 +15,6 @@ class KodeverkConfig(@Value($$"${spring.http.serviceclient.kodeverk.base-url}") 
 
     companion object {
         const val KODEVERK  = "kodeverk"
-        private val KODEVERK_CACHE = CacheNøkkelConfig(KODEVERK)
+        val KODEVERK_CACHE = CacheNøkkelConfig(KODEVERK)
     }
 }

@@ -1,5 +1,7 @@
 package no.nav.tilgangsmaskin.tilgang
 
+import no.nav.tilgangsmaskin.ansatt.AnsattId
+
 import io.mockk.every
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerId.Companion.BRUKERID_LENGTH

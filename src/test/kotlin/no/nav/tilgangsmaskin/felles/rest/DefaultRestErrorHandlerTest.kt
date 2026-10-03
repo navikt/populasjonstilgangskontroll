@@ -6,7 +6,11 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.matchers.types.shouldNotBeInstanceOf
-import no.nav.tilgangsmaskin.felles.rest.RestDefaultErrorHandler.Companion.IDENTIFIKATOR
+import no.nav.sikkerhetstjenesten.felles.rest.DefaultRestErrorHandler
+import no.nav.sikkerhetstjenesten.felles.rest.DefaultRestErrorHandler.Companion.IDENTIFIKATOR
+import no.nav.sikkerhetstjenesten.felles.rest.IrrecoverableRestException
+import no.nav.sikkerhetstjenesten.felles.rest.NotFoundRestException
+import no.nav.sikkerhetstjenesten.felles.rest.RecoverableRestException
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
@@ -22,7 +26,7 @@ import java.net.URI
 
 class DefaultRestErrorHandlerTest : BehaviorSpec({
 
-    val handler = RestDefaultErrorHandler()
+    val handler = DefaultRestErrorHandler()
     val uri = URI.create("http://test-service/api/resource")
 
     fun req(ident: String? = null) = MockClientHttpRequest(GET, uri).apply {

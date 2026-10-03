@@ -8,9 +8,9 @@ import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GEO_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GEO_OG_GLOBALE_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjenesteTest.EntraTestConfig
-import no.nav.tilgangsmaskin.felles.cache.CacheOperations
+import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
-import no.nav.tilgangsmaskin.felles.cache.getOne
+import no.nav.sikkerhetstjenesten.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
@@ -38,7 +38,7 @@ class EntraTjenesteTest(private val tjeneste: EntraTjeneste, private val server:
     init {
         beforeEach {
             server.reset()
-            cache.clear(ENTRA_CACHES)
+            ENTRA_CACHES.forEach(cache::clear)
         }
 
         afterEach {

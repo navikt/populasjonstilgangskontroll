@@ -1,10 +1,11 @@
 package no.nav.tilgangsmaskin.tilgang
 
+import no.nav.tilgangsmaskin.ansatt.AnsattId
+
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.tilgang.openapi.AggregertBulkRespons
 import no.nav.tilgangsmaskin.tilgang.openapi.AggregertBulkRespons.EnkeltBulkRespons
 import no.nav.tilgangsmaskin.tilgang.openapi.AggregertBulkRespons.EnkeltBulkRespons.Companion.ok

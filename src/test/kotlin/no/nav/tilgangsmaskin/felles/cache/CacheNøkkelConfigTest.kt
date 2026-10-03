@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.cache
 
+import no.nav.sikkerhetstjenesten.felles.cache.CacheNøkkelConfig
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE

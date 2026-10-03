@@ -9,17 +9,17 @@ import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import no.nav.tilgangsmaskin.felles.ClusterAddingTimedAspectTest.TestConfig
-import no.nav.tilgangsmaskin.felles.security.AuthContext
-import no.nav.tilgangsmaskin.felles.rest.health.ObservabilityBeanConfig
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.DEV_GCP_CLUSTER
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.PROD_GCP_CLUSTER
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.DEV_GCP_CLUSTER
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.PROD_GCP_CLUSTER
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.test.context.ContextConfiguration
+import no.nav.sikkerhetstjenesten.felles.rest.health.ObservabilityAutoConfiguration
 
-@ContextConfiguration(classes = [TestConfig::class, ObservabilityBeanConfig::class])
+@ContextConfiguration(classes = [TestConfig::class, ObservabilityAutoConfiguration::class])
 @AutoConfigureMetrics
 class ClusterAddingTimedAspectTest(
     private val registry: MeterRegistry,
@@ -37,7 +37,7 @@ class ClusterAddingTimedAspectTest(
         }
 
         afterEach {
-            unmockkObject(ClusterUtils.Companion)
+            unmockkObject(ClusterUtils)
         }
         Given("clusterAddingTimedAspect") {
             When("tjeneste kalles") {

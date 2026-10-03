@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.cache
 
+import no.nav.sikkerhetstjenesten.felles.cache.CacheNøkkel
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 
@@ -24,9 +25,9 @@ class CacheNøkkelTest : BehaviorSpec({
                 nøkkel.id shouldBe "Z999999"
             }
         }
-        When("masked genereres") {
-            Then("id maskeres ikke for kort id") {
-                nøkkel.maskert shouldBe "graph::geoGrupper:Z999999"
+        When("original key is read") {
+            Then("the original key is preserved") {
+                nøkkel.nøkkel shouldBe "graph::geoGrupper:Z999999"
             }
         }
     }
@@ -50,42 +51,11 @@ class CacheNøkkelTest : BehaviorSpec({
                 nøkkel.id shouldBe "08526835670"
             }
         }
-        When("masked genereres") {
-            Then("fnr maskeres") {
-                nøkkel.maskert shouldBe "oppfolging::0852*******"
+        When("original key is read") {
+            Then("the original key is preserved") {
+                nøkkel.nøkkel shouldBe "oppfolging::08526835670"
             }
         }
     }
 
-    Given("maskering") {
-        When("11-sifret fnr i id") {
-            Then("maskeres") {
-                CacheNøkkel("skjerming::08526835670").maskert shouldBe "skjerming::0852*******"
-            }
-        }
-        When("13-sifret aktørId i id") {
-            Then("maskeres") {
-                CacheNøkkel("pdl::1234567890123").maskert shouldBe "pdl::123456*******"
-            }
-        }
-        When("kort id") {
-            Then("maskeres ikke") {
-                CacheNøkkel("nom::Z999999").maskert shouldBe "nom::Z999999"
-            }
-        }
-        When("fnr i id med metode satt") {
-            Then("maskeres") {
-                CacheNøkkel("pdl::medFamilie:08526835670").maskert shouldBe "pdl::medFamilie:0852*******" }
-        }
-    }
-
-    Given("nøkkel bevares") {
-        When("nøkkel opprettes") {
-            Then("originalnøkkel er uendret") {
-                val nøkkel = "graph::geoGrupper:Z999999"
-                CacheNøkkel(nøkkel).verdi shouldBe nøkkel
-            }
-        }
-    }
 })
-

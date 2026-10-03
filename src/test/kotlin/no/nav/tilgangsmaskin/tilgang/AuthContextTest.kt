@@ -1,18 +1,18 @@
 package no.nav.tilgangsmaskin.tilgang
 
+
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
-import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.felles.security.AuthContext
-import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.AZP_NAME
-import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.CLIENT_CREDENTIALS
-import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.NAVIDENT
-import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.OID
-import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.ROLES
-import no.nav.tilgangsmaskin.felles.security.TokenType.CCF
-import no.nav.tilgangsmaskin.felles.security.TokenType.OBO
-import no.nav.tilgangsmaskin.felles.security.TokenType.UNAUTHENTICATED
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.AZP_NAME
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.CLIENT_CREDENTIALS
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.NAVIDENT
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.OID
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.ROLES
+import no.nav.sikkerhetstjenesten.felles.security.TokenType.CCF
+import no.nav.sikkerhetstjenesten.felles.security.TokenType.OBO
+import no.nav.sikkerhetstjenesten.felles.security.TokenType.UNAUTHENTICATED
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.jwt.Jwt
@@ -64,17 +64,17 @@ class AuthContextTest : BehaviorSpec({
         }
     }
 
-    Given("ansattId") {
+    Given("navIdent") {
         When("NAVident finnes") {
-            Then("returnerer AnsattId") {
+            Then("returnerer navIdent") {
                 setClaims(NAVIDENT to "Z999999")
-                authContext.ansattId shouldBe AnsattId("Z999999")
+                authContext.navIdent shouldBe "Z999999"
             }
         }
 
         When("NAVident mangler") {
             Then("returnerer null") {
-                authContext.ansattId shouldBe null
+                authContext.navIdent shouldBe null
             }
         }
     }

@@ -5,6 +5,8 @@ import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.GROUPS
 import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.NAVIDENT
 import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.OID
 import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.ROLES
+import no.nav.sikkerhetstjenesten.felles.security.GRANTED_CCF_AUTHORITY
+import no.nav.sikkerhetstjenesten.felles.security.GRANTED_OBO_AUTHORITY
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.convert.converter.Converter
 import org.springframework.security.authentication.AbstractAuthenticationToken
@@ -18,9 +20,6 @@ import java.util.UUID
 
 private const val ROLLE = "ROLE_"
 private const val ENKELTGRUPPE_ROLLE = "${ROLLE}ENKELT"
-private const val PREFIX = "TOKEN_"
-const val OBO_AUTHORITY = "${PREFIX}OBO"
-const val CCF_AUTHORITY = "${PREFIX}CCF"
 
 class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(
     @param:Value($$"${gruppe.enkelttilgang:}") private val gruppeEnkeltTilgang: UUID) : Converter<Jwt, AbstractAuthenticationToken> {
@@ -51,8 +50,8 @@ class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(
 
     private fun authority(jwt: Jwt) =
         when {
-            jwt.getClaimAsStringList(ROLES).orEmpty().contains(CLIENT_CREDENTIALS) -> SimpleGrantedAuthority(CCF_AUTHORITY)
-            jwt.getClaimAsString(OID) != null -> SimpleGrantedAuthority(OBO_AUTHORITY)
+            jwt.getClaimAsStringList(ROLES).orEmpty().contains(CLIENT_CREDENTIALS) -> GRANTED_CCF_AUTHORITY
+            jwt.getClaimAsString(OID) != null -> GRANTED_OBO_AUTHORITY
             else -> null
         }
 

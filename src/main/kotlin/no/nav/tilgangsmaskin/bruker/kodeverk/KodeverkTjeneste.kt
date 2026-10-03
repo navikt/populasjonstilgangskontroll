@@ -32,35 +32,3 @@ class KodeverkTjeneste(private val client: KodeverkClient) {
     @NoCoverageAnalysis
     override fun toString() = "${javaClass.simpleName} [client=$client]"
 }
-
-@ConditionalOnGCP
-class CacheKodeverk(private val kodeverk: KodeverkTjeneste, private val cache: CacheOperations) : LeaderAware(true) {
-
-    private val log = getLogger(javaClass)
-
-    @Scheduled(fixedRate = INTERVAL_MINUTES, timeUnit = MINUTES, initialDelay = 1)
-    fun oppdaterCache() =
-        somLeder {
-            val måling = measureTimedValue {
-                runCatching {
-                    val koder = kodeverk.koderOgNavn()
-                    cache.putMany(KODEVERK_CACHE, koder)
-                    koder
-                }
-            }
-            måling.value.onSuccess {
-                log.info(
-                    "Periodisk cache-oppdatering OK, la til {} koder i cache på {}ms",
-                    it.size,
-                    måling.duration.inWholeMilliseconds
-                )
-            }.onFailure {
-                log.warn("Periodisk cache-oppdatering feilet", it)
-            }
-        }
-
-    companion object {
-        const val KODER = "koder"
-        private const val INTERVAL_MINUTES = 15L
-    }
-}

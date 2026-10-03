@@ -5,7 +5,7 @@ import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
 import no.nav.sikkerhetstjenesten.felles.leder.LeaderAware
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.DAYS
 import kotlin.time.measureTimedValue
 
 @ConditionalOnGCP
@@ -13,7 +13,7 @@ class KodeverkCache(private val kodeverk: KodeverkTjeneste, private val cache: C
 
     private val log = LoggerFactory.getLogger(javaClass)
 
-    @Scheduled(fixedRate = INTERVAL_MINUTES, timeUnit = TimeUnit.MINUTES, initialDelay = 1)
+    @Scheduled(fixedRate = INTERVAL_DAYS, timeUnit = DAYS, initialDelayString = "1m")
     fun oppdaterCache() =
         somLeder {
             val måling = measureTimedValue {
@@ -35,7 +35,6 @@ class KodeverkCache(private val kodeverk: KodeverkTjeneste, private val cache: C
         }
 
     companion object {
-        const val KODER = "koder"
-        private const val INTERVAL_MINUTES = 15L
+        private const val INTERVAL_DAYS = 30L
     }
 }

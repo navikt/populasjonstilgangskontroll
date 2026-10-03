@@ -3,6 +3,7 @@ package no.nav.tilgangsmaskin.bruker.kodeverk
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
 import no.nav.sikkerhetstjenesten.felles.leder.LeaderAware
+import no.nav.tilgangsmaskin.bruker.kodeverk.KodeverkConfig.Companion.KODEVERK_CACHE
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import java.util.concurrent.TimeUnit.DAYS
@@ -19,14 +20,14 @@ class KodeverkCache(private val kodeverk: KodeverkTjeneste, private val cache: C
             val måling = measureTimedValue {
                 runCatching {
                     val koder = kodeverk.koderOgNavn()
-                    cache.putMany(KodeverkConfig.KODEVERK_CACHE, koder)
-                    koder
+                    cache.putMany(KODEVERK_CACHE, koder)
+                    koder.size
                 }
             }
             måling.value.onSuccess {
                 log.info(
                     "Periodisk cache-oppdatering OK, la til {} koder i cache på {}ms",
-                    it.size,
+                    it,
                     måling.duration.inWholeMilliseconds
                 )
             }.onFailure {

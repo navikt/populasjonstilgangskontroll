@@ -4,8 +4,8 @@ import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.Companion.profiler
 import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.local
 import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
+import no.nav.sikkerhetstjenesten.felles.cache.CacheSizeAware
 import no.nav.tilgangsmaskin.felles.TimeBeanConfig.Companion.AUDITING_TIME_PROVIDER
-import no.nav.tilgangsmaskin.felles.cache.CacheSizeAware
 import no.nav.tilgangsmaskin.regler.motor.RegelSett
 import org.springframework.boot.actuate.info.Info.Builder
 import org.springframework.boot.actuate.info.InfoContributor
@@ -38,7 +38,7 @@ fun main(args: Array<String>) {
 
 @Component
 @Lazy
-class StartupInfoContributor(private val caches : CacheSizeAware, private val ctx: ConfigurableApplicationContext,vararg val regelsett: RegelSett) :
+class StartupInfoContributor(private val caches : CacheSizeAware, private val ctx: ConfigurableApplicationContext, vararg val regelsett: RegelSett) :
     InfoContributor {
 
     override fun contribute(builder: Builder) {

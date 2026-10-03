@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.felles.security
 
+import no.nav.sikkerhetstjenesten.felles.rest.DownstreamURIContext.currentUri
 import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.OSLO
-import no.nav.tilgangsmaskin.felles.security.OAuth2DownstreamURIContext.currentUri
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.security.core.Authentication
@@ -21,7 +21,7 @@ class OAuth2LoggingAuthorizationSuccessHandler(
         principal: Authentication,
         attributes: Map<String, Any>
     ) {
-        val uri = currentUri() ?: UTILGJENGELIG
+        val uri = currentUri ?: UTILGJENGELIG
         val registrationId = authorizedClient.clientRegistration.registrationId
         val previousClient = service.loadAuthorizedClient<OAuth2AuthorizedClient>(registrationId, principal.name)
         val previousExpiry = previousClient?.expiry()

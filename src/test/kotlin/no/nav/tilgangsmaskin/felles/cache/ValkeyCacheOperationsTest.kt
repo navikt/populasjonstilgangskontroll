@@ -23,6 +23,7 @@ import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.mockk.verify
+import no.nav.sikkerhetstjenesten.felles.cache.CacheSizeAware
 import no.nav.sikkerhetstjenesten.felles.cache.ValkeyCacheOperations
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.sikkerhetstjenesten.felles.security.AuthContext

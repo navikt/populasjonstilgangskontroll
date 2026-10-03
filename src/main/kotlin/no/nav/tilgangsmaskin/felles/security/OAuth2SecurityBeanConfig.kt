@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.felles.security
 
+import no.nav.sikkerhetstjenesten.felles.rest.DownstreamUriCapturingInterceptor
 import no.nav.sikkerhetstjenesten.felles.security.AuthContext
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterConstants.DEV
 import org.springframework.beans.factory.ObjectProvider
@@ -80,7 +81,7 @@ class OAuth2SecurityBeanConfig( private val logbookInterceptor: ObjectProvider<L
             groups.forEachClient { _, builder ->
                 builder.requestInterceptors {
                     logbookInterceptor.ifAvailable { interceptor -> it.add(interceptor) }
-                    it.addFirst(OAuth2DownstreamUriCapturingInterceptor())
+                    it.addFirst(DownstreamUriCapturingInterceptor())
                 }
                 builder.defaultStatusHandler(HttpStatusCode::isError, handler::handle)
             }

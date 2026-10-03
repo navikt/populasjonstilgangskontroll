@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.felles.cache
 
-import no.nav.sikkerhetstjenesten.entraproxy.felles.cache.ResilientValkeySerializer
 import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.nulls.shouldBeNull
@@ -10,6 +9,7 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.sikkerhetstjenesten.felles.cache.ResilientValkeySerializer
 import org.springframework.data.redis.serializer.RedisSerializer
 import org.springframework.data.redis.serializer.SerializationException
 

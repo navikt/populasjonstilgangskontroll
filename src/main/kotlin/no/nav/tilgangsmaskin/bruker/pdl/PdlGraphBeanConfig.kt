@@ -5,7 +5,7 @@ import no.nav.sikkerhetstjenesten.felles.rest.RestHeaderAddingRequestInterceptor
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
-import no.nav.tilgangsmaskin.felles.security.OAuth2DownstreamUriCapturingInterceptor
+import no.nav.sikkerhetstjenesten.felles.rest.DownstreamUriCapturingInterceptor
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -26,7 +26,7 @@ class PdlGraphBeanConfig {
     fun pdlGraphRestClient(builder: Builder, mgr: OAuth2AuthorizedClientManager, failureHandler: OAuth2AuthorizationFailureHandler) =
         builder
             .requestInterceptors {
-                it.add(OAuth2DownstreamUriCapturingInterceptor())
+                it.add(DownstreamUriCapturingInterceptor())
                 it.add(RestHeaderAddingRequestInterceptor(BEHANDLINGSNUMMER))
                 it.add(OAuth2ClientHttpRequestInterceptor(mgr).apply {
                     setClientRegistrationIdResolver { PDLGRAPH }

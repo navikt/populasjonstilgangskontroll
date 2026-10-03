@@ -2,6 +2,8 @@ package no.nav.tilgangsmaskin.felles.security
 
 import no.nav.sikkerhetstjenesten.felles.rest.DownstreamUriCapturingInterceptor
 import no.nav.sikkerhetstjenesten.felles.security.AuthContext
+import no.nav.sikkerhetstjenesten.felles.security.OAuth2LoggingAuthorizationFailureHandler
+import no.nav.sikkerhetstjenesten.felles.security.OAuth2LoggingAuthorizationSuccessHandler
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterConstants.DEV
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.beans.factory.annotation.Value

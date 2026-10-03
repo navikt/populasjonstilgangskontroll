@@ -3,10 +3,10 @@ package no.nav.tilgangsmaskin.tilgang
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
+import no.nav.sikkerhetstjenesten.felles.security.OAuth2RequireCCF
+import no.nav.sikkerhetstjenesten.felles.security.OAuth2RequireOBO
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.felles.rest.ProdController
-import no.nav.tilgangsmaskin.felles.security.OAuth2RequireCCF
-import no.nav.tilgangsmaskin.felles.security.OAuth2RequireOBO
 import no.nav.tilgangsmaskin.felles.security.ansattId
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withAnsattContext
 import no.nav.tilgangsmaskin.regler.RegelTjeneste

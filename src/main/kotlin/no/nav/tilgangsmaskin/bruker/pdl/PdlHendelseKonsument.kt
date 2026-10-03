@@ -9,7 +9,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlKafkaBeanConfig.Companion.PDL_CONTAIN
 import no.nav.tilgangsmaskin.bruker.pdl.PdlKafkaBeanConfig.Companion.PDL_GRADERING_FILTER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL_CACHES
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.sikkerhetstjenesten.felles.domain.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component

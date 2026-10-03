@@ -17,7 +17,7 @@ import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.kodeverk.KodeverkTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.sikkerhetstjenesten.felles.domain.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withAnsattContext
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor

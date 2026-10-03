@@ -5,7 +5,7 @@ import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.PersonTilBrukerMapper.tilBruker
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTjeneste
 import no.nav.tilgangsmaskin.bruker.pdl.Person
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.sikkerhetstjenesten.felles.domain.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 

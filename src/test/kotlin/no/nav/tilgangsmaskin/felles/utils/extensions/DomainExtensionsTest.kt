@@ -5,8 +5,8 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.requireDigits
+import no.nav.sikkerhetstjenesten.felles.domain.DomainExtensions.maskFnr
+import no.nav.sikkerhetstjenesten.felles.domain.DomainExtensions.requireDigits
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.upcase
 import org.slf4j.MDC
 

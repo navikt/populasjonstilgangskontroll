@@ -17,9 +17,9 @@ import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfig
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.test.context.ContextConfiguration
-import no.nav.sikkerhetstjenesten.felles.rest.health.ObservabilityBeanConfig
+import no.nav.sikkerhetstjenesten.felles.rest.health.ObservabilityAutoConfiguration
 
-@ContextConfiguration(classes = [TestConfig::class, ObservabilityBeanConfig::class])
+@ContextConfiguration(classes = [TestConfig::class, ObservabilityAutoConfiguration::class])
 @AutoConfigureMetrics
 class ClusterAddingTimedAspectTest(
     private val registry: MeterRegistry,

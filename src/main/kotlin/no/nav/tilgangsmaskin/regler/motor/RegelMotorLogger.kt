@@ -10,7 +10,7 @@ import no.nav.sikkerhetstjenesten.felles.security.AuthContext
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.sikkerhetstjenesten.felles.domain.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withMDC
 import org.slf4j.LoggerFactory.getLogger
 import org.slf4j.MDC

@@ -7,7 +7,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
-import no.nav.sikkerhetstjenesten.felles.cache.CacheBeanConfig.Companion.VALKEY_MAPPER
+import no.nav.sikkerhetstjenesten.felles.cache.CacheAutoConfiguration.Companion.VALKEY_MAPPER
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.tilgangsmaskin.ansatt.AnsattId

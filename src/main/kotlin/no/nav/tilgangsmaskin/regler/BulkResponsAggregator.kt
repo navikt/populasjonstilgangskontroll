@@ -4,7 +4,7 @@ import io.micrometer.observation.annotation.Observed
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.sikkerhetstjenesten.felles.notifikasjon.Auditor
 import no.nav.tilgangsmaskin.ansatt.Ansatt
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.sikkerhetstjenesten.felles.domain.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.BrukerOgRegelsett

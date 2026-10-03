@@ -6,7 +6,7 @@ import no.nav.tilgangsmaskin.felles.rest.ProdController
 import no.nav.tilgangsmaskin.felles.security.OAuth2RequireCCF
 import no.nav.tilgangsmaskin.felles.security.OAuth2RequireOBO
 import no.nav.tilgangsmaskin.felles.security.ansattId
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.sikkerhetstjenesten.felles.domain.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withAnsattContext
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType

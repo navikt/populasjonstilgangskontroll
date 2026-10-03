@@ -13,7 +13,7 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlAvroEnvExtensions.userInfo
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL
 import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
 import no.nav.tilgangsmaskin.felles.kafka.KafkaTypedDroppedMessageMeter
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.sikkerhetstjenesten.felles.domain.DomainExtensions.maskFnr
 import org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG
 import org.springframework.boot.kafka.autoconfigure.KafkaProperties
 import org.springframework.context.annotation.Bean

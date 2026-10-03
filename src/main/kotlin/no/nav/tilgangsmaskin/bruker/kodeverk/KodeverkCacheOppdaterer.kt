@@ -10,12 +10,12 @@ import java.util.concurrent.TimeUnit.DAYS
 import kotlin.time.measureTimedValue
 
 @ConditionalOnGCP
-class KodeverkCache(private val kodeverk: KodeverkTjeneste, private val cache: CacheOperations) : LeaderAware() {
+class KodeverkCacheOppdaterer(private val kodeverk: KodeverkTjeneste, private val cache: CacheOperations) : LeaderAware() {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
     @Scheduled(fixedRate = INTERVAL_DAYS, timeUnit = DAYS, initialDelayString = "1m")
-    fun oppdaterCache() =
+    fun oppdater() =
         somLeder {
             val måling = measureTimedValue {
                 runCatching {

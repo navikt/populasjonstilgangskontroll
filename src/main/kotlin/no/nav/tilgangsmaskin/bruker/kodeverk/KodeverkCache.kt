@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit.DAYS
 import kotlin.time.measureTimedValue
 
 @ConditionalOnGCP
-class KodeverkCache(private val kodeverk: KodeverkTjeneste, private val cache: CacheOperations) : LeaderAware(true) {
+class KodeverkCache(private val kodeverk: KodeverkTjeneste, private val cache: CacheOperations) : LeaderAware() {
 
     private val log = LoggerFactory.getLogger(javaClass)
 

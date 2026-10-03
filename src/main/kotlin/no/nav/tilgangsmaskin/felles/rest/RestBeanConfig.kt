@@ -38,7 +38,6 @@ class RestBeanConfig(
     @Bean
     fun handler() = DefaultRestErrorHandler()
 
-
     @Bean
     fun restClientCustomizer(handler: ErrorHandler) =
         RestClientCustomizer { c ->

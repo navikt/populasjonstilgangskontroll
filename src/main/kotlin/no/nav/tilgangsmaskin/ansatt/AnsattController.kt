@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt
 
 import io.swagger.v3.oas.annotations.Operation
-import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterConstants.DEV
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.felles.rest.DevController

@@ -1,10 +1,10 @@
 package no.nav.tilgangsmaskin
 
 import no.nav.boot.conditionals.ConditionalOnGCP
-import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.Companion.profiler
-import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.local
 import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
 import no.nav.sikkerhetstjenesten.felles.cache.CacheSizeAware
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.Companion.profiler
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.local
 import no.nav.tilgangsmaskin.felles.TimeBeanConfig.Companion.AUDITING_TIME_PROVIDER
 import no.nav.tilgangsmaskin.regler.motor.RegelSett
 import org.springframework.boot.actuate.info.Info.Builder

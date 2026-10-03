@@ -1,9 +1,9 @@
 package no.nav.tilgangsmaskin.ansatt.graph.oid
 
 import io.micrometer.observation.annotation.Observed
-import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.sikkerhetstjenesten.felles.rest.ConflictRestException
 import no.nav.sikkerhetstjenesten.felles.rest.NotFoundRestException
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GRAPH
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidClient.Companion.filter
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.ENTRA_OID

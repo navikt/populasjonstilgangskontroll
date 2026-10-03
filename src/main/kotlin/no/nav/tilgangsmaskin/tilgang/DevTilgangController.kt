@@ -1,11 +1,11 @@
 package no.nav.tilgangsmaskin.tilgang
 
 import io.swagger.v3.oas.annotations.Operation
-import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterConstants.DEV
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingEndring.Avsluttet
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Identer
 import no.nav.tilgangsmaskin.bruker.Identifikator
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter

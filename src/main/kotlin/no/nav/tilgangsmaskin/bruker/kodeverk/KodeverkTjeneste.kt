@@ -1,8 +1,8 @@
 package no.nav.tilgangsmaskin.bruker.kodeverk
 
-import no.nav.tilgangsmaskin.bruker.kodeverk.KodeverkConfig.Companion.KODEVERK
 import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
-import no.nav.tilgangsmaskin.felles.rest.RestRetryingWhenRecoverableService
+import no.nav.sikkerhetstjenesten.felles.rest.RestRetryingWhenRecoverableService
+import no.nav.tilgangsmaskin.bruker.kodeverk.KodeverkConfig.Companion.KODEVERK
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.web.service.registry.ImportHttpServices
 

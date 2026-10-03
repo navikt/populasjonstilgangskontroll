@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.vergemål
 
-import no.nav.sikkerhetstjenesten.felles.rest.PingableHealthIndicator
 import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
+import no.nav.sikkerhetstjenesten.felles.rest.PingableHealthIndicator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 

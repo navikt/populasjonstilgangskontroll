@@ -1,11 +1,11 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
+import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
+import no.nav.sikkerhetstjenesten.felles.rest.DownstreamUriCapturingInterceptor
 import no.nav.sikkerhetstjenesten.felles.rest.PingableHealthIndicator
 import no.nav.sikkerhetstjenesten.felles.rest.RestHeaderAddingRequestInterceptor
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.BEHANDLINGSNUMMER
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
-import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
-import no.nav.sikkerhetstjenesten.felles.rest.DownstreamUriCapturingInterceptor
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

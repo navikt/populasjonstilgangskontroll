@@ -4,9 +4,9 @@ import no.nav.sikkerhetstjenesten.felles.cache.AbstractCacheOppfrisker
 import no.nav.sikkerhetstjenesten.felles.cache.CacheNøkkel
 import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
 import no.nav.sikkerhetstjenesten.felles.domain.DomainExtensions.maskFnr
-import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.sikkerhetstjenesten.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import no.nav.sikkerhetstjenesten.felles.rest.NotFoundRestException
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withMDC

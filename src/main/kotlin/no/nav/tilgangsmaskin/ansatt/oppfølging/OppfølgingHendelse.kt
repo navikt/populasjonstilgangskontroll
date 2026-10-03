@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.oppfølging
 
-import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.AktørId
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import java.time.Instant
 import java.util.UUID

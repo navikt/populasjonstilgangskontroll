@@ -1,8 +1,8 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.AktørId
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Familie
 import no.nav.tilgangsmaskin.bruker.Familie.Companion.INGEN_FAMILIE
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning

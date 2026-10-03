@@ -1,9 +1,9 @@
 package no.nav.tilgangsmaskin.regler.enkelttilgang
 
-import no.nav.tilgangsmaskin.ansatt.AnsattId
-import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.ansatt.nom.Leder
 import no.nav.sikkerhetstjenesten.felles.domain.DomainExtensions.maskFnr
+import no.nav.tilgangsmaskin.ansatt.AnsattId
+import no.nav.tilgangsmaskin.ansatt.nom.Leder
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Repository

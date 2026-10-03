@@ -2,9 +2,9 @@ package no.nav.tilgangsmaskin.bruker
 
 import com.fasterxml.jackson.annotation.JsonValue
 import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
-import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.Companion.isProd
 import no.nav.sikkerhetstjenesten.felles.domain.DomainExtensions.maskFnr
 import no.nav.sikkerhetstjenesten.felles.domain.DomainExtensions.requireDigits
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.Companion.isProd
 
 data class Identifikator(@JsonValue val verdi: String) {
     init {

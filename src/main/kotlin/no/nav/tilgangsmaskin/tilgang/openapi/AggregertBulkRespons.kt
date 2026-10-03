@@ -3,9 +3,9 @@ package no.nav.tilgangsmaskin.tilgang.openapi
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
-import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
 import no.nav.sikkerhetstjenesten.felles.domain.DomainExtensions.maskFnr
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.FORBIDDEN

@@ -1,8 +1,8 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
-import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.sikkerhetstjenesten.felles.graphql.AbstractSyncGraphQLClientAdapter
 import no.nav.sikkerhetstjenesten.felles.rest.NotFoundRestException
+import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.pdl.PdlGraphQLConfig.Companion.PDLGRAPH
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPersonMapper.tilPartner

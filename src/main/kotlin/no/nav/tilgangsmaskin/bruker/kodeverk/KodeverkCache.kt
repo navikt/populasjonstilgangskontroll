@@ -19,9 +19,10 @@ class KodeverkCache(private val kodeverk: KodeverkTjeneste, private val cache: C
         somLeder {
             val måling = measureTimedValue {
                 runCatching {
-                    val koder = kodeverk.koderOgNavn()
-                    cache.putMany(KODEVERK_CACHE, koder)
-                    koder.size
+                    with(kodeverk.koderOgNavn()) {
+                        cache.putMany(KODEVERK_CACHE, this)
+                        size
+                    }
                 }
             }
             måling.value.onSuccess {

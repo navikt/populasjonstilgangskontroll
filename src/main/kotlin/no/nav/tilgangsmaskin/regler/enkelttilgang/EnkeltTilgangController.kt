@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.regler.enkelttilgang
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
-import no.nav.tilgangsmaskin.felles.security.RequireOAuth2OBOAndEnkelt
+import no.nav.tilgangsmaskin.felles.security.OAuth2RequireOBOAndEnkelt
 import no.nav.tilgangsmaskin.felles.security.ansattId
 import no.nav.tilgangsmaskin.regler.enkelttilgang.openapi.EnkeltTilgangApiResponse
 import no.nav.tilgangsmaskin.tilgang.openapi.MSG
@@ -33,7 +33,7 @@ class EnkeltTilgangController(private val enkelt: EnkeltTilgangTjeneste) {
     @ResponseStatus(NO_CONTENT)
     @Operation(summary = SUMMARY_ENKELTTILGANG, description = DESCRIPTION_ENKELTTILGANG)
     @EnkeltTilgangApiResponse
-    @RequireOAuth2OBOAndEnkelt
+    @OAuth2RequireOBOAndEnkelt
     fun enkeltTilgang(@AuthenticationPrincipal principal: OAuth2AuthenticatedPrincipal, @RequestBody @EnkeltTilgangGyldig data: EnkeltTilgangData) {
         enkelt.registrerTilgang(principal.ansattId(), data)
     }

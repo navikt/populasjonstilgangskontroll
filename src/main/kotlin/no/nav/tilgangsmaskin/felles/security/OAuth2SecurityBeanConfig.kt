@@ -4,6 +4,7 @@ import no.nav.sikkerhetstjenesten.felles.rest.DownstreamUriCapturingInterceptor
 import no.nav.sikkerhetstjenesten.felles.security.AuthContext
 import no.nav.sikkerhetstjenesten.felles.security.OAuth2LoggingAuthorizationFailureHandler
 import no.nav.sikkerhetstjenesten.felles.security.OAuth2LoggingAuthorizationSuccessHandler
+import no.nav.sikkerhetstjenesten.felles.security.SecurityExtensions.stateless
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterConstants.DEV
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.beans.factory.annotation.Value
@@ -108,12 +109,4 @@ class OAuth2SecurityBeanConfig( private val logbookInterceptor: ObjectProvider<L
             setAuthorizationSuccessHandler(successHandler)
             setAuthorizationFailureHandler(failureHandler)
         }
-
-    private fun HttpSecurity.stateless() =
-        requestCache { it.disable() }
-            .sessionManagement { it.sessionCreationPolicy(STATELESS) }
-            .csrf { it.disable() }
-            .formLogin { it.disable() }
-            .httpBasic { it.disable() }
-            .logout { it.disable() }
 }

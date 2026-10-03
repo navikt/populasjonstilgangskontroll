@@ -5,7 +5,6 @@ import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.GROUPS
 import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.NAVIDENT
 import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.OID
 import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.ROLES
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.convert.converter.Converter
 import org.springframework.security.authentication.AbstractAuthenticationToken
@@ -25,8 +24,6 @@ const val CCF_AUTHORITY = "${PREFIX}CCF"
 
 class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(
     @param:Value($$"${gruppe.enkelttilgang:}") private val gruppeEnkeltTilgang: UUID) : Converter<Jwt, AbstractAuthenticationToken> {
-
-    private val log = getLogger(javaClass)
 
     private val delegate = JwtAuthenticationConverter()
         .andThen {

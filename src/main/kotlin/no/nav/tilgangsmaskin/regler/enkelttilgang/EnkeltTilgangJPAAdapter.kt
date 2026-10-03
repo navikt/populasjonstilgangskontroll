@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.regler.enkelttilgang
 
-import no.nav.sikkerhetstjenesten.felles.domain.DomainExtensions.maskFnr
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.Leder
 import no.nav.tilgangsmaskin.bruker.BrukerId

@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.bruker
 
 import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
-import no.nav.sikkerhetstjenesten.felles.domain.DomainExtensions.requireDigits
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.requireDigits
 
 
 sealed class GeografiskTilknytning {

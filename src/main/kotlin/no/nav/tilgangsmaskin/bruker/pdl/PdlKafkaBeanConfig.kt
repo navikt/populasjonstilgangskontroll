@@ -9,7 +9,7 @@ import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig.SPECIFIC_AVRO_
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.person.pdl.leesah.Personhendelse
 import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
-import no.nav.sikkerhetstjenesten.felles.domain.DomainExtensions.maskFnr
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.bruker.pdl.PdlAvroEnvExtensions.schemaRegistryUrl
 import no.nav.tilgangsmaskin.bruker.pdl.PdlAvroEnvExtensions.userInfo
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL

@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.regler.enkelttilgang
 import io.micrometer.core.annotation.Timed
 import io.micrometer.core.instrument.Tag
 import io.micrometer.observation.annotation.Observed
-import no.nav.sikkerhetstjenesten.felles.domain.DomainExtensions.maskFnr
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.sikkerhetstjenesten.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.diffFromNow
 import no.nav.tilgangsmaskin.ansatt.AnsattId

@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.bruker
 
 import io.micrometer.observation.annotation.Observed
-import no.nav.sikkerhetstjenesten.felles.domain.DomainExtensions.maskFnr
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.ansatt.skjerming.SkjermingTjeneste
 import no.nav.tilgangsmaskin.bruker.PersonTilBrukerMapper.tilBruker
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTjeneste

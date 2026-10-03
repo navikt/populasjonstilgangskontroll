@@ -1,9 +1,9 @@
 package no.nav.tilgangsmaskin.felles.utils.extensions
 
 import no.nav.sikkerhetstjenesten.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.withMDC
 import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.månederSidenIdag
 import no.nav.tilgangsmaskin.ansatt.AnsattId
-import org.slf4j.MDC
 import java.time.Clock
 import java.time.LocalDate
 
@@ -12,24 +12,6 @@ object DomainExtensions {
 
     fun <T> withAnsattContext(ansattId: AnsattId, block: () -> T): T =
         withMDC(USER_ID to ansattId.verdi, block = block)
-
-    fun String.upcase() = this.replaceFirstChar { it.uppercaseChar() }
-
-    inline fun <T> withMDC(vararg pairs: Pair<String, String>, block: () -> T) =
-        withMDC(verdier = pairs.toMap(), block = block)
-
-    inline fun <T> withMDC(verdier: Map<String, String>, block: () -> T) =
-        try {
-            verdier.forEach { (key, value) ->
-                MDC.put(key, value)
-            }
-            block()
-        } finally {
-            verdier.forEach { (key, _) ->
-                MDC.remove(key)
-            }
-        }
-
 
     enum class Dødsperiode {
         MND_0_6,

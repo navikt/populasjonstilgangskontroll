@@ -3,13 +3,12 @@ package no.nav.tilgangsmaskin.ansatt.graph
 import no.nav.sikkerhetstjenesten.felles.cache.AbstractCacheOppfrisker
 import no.nav.sikkerhetstjenesten.felles.cache.CacheNøkkel
 import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
-import no.nav.sikkerhetstjenesten.felles.domain.DomainExtensions.maskFnr
 import no.nav.sikkerhetstjenesten.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import no.nav.sikkerhetstjenesten.felles.rest.NotFoundRestException
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.withMDC
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withMDC
 import org.springframework.stereotype.Component
 import java.util.UUID
 
@@ -30,7 +29,7 @@ class EntraCacheOppfrisker(private val entra: EntraTjeneste,
                 (e as? NotFoundRestException)?.let {
                     tømOgOppfrisk(ansattId, oid, nøkkelElementer.metode)
                 } ?: log.info(
-                    "Oppfrisking av ${nøkkelElementer.cacheName}::${nøkkelElementer.metode}:${nøkkelElementer.id.maskFnr()} feilet",
+                    "Oppfrisking av ${nøkkelElementer.cacheName}::${nøkkelElementer.metode}:${nøkkelElementer.id} feilet",
                     e,
                 )
             }.getOrThrow()

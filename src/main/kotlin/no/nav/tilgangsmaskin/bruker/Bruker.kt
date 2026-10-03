@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.bruker
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
-import no.nav.sikkerhetstjenesten.felles.domain.DomainExtensions.maskFnr
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe
 import no.nav.tilgangsmaskin.bruker.Familie.Companion.INGEN_FAMILIE
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UkjentBosted

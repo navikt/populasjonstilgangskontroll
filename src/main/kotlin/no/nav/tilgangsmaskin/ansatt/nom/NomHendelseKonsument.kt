@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin.ansatt.nom
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
-import no.nav.sikkerhetstjenesten.felles.domain.DomainExtensions.maskFnr
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.ALLTID
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.NomAnsattData.NomAnsattPeriode

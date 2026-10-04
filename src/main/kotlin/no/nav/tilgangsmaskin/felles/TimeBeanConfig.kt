@@ -12,7 +12,7 @@ import java.util.Optional
 @NoCoverageAnalysis
 class TimeBeanConfig {
     @Bean
-    fun clock(): Clock = Clock.systemUTC()
+    fun clock() = Clock.systemUTC()
 
     @Bean(AUDITING_TIME_PROVIDER)
     fun auditingDateTimeProvider(clock: Clock) =

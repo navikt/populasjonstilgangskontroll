@@ -1,6 +1,5 @@
 package no.nav.tilgangsmaskin.felles.security
 
-import no.nav.sikkerhetstjenesten.felles.rest.DownstreamUriCapturingInterceptor
 import no.nav.sikkerhetstjenesten.felles.security.AuthContext
 import no.nav.sikkerhetstjenesten.felles.security.OAuth2LoggingAuthorizationFailureHandler
 import no.nav.sikkerhetstjenesten.felles.security.OAuth2LoggingAuthorizationSuccessHandler
@@ -10,11 +9,8 @@ import org.springframework.beans.factory.ObjectProvider
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.HttpStatusCode
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.http.SessionCreationPolicy.STATELESS
-import org.springframework.security.config.observation.SecurityObservationSettings
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.OAuth2AuthorizationFailureHandler
 import org.springframework.security.oauth2.client.OAuth2AuthorizationSuccessHandler
@@ -26,7 +22,6 @@ import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpReq
 import org.springframework.security.oauth2.client.web.client.support.OAuth2RestClientHttpServiceGroupConfigurer.from
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.access.AccessDeniedHandler
-import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer
 import org.zalando.logbook.spring.LogbookClientHttpRequestInterceptor
 import tools.jackson.databind.json.JsonMapper
@@ -73,7 +68,7 @@ class OAuth2SecurityBeanConfig( private val logbookInterceptor: ObjectProvider<L
             .build()
 
     @Bean
-    fun oauth2GroupConfigurer(manager: OAuth2AuthorizedClientManager, handler: ErrorHandler) =
+    fun oauth2GroupConfigurer(manager: OAuth2AuthorizedClientManager) =
         RestClientHttpServiceGroupConfigurer { groups ->
             from(manager).configureGroups(groups)
            // groups.forEachClient { _, builder ->

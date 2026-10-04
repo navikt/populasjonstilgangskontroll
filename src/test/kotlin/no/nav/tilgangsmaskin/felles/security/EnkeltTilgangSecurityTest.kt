@@ -9,8 +9,8 @@ import io.mockk.every
 import io.mockk.verify
 import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.GROUPS
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterConstants.PROD_GCP
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.rest.PROD_BASE_PATH
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangData
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste

@@ -13,7 +13,7 @@ import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.ROLES
 import no.nav.sikkerhetstjenesten.felles.security.TokenType.CCF
 import no.nav.sikkerhetstjenesten.felles.security.TokenType.OBO
 import no.nav.sikkerhetstjenesten.felles.security.TokenType.UNAUTHENTICATED
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken

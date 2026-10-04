@@ -26,5 +26,4 @@ object DomainExtensions {
             in 13..24 -> Dødsperiode.MND_13_24
             else -> Dødsperiode.MND_OVER_24
         }
-    const val UTILGJENGELIG = "N/A"
 }

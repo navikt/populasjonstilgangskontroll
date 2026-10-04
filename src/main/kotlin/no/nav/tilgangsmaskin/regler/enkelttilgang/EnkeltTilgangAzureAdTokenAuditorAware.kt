@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import no.nav.sikkerhetstjenesten.felles.security.AuthContext
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import org.springframework.data.domain.AuditorAware
 import org.springframework.stereotype.Component
 import java.util.Optional

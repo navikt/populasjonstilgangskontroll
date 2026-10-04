@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.felles.kafka
 
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import org.apache.kafka.clients.consumer.ConsumerRecord
 
 class KafkaDroppedMessageCounter(private val registry: MeterRegistry) {

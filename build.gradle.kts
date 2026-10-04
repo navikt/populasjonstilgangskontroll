@@ -60,7 +60,7 @@ dependencies {
         implementation("at.yawk.lz4:lz4-java:1.11.1")
         testImplementation("at.yawk.lz4:lz4-java:1.11.1")
     }
-    implementation("no.nav.felles:sikkerhetstjenesten-lib:0.0.46")
+    implementation("no.nav.felles:sikkerhetstjenesten-lib:0.0.47")
     implementation(libs.contract.pdl.avro)
     implementation(libs.boot.conditionals)
     implementation(libs.bundles.observability)

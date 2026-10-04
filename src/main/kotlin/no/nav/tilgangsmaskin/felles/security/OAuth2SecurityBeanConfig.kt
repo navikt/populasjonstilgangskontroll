@@ -76,13 +76,13 @@ class OAuth2SecurityBeanConfig( private val logbookInterceptor: ObjectProvider<L
     fun oauth2GroupConfigurer(manager: OAuth2AuthorizedClientManager, handler: ErrorHandler) =
         RestClientHttpServiceGroupConfigurer { groups ->
             from(manager).configureGroups(groups)
-            groups.forEachClient { _, builder ->
+           // groups.forEachClient { _, builder ->
                 //builder.requestInterceptors {
                //     logbookInterceptor.ifAvailable { interceptor -> it.add(interceptor) }
                 //    it.addFirst(DownstreamUriCapturingInterceptor())
                 //}
-                builder.defaultStatusHandler(HttpStatusCode::isError, handler::handle)
-            }
+              //  builder.defaultStatusHandler(HttpStatusCode::isError, handler::handle)
+           // }
         }
 
 

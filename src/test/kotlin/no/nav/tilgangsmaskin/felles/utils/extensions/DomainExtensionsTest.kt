@@ -3,7 +3,6 @@ package no.nav.tilgangsmaskin.felles.utils.extensions
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.OSLO
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.Dødsperiode
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.Dødsperiode.MND_0_6
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.Dødsperiode.MND_13_24
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.Dødsperiode.MND_7_12
@@ -11,9 +10,8 @@ import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.Dødsperio
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.intervallSiden
 import java.time.Clock
 import java.time.LocalDate
-import java.time.ZoneId
 
-class DødsperiodeExtensionsTest : BehaviorSpec({
+class DomainExtensionsTest : BehaviorSpec({
     val fastDato = LocalDate.of(2026, 5, 27)
     val fastClock = Clock.fixed(fastDato.atStartOfDay(OSLO).toInstant(), OSLO)
 

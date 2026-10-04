@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
 import no.nav.sikkerhetstjenesten.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.sikkerhetstjenesten.felles.rest.DefaultRestErrorHandler
+import no.nav.sikkerhetstjenesten.felles.rest.DownstreamUriCapturingInterceptor
 import no.nav.sikkerhetstjenesten.felles.security.AuthContext
 import org.apache.hc.core5.util.TimeValue
 import org.springframework.beans.factory.ObjectProvider
@@ -43,6 +44,7 @@ class RestBeanConfig(
         RestClientCustomizer { c ->
             c.requestInterceptors {
                 logbookInterceptor.ifAvailable { interceptor -> it.add(interceptor) }
+                it.addFirst(DownstreamUriCapturingInterceptor())
             }
             c.defaultStatusHandler(HttpStatusCode::isError, handler::handle)
         }

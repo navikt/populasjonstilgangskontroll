@@ -75,7 +75,7 @@ class EnkeltTilgangTjeneste(
                 adapter.enkeltTilgang(ansattId.verdi, enhetsnummer, data, gt,navn)
                 kafka.publiser(ansattId).also {
                     teller.tell(INGEN_REGEL_TAG, ENKELTTILGANG_GITT)
-                    log.info("Enkelttilgang OK. $ansattId ved enhet $enhetsnummer har fått tilgang til ${data.brukerId} til og med ${data.gyldigtil}")
+                    log.info("Enkelttilgang OK. $ansattId ved enhet $enhetsnummer ($navn) har fått tilgang til ${data.brukerId} til og med ${data.gyldigtil}")
                 }
                 true
             }.onFailure { e ->

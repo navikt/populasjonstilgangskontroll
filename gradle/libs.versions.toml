@@ -17,7 +17,7 @@ spring-boot = "4.1.1"
 spring-dependency-management = "1.1.7"
 springdoc = "3.1.0"
 springmockk = "5.0.1"
-sikkerhetstjenesten-lib = "0.0.49"
+sikkerhetstjenesten-lib = "0.0.51"
 testcontainers = "2.0.5"
 
 [libraries]

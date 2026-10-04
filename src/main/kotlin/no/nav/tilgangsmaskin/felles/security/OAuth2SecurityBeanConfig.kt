@@ -73,11 +73,6 @@ class OAuth2SecurityBeanConfig( private val logbookInterceptor: ObjectProvider<L
             .build()
 
     @Bean
-    fun securityObservationSettings()  =
-        SecurityObservationSettings.withDefaults().shouldObserveRequests(false)
-            .build()
-
-    @Bean
     fun oauth2GroupConfigurer(manager: OAuth2AuthorizedClientManager, handler: ErrorHandler) =
         RestClientHttpServiceGroupConfigurer { groups ->
             from(manager).configureGroups(groups)

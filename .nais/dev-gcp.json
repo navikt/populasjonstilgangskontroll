@@ -30,6 +30,26 @@
   },
   "inbound": [
     {
+      "name": "grunn-og-hjelp-infotrygd",
+      "namespace": "grunn-og-hjelp",
+      "cluster": "dev-gcp"
+    },
+    {
+      "name": "spberegning",
+      "namespace": "grunn-og-hjelp",
+      "cluster": "dev-gcp"
+    },
+    {
+    "name": "spberegning",
+    "namespace": "helsearbeidsgiver",
+    "cluster": "dev-fss"
+    },
+    {
+      "name": "veilarbvedtaksstotte",
+      "namespace": "obo",
+      "cluster": "dev-gcp"
+    },
+    {
       "name": "sp-forsikring",
       "namespace": "tbd",
       "cluster": "dev-gcp"

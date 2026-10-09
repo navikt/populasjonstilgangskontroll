@@ -30,6 +30,16 @@
   },
   "inbound": [
     {
+      "name": "grunn-og-hjelp-infotrygd",
+      "namespace": "grunn-og-hjelp",
+      "cluster": "dev-gcp"
+    },
+    {
+      "name": "spberegning",
+      "namespace": "grunn-og-hjelp",
+      "cluster": "dev-gcp"
+    },
+    {
     "name": "spberegning",
     "namespace": "helsearbeidsgiver",
     "cluster": "dev-fss"

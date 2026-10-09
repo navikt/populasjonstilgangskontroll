@@ -30,6 +30,11 @@
   },
   "inbound": [
     {
+    "name": "spberegning",
+    "namespace": "helsearbeidsgiver",
+    "cluster": "dev-fss"
+    },
+    {
       "name": "veilarbvedtaksstotte",
       "namespace": "obo",
       "cluster": "dev-gcp"

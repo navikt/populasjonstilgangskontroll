@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
+import no.nav.sikkerhetstjenesten.felles.rest.DefaultRestErrorHandler.Companion.IDENTIFIKATOR
 import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDLPIP
-import no.nav.tilgangsmaskin.felles.rest.RestDefaultErrorHandler.Companion.IDENTIFIKATOR
 import org.springframework.security.oauth2.client.annotation.ClientRegistrationId
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
@@ -27,4 +27,3 @@ interface PdlPipClient {
         const val PDL_PIP_PING_PATH = "/internal/health/liveness"
     }
 }
-

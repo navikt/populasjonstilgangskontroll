@@ -1,6 +1,6 @@
 package no.nav.tilgangsmaskin.regler.motor
 
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.upcase
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.upcase
 
 data class RegelSett(private val spec: Pair<RegelType, List<Regel>>) {
     val regler = spec.second

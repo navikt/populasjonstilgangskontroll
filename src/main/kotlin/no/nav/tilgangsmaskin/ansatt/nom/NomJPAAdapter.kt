@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.toInstant
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.toInstant
 import org.springframework.stereotype.Repository
 import java.time.Instant.now
 

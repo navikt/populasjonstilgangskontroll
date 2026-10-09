@@ -1,6 +1,0 @@
-package no.nav.tilgangsmaskin.felles.cache
-
-interface CacheOppfrisker {
-    val cacheName: String
-    fun oppfrisk(nøkkel: CacheNøkkel): Any
-}

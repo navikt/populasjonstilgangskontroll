@@ -1,10 +1,12 @@
 package no.nav.tilgangsmaskin.felles.rest
 
 import io.micrometer.core.instrument.MeterRegistry
-import io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS
-import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
-import no.nav.tilgangsmaskin.felles.rest.health.HttpClientPoolMetrics
-import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.sekunder
+import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
+import no.nav.sikkerhetstjenesten.felles.rest.ConsumerAwareHandlerInterceptor
+import no.nav.sikkerhetstjenesten.felles.rest.DefaultRestErrorHandler
+import no.nav.sikkerhetstjenesten.felles.rest.DownstreamUriCapturingInterceptor
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext
+import org.apache.hc.core5.util.TimeValue
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.http.client.HttpComponentsClientHttpRequestFactoryBuilder
 import org.springframework.boot.http.client.autoconfigure.ClientHttpRequestFactoryBuilderCustomizer
@@ -14,24 +16,20 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
-import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import org.zalando.logbook.spring.LogbookClientHttpRequestInterceptor
-import reactor.netty.http.client.HttpClient
 import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
 
 
 @Configuration
 @NoCoverageAnalysis
 class RestBeanConfig(
-    private val ansattIdAddingInterceptor: ConsumerAwareHandlerInterceptor,
-    private val handler: ErrorHandler,
-    private val logbookInterceptor: ObjectProvider<LogbookClientHttpRequestInterceptor>,
-) : WebMvcConfigurer {
+    private val ctx: AuthContext,
+    private val meterRegistry: MeterRegistry,
+    private val logbookInterceptor: ObjectProvider<LogbookClientHttpRequestInterceptor>) : WebMvcConfigurer {
 
     @Bean
     fun jackson3Customizer() = JsonMapperBuilderCustomizer {
@@ -39,23 +37,14 @@ class RestBeanConfig(
     }
 
     @Bean
-    fun electorWebClient(builder: WebClient.Builder): WebClient =
-        builder
-            .clientConnector(ReactorClientHttpConnector(
-                HttpClient.create().option(CONNECT_TIMEOUT_MILLIS, 3000)
-            ))
-            .build()
-
+    fun handler() = DefaultRestErrorHandler()
 
     @Bean
-    fun httpClientPoolMetrics(registry: MeterRegistry) =
-        HttpClientPoolMetrics(registry)
-
-    @Bean
-    fun restClientCustomizer() =
+    fun restClientCustomizer(handler: ErrorHandler) =
         RestClientCustomizer { c ->
             c.requestInterceptors {
                 logbookInterceptor.ifAvailable { interceptor -> it.add(interceptor) }
+                it.addFirst(DownstreamUriCapturingInterceptor())
             }
             c.defaultStatusHandler(HttpStatusCode::isError, handler::handle)
         }
@@ -70,12 +59,13 @@ class RestBeanConfig(
                     cm.setMaxConnPerRoute(50)
                 }
                 .withConnectionConfigCustomizer { cfg ->
-                    cfg.setValidateAfterInactivity(2.sekunder)
+                    cfg.setValidateAfterInactivity(TimeValue.ofSeconds(2))
                 }
         }
 
     override fun addInterceptors(registry: InterceptorRegistry) {
-        registry.addInterceptor(ansattIdAddingInterceptor)
+        registry.addInterceptor(ConsumerAwareHandlerInterceptor(ctx,
+            meterRegistry))
     }
 
     override fun configureContentNegotiation(configurer: ContentNegotiationConfigurer) {

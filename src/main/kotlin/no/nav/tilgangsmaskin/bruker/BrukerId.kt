@@ -1,10 +1,10 @@
 package no.nav.tilgangsmaskin.bruker
 
 import com.fasterxml.jackson.annotation.JsonValue
-import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.requireDigits
+import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.requireDigits
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.Companion.isProd
 
 data class Identifikator(@JsonValue val verdi: String) {
     init {
@@ -31,7 +31,6 @@ data class BrukerId(@JsonValue val verdi: String) : Comparable<BrukerId> {
     }
 
     companion object {
-
         const val BRUKERID_LENGTH = 11
         private val W1 = intArrayOf(2, 5, 4, 9, 8, 1, 6, 7, 3)
         private val W2 = intArrayOf(2, 3, 4, 5, 6, 7, 2, 3, 4, 5)

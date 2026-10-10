@@ -54,8 +54,8 @@ repositories {
 
 dependencies {
     constraints {  // TODO midlertidig
-        implementation("at.yawk.lz4:lz4-java:1.11.1")
-        testImplementation("at.yawk.lz4:lz4-java:1.11.1")
+        implementation("at.yawk.lz4:lz4-java:1.12.0")
+        testImplementation("at.yawk.lz4:lz4-java:1.12.0")
     }
     implementation(libs.contract.pdl.avro)
     implementation(libs.boot.conditionals)

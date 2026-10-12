@@ -1,6 +1,6 @@
 [versions]
 asciidoctor = "4.0.5"
-boot-conditionals = "6.0.7"
+boot-conditionals = "6.0.9"
 commons-pool2 = "2.13.1"
 confluent = "8.3.1"
 contract-pdl-avro = "18"

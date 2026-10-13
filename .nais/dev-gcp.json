@@ -35,7 +35,7 @@
       "cluster": "dev-gcp"
     },
     {
-      "name": "spberegning",
+      "name": "grunn-og-hjelpestonad",
       "namespace": "grunn-og-hjelp",
       "cluster": "dev-gcp"
     },

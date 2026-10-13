@@ -28,6 +28,11 @@
   },
   "inbound": [
     {
+      "name": "spberegning",
+      "namespace": "helsearbeidsgiver",
+      "cluster": "prod-fss"
+    },
+    {
       "name": "sp-forsikring",
       "namespace": "tbd",
       "cluster": "prod-gcp"

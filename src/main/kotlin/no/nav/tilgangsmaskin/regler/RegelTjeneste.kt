@@ -35,11 +35,13 @@ class RegelTjeneste(
         val elapsedTime = measureTime {
             log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
             bruker(brukerId)?.let { bruker ->
+                val ansatt = ansattTjeneste.ansatt(ansattId)
                 runCatching {
-                    motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)
+                    motor.kompletteRegler(ansatt, bruker)
                 }.onFailure { e ->
                     when (e) {
                         is RegelException -> {
+                            motor.kjerneregler(ansatt, bruker)
                             if (!enkeltTilgangTjeneste.harTilgang(ansattId, bruker.brukerId)) {
                                 throw e
                             }

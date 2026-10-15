@@ -28,6 +28,11 @@
   },
   "inbound": [
     {
+      "name": "watson-admin-api",
+      "namespace": "holmes",
+      "cluster": "prod-gcp"
+    },
+    {
       "name": "spberegning",
       "namespace": "helsearbeidsgiver",
       "cluster": "prod-fss"

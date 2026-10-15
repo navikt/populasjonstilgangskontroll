@@ -41,10 +41,10 @@ class RegelTjeneste(
                 }.onFailure { e ->
                     when (e) {
                         is RegelException -> {
-                            motor.kjerneregler(ansatt, bruker)
                             if (!enkeltTilgangTjeneste.harTilgang(ansattId, bruker.brukerId)) {
                                 throw e
                             }
+                            motor.kjerneregler(ansatt, bruker)
                             log.info("Enkelttilgang benyttet. {} fikk tilgang til {}", ansattId, brukerId.maskFnr())
                         }
                         else -> throw e

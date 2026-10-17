@@ -51,7 +51,7 @@ Caches are central to performance — see `felles/cache/`. TTLs: OID→NavIdent 
 ./gradlew bootJar        # Produces build/libs/app.jar
 ```
 
-- **Java 25** (toolchain managed by Gradle)
+- **Java 27** (toolchain managed by Gradle)
 - Tests use `SharedPostgresContainer` singleton to avoid container restarts per test class
 - Kotest `ProjectConfig` initializes `EntraGlobalGruppe` IDs from `test.properties` before all specs
 
@@ -93,4 +93,3 @@ Migrations in `src/main/resources/db/migration/`. Currently at V24. Schema cente
 | `src/main/kotlin/no/nav/tilgangsmaskin/felles/cache/` | Valkey/Caffeine cache infrastructure |
 | `src/test/kotlin/no/nav/tilgangsmaskin/SharedPostgresContainer.kt` | Shared test DB container |
 | `src/main/resources/application-gcp.yaml` | Production configuration (Kafka, Valkey, DB, OAuth2 clients) |
-

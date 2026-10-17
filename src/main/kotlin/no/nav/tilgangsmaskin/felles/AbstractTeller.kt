@@ -4,7 +4,7 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tag
 import io.micrometer.core.instrument.Tags
-import no.nav.tilgangsmaskin.felles.security.AuthContext
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext
 
 abstract class AbstractTeller(
     private val registry: MeterRegistry,

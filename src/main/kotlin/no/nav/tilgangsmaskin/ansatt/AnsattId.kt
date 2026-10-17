@@ -1,8 +1,8 @@
 package no.nav.tilgangsmaskin.ansatt
 
 import com.fasterxml.jackson.annotation.JsonValue
-import no.nav.tilgangsmaskin.felles.NoCoverageAnalysis
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.requireDigits
+import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.requireDigits
 
 data class AnsattId(@JsonValue val verdi: String) {
     init {

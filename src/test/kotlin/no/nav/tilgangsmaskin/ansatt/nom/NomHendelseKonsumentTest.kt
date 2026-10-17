@@ -6,8 +6,8 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.ALLTID
 import no.nav.tilgangsmaskin.ansatt.nom.NomHendelseKonsument.Companion.ansattData
-import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.ALLTID
 import org.springframework.kafka.annotation.KafkaListener
 import java.time.LocalDate
 import java.time.LocalDate.EPOCH

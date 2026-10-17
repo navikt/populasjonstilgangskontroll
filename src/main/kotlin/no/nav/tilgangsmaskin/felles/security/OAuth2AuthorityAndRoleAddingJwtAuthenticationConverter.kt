@@ -1,11 +1,12 @@
 package no.nav.tilgangsmaskin.felles.security
 
-import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.CLIENT_CREDENTIALS
-import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.GROUPS
-import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.NAVIDENT
-import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.OID
-import no.nav.tilgangsmaskin.felles.security.AuthContext.Companion.ROLES
-import org.slf4j.LoggerFactory.getLogger
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.CLIENT_CREDENTIALS
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.GROUPS
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.NAVIDENT
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.OID
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext.Companion.ROLES
+import no.nav.sikkerhetstjenesten.felles.security.GRANTED_CCF_AUTHORITY
+import no.nav.sikkerhetstjenesten.felles.security.GRANTED_OBO_AUTHORITY
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.convert.converter.Converter
 import org.springframework.security.authentication.AbstractAuthenticationToken
@@ -15,20 +16,13 @@ import org.springframework.security.oauth2.core.DefaultOAuth2AuthenticatedPrinci
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
-import org.springframework.stereotype.Component
 import java.util.UUID
 
 private const val ROLLE = "ROLE_"
 private const val ENKELTGRUPPE_ROLLE = "${ROLLE}ENKELT"
-private const val PREFIX = "TOKEN_"
-const val OBO_AUTHORITY = "${PREFIX}OBO"
-const val CCF_AUTHORITY = "${PREFIX}CCF"
 
-@Component
 class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(
     @param:Value($$"${gruppe.enkelttilgang:}") private val gruppeEnkeltTilgang: UUID) : Converter<Jwt, AbstractAuthenticationToken> {
-
-    private val log = getLogger(javaClass)
 
     private val delegate = JwtAuthenticationConverter()
         .andThen {
@@ -56,8 +50,8 @@ class OAuth2AuthorityAndRoleAddingJwtAuthenticationConverter(
 
     private fun authority(jwt: Jwt) =
         when {
-            jwt.getClaimAsStringList(ROLES).orEmpty().contains(CLIENT_CREDENTIALS) -> SimpleGrantedAuthority(CCF_AUTHORITY)
-            jwt.getClaimAsString(OID) != null -> SimpleGrantedAuthority(OBO_AUTHORITY)
+            jwt.getClaimAsStringList(ROLES).orEmpty().contains(CLIENT_CREDENTIALS) -> GRANTED_CCF_AUTHORITY
+            jwt.getClaimAsString(OID) != null -> GRANTED_OBO_AUTHORITY
             else -> null
         }
 

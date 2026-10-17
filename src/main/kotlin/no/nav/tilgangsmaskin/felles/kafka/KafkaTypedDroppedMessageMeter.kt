@@ -2,21 +2,15 @@ package no.nav.tilgangsmaskin.felles.kafka
 
 import io.micrometer.core.instrument.MeterRegistry
 import org.apache.kafka.clients.consumer.ConsumerRecord
-import org.slf4j.LoggerFactory
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.listener.RetryListener
 import kotlin.reflect.KClass
 
-/**
- * Typesikker [org.springframework.kafka.listener.RetryListener] som logger droppede meldinger med kjent hendelsestype.
- *
- * Subklasser spesifiserer [eventType] og implementerer [formatEvent] for
- * domenespesifikk logging uten å eksponere sensitive data.
- */
 abstract class KafkaTypedDroppedMessageMeter<T : Any>(
     registry: MeterRegistry,
     private val eventType: KClass<T>) : RetryListener {
 
-    private val log = LoggerFactory.getLogger(javaClass)
+    private val log = getLogger(javaClass)
     private val counter = KafkaDroppedMessageCounter(registry)
 
     protected open fun formatEvent(event: T) = "$event"

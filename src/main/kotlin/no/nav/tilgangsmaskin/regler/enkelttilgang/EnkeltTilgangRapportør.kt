@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import no.nav.boot.conditionals.ConditionalOnGCP
-import no.nav.sikkerhetstjenesten.entraproxy.felles.leder.LeaderAware
+import no.nav.sikkerhetstjenesten.felles.leder.LeaderAware
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component

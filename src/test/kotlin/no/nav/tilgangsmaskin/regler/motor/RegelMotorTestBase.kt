@@ -1,21 +1,19 @@
 package no.nav.tilgangsmaskin.regler.motor
 
+import no.nav.tilgangsmaskin.ansatt.AnsattId
+
 import com.ninjasquad.springmockk.MockkBean
-import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
-import no.nav.tilgangsmaskin.ansatt.Ansatt
-import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.NomTjeneste
 import no.nav.tilgangsmaskin.ansatt.oppfølging.OppfølgingTjeneste
 import no.nav.tilgangsmaskin.ansatt.vergemål.VergemålTjeneste
-import no.nav.tilgangsmaskin.bruker.Bruker
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.felles.rest.notifikasjon.LocalAuditor
+import no.nav.sikkerhetstjenesten.felles.notifikasjon.LocalAuditor
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext
 import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
-import no.nav.tilgangsmaskin.felles.security.AuthContext
-import no.nav.tilgangsmaskin.felles.security.TokenType.CCF
+import no.nav.sikkerhetstjenesten.felles.security.TokenType.CCF
 import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.test.context.ContextConfiguration

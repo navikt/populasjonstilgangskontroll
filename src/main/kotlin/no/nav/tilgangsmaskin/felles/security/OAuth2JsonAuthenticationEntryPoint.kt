@@ -2,6 +2,8 @@ package no.nav.tilgangsmaskin.felles.security
 
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import no.nav.sikkerhetstjenesten.felles.security.securityProblemDetail
+import no.nav.tilgangsmaskin.regler.motor.RegelMetadata.Companion.TYPE_URI
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
 import org.springframework.security.core.AuthenticationException
@@ -17,6 +19,6 @@ class OAuth2JsonAuthenticationEntryPoint(private val mapper: JsonMapper) : Authe
         with(res) {
             status = UNAUTHORIZED.value()
             contentType = APPLICATION_PROBLEM_JSON_VALUE
-            mapper.writeValue(writer, securityProblemDetail(UNAUTHORIZED, MANGLER_BEARER_TOKEN))
+            mapper.writeValue(writer, securityProblemDetail(UNAUTHORIZED, MANGLER_BEARER_TOKEN, TYPE_URI))
         }
 }

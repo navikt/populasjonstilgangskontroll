@@ -7,8 +7,8 @@ import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import io.mockk.every
-import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.PARTNER
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.SØSKEN
@@ -23,13 +23,13 @@ import no.nav.tilgangsmaskin.bruker.pdl.PdlPipConfig.Companion.PDL_MED_UTVIDET_F
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTestMapper.pdlRespons
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTestMapper.restRespons
 import no.nav.tilgangsmaskin.bruker.pdl.PdlTjenesteTest.PdlTestConfig
-import no.nav.tilgangsmaskin.felles.cache.CacheOperations
+import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
+import no.nav.sikkerhetstjenesten.felles.cache.getOne
 import no.nav.tilgangsmaskin.felles.cache.CacheTestConfig
-import no.nav.tilgangsmaskin.felles.cache.getOne
-import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
-import no.nav.tilgangsmaskin.felles.rest.RecoverableRestException
+import no.nav.sikkerhetstjenesten.felles.rest.RecoverableRestException
+import no.nav.sikkerhetstjenesten.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.boot.test.context.TestConfiguration
@@ -70,7 +70,7 @@ class PdlTjenesteTest(
     init {
         beforeEach {
             server.reset()
-            cache.clear(PDL_CACHES)
+            PDL_CACHES.forEach(cache::clear)
             every { graphQL.partnere(any()) } returns emptySet()
         }
 

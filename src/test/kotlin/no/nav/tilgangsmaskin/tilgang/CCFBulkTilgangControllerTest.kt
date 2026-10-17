@@ -1,5 +1,7 @@
 package no.nav.tilgangsmaskin.tilgang
 
+import no.nav.tilgangsmaskin.ansatt.AnsattId
+
 import io.mockk.every
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.bruker.Bruker

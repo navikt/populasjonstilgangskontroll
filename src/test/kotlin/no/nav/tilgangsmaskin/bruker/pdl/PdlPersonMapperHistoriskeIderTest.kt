@@ -1,7 +1,6 @@
 package no.nav.tilgangsmaskin.bruker.pdl
 
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import no.nav.tilgangsmaskin.bruker.BrukerId
@@ -17,7 +16,8 @@ class PdlPersonMapperHistoriskeIderTest : BehaviorSpec({
     Given("tilPerson - historiske ids") {
         When("historisk FOLKEREGISTERIDENT") {
             Then("inkluderes") {
-                tilPerson(BRUKER_ID, pdlRespons(identer = identer(historiske = listOf("12345678901" to FOLKEREGISTERIDENT)))).historiskeIds shouldContainExactly setOf(BrukerId("12345678901"))
+                tilPerson(BRUKER_ID, pdlRespons(identer = identer(historiske = listOf("12345678901" to FOLKEREGISTERIDENT)))).historiskeIds shouldContainExactly setOf(
+                    BrukerId("12345678901"))
             }
         }
         When("historisk NPID") {

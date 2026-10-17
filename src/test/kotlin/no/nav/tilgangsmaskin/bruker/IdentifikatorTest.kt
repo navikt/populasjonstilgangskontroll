@@ -3,13 +3,49 @@ package no.nav.tilgangsmaskin.bruker
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
+import no.nav.sikkerhetstjenesten.felles.cache.CacheAutoConfiguration.Companion.VALKEY_MAPPER
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.Companion.isProd
+import no.nav.tilgangsmaskin.ansatt.AnsattId
+import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.KotlinModule
 
 class BrukerIdTest : BehaviorSpec({
+
+    Given("identifikatorer i opprinnelig namespace") {
+        Then("beholdes klassenavn og JSON-format") {
+            val mapper = JsonMapper.builder().addModule(KotlinModule.Builder().build()).build()
+            val ansattId = AnsattId("Z999999")
+            val brukerId = BrukerId("08526835671")
+
+            ansattId.javaClass.name shouldBe "no.nav.tilgangsmaskin.ansatt.AnsattId"
+            brukerId.javaClass.name shouldBe "no.nav.tilgangsmaskin.bruker.BrukerId"
+            mapper.writeValueAsString(ansattId) shouldBe "\"Z999999\""
+            mapper.writeValueAsString(brukerId) shouldBe "\"08526835671\""
+            mapper.readValue("\"Z999999\"", AnsattId::class.java) shouldBe ansattId
+            mapper.readValue("\"08526835671\"", BrukerId::class.java) shouldBe brukerId
+        }
+
+        Then("kan identifikatorene leses fra Valkey med opprinnelige klassenavn") {
+            val serializer = GenericJacksonJsonRedisSerializer(VALKEY_MAPPER)
+            val ansattId = AnsattId("Z999999")
+            val brukerId = BrukerId("08526835671")
+
+            serializer.deserialize(serializer.serialize(ansattId)) shouldBe ansattId
+            serializer.deserialize(serializer.serialize(brukerId)) shouldBe brukerId
+            serializer.deserialize(
+                """["no.nav.tilgangsmaskin.ansatt.AnsattId","Z999999"]""".toByteArray()
+            ) shouldBe ansattId
+            serializer.deserialize(
+                """["no.nav.tilgangsmaskin.bruker.BrukerId","08526835671"]""".toByteArray()
+            ) shouldBe brukerId
+        }
+    }
 
     Given("Identifikator") {
         When("verdien er gyldig AktørId (13 siffer)") {

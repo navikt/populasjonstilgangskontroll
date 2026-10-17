@@ -1,7 +1,7 @@
 package no.nav.tilgangsmaskin.ansatt.nom
 
+import no.nav.sikkerhetstjenesten.felles.graphql.AbstractSyncGraphQLClientAdapter
 import no.nav.tilgangsmaskin.ansatt.nom.NomGraphQLConfig.Companion.NOMGRAPH
-import no.nav.tilgangsmaskin.felles.graphql.AbstractSyncGraphQLClientAdapter
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.graphql.client.GraphQlClient
 import org.springframework.stereotype.Component

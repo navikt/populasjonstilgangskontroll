@@ -1,5 +1,7 @@
 package no.nav.tilgangsmaskin.regler
 
+import no.nav.tilgangsmaskin.ansatt.AnsattId
+
 import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
@@ -10,15 +12,17 @@ import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilgangsmaskin.ansatt.AnsattId
+import io.mockk.verify
+import io.mockk.verifyOrder
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
-import no.nav.tilgangsmaskin.felles.rest.notifikasjon.LocalAuditor
-import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
+import no.nav.sikkerhetstjenesten.felles.notifikasjon.LocalAuditor
+import no.nav.sikkerhetstjenesten.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat
+import no.nav.tilgangsmaskin.regler.motor.KjerneRegel
 import no.nav.tilgangsmaskin.regler.motor.Regel
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
@@ -172,10 +176,83 @@ class RegelTjenesteTest : BehaviorSpec() {
                     val regelException = RegelException(AnsattBuilder(ansattId).build(), funnetBruker, mockk<Regel>(relaxed = true))
                     every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } returns funnetBruker
                     every { motor.kompletteRegler(any(), any()) } throws regelException
+                    every { motor.kjerneregler(any(), funnetBruker) } returns Unit
                     every { enkeltTilgang.harTilgang(ansattId, vanligBrukerId) } returns true
                     shouldNotThrowAny {
                         regler.kompletteRegler(ansattId, vanligBrukerId.verdi)
                     }
+                    verifyOrder {
+                        motor.kompletteRegler(any(), funnetBruker)
+                        enkeltTilgang.harTilgang(ansattId, vanligBrukerId)
+                        motor.kjerneregler(any(), funnetBruker)
+                    }
+                }
+            }
+            When("kjerneregler avslår og enkelttilgang er registrert") {
+                Then("kastes kjerneavslaget videre til tross for enkelttilgang") {
+                    val funnetBruker = BrukerBuilder(vanligBrukerId).build()
+                    val ansatt = AnsattBuilder(ansattId).build()
+                    val kjerneRegel = mockk<KjerneRegel>(relaxed = true)
+                    val opprinneligAvslag = RegelException(ansatt, funnetBruker, kjerneRegel)
+                    val kjerneAvslag = RegelException(ansatt, funnetBruker, kjerneRegel)
+                    every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } returns funnetBruker
+                    every { motor.kompletteRegler(any(), funnetBruker) } throws opprinneligAvslag
+                    every { motor.kjerneregler(any(), funnetBruker) } throws kjerneAvslag
+                    every { enkeltTilgang.harTilgang(ansattId, vanligBrukerId) } returns true
+
+                    shouldThrow<RegelException> {
+                        regler.kompletteRegler(ansattId, vanligBrukerId.verdi)
+                    } shouldBe kjerneAvslag
+                    verifyOrder {
+                        enkeltTilgang.harTilgang(ansattId, vanligBrukerId)
+                        motor.kjerneregler(any(), funnetBruker)
+                    }
+                }
+            }
+            When("kjerneregler kaster en teknisk feil") {
+                Then("kastes feilen videre til tross for enkelttilgang") {
+                    val funnetBruker = BrukerBuilder(vanligBrukerId).build()
+                    val regelException = RegelException(AnsattBuilder(ansattId).build(), funnetBruker, mockk<Regel>(relaxed = true))
+                    val feil = IllegalStateException("Kjerneregler feilet")
+                    every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } returns funnetBruker
+                    every { motor.kompletteRegler(any(), funnetBruker) } throws regelException
+                    every { motor.kjerneregler(any(), funnetBruker) } throws feil
+                    every { enkeltTilgang.harTilgang(ansattId, vanligBrukerId) } returns true
+
+                    shouldThrow<IllegalStateException> {
+                        regler.kompletteRegler(ansattId, vanligBrukerId.verdi)
+                    } shouldBe feil
+                    verifyOrder {
+                        enkeltTilgang.harTilgang(ansattId, vanligBrukerId)
+                        motor.kjerneregler(any(), funnetBruker)
+                    }
+                }
+            }
+            When("enkelttilgang mangler") {
+                Then("kastes det opprinnelige avslaget videre uten å kjøre kjerneregler på nytt") {
+                    val funnetBruker = BrukerBuilder(vanligBrukerId).build()
+                    val regelException = RegelException(AnsattBuilder(ansattId).build(), funnetBruker, mockk<Regel>(relaxed = true))
+                    every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } returns funnetBruker
+                    every { motor.kompletteRegler(any(), funnetBruker) } throws regelException
+                    every { enkeltTilgang.harTilgang(ansattId, vanligBrukerId) } returns false
+
+                    shouldThrow<RegelException> {
+                        regler.kompletteRegler(ansattId, vanligBrukerId.verdi)
+                    } shouldBe regelException
+                    verify(exactly = 0) { motor.kjerneregler(any(), any()) }
+                }
+            }
+            When("komplette regler godkjenner") {
+                Then("kjøres ikke kjerneregler på nytt eller sjekkes enkelttilgang") {
+                    val funnetBruker = BrukerBuilder(vanligBrukerId).build()
+                    every { brukere.medNærmesteFamilie(vanligBrukerId.verdi) } returns funnetBruker
+                    every { motor.kompletteRegler(any(), funnetBruker) } returns Unit
+
+                    shouldNotThrowAny {
+                        regler.kompletteRegler(ansattId, vanligBrukerId.verdi)
+                    }
+                    verify(exactly = 0) { motor.kjerneregler(any(), any()) }
+                    verify(exactly = 0) { enkeltTilgang.harTilgang(any(), any()) }
                 }
             }
         }

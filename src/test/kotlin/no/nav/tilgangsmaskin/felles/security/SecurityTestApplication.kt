@@ -1,8 +1,9 @@
 package no.nav.tilgangsmaskin.felles.security
 
+import no.nav.sikkerhetstjenesten.felles.cache.CacheAutoConfiguration
+import no.nav.sikkerhetstjenesten.felles.notifikasjon.NotificationAutoConfiguration
+import no.nav.sikkerhetstjenesten.felles.rest.DefaultRestErrorHandler
 import no.nav.tilgangsmaskin.felles.cache.CaffeineCacheOperations
-import no.nav.tilgangsmaskin.felles.rest.RestDefaultErrorHandler
-import no.nav.tilgangsmaskin.felles.rest.notifikasjon.logbook.LogbookBeanConfiguration
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController
 import no.nav.tilgangsmaskin.tilgang.BulkTilgangController
 import no.nav.tilgangsmaskin.tilgang.TilgangController
@@ -12,15 +13,15 @@ import org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfigur
 import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration
 import org.springframework.context.annotation.Import
 
-@SpringBootApplication(exclude = [DataSourceAutoConfiguration::class, HibernateJpaAutoConfiguration::class, FlywayAutoConfiguration::class])
+@SpringBootApplication(exclude = [DataSourceAutoConfiguration::class, HibernateJpaAutoConfiguration::class, FlywayAutoConfiguration::class, CacheAutoConfiguration::class])
 @Import(
     OAuth2SecurityBeanConfig::class,
     TilgangController::class,
     BulkTilgangController::class,
     EnkeltTilgangController::class,
     PdlTestConfig::class,
-    LogbookBeanConfiguration::class,
+    NotificationAutoConfiguration::class,
     CaffeineCacheOperations::class,
-    RestDefaultErrorHandler::class
+    DefaultRestErrorHandler::class
 )
 class SecurityTestApplication

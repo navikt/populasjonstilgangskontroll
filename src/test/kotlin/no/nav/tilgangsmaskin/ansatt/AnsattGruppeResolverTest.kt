@@ -4,7 +4,6 @@ import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.IsolationMode.InstancePerTest
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import io.mockk.every
@@ -12,25 +11,25 @@ import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.mockk.verify
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraAnsattGruppeResolver
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.Companion.globaleGrupper
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.NASJONAL
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGlobalGruppe.STRENGT_FORTROLIG
 import no.nav.tilgangsmaskin.ansatt.graph.EntraGruppe
-import no.nav.tilgangsmaskin.ansatt.graph.EntraGrupperConfig.Companion.GEO_OG_GLOBALE_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.EntraTjeneste
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
-import no.nav.tilgangsmaskin.felles.cache.CacheOperations
-import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
-import no.nav.tilgangsmaskin.felles.rest.notifikasjon.MessagePublisher
-import no.nav.tilgangsmaskin.felles.security.AuthContext
-import no.nav.tilgangsmaskin.felles.security.TokenType
-import no.nav.tilgangsmaskin.felles.security.TokenType.CCF
-import no.nav.tilgangsmaskin.felles.security.TokenType.UNAUTHENTICATED
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
+import no.nav.sikkerhetstjenesten.felles.notifikasjon.MessagePublisher
+import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
+import no.nav.sikkerhetstjenesten.felles.rest.NotFoundRestException
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext
+import no.nav.sikkerhetstjenesten.felles.security.TokenType
+import no.nav.sikkerhetstjenesten.felles.security.TokenType.CCF
+import no.nav.sikkerhetstjenesten.felles.security.TokenType.UNAUTHENTICATED
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.Companion.isProd
 import java.net.URI
 import java.util.*
 
@@ -97,7 +96,8 @@ class AnsattGruppeResolverTest : BehaviorSpec({
             Then("sletter cache, henter ny oid og gjør retry") {
                 val nyOid = UUID.randomUUID()
                 val forventet = setOf(geoGruppe)
-                every { entra.geoOgGlobaleGrupper(ansattId, oid) } throws NotFoundRestException(URI("http://graph"), ansattId.verdi)
+                every { entra.geoOgGlobaleGrupper(ansattId, oid) } throws NotFoundRestException(URI("http://graph"),
+                    ansattId.verdi)
                 every { oidTjeneste.oid(ansattId) } returnsMany listOf(oid, nyOid)
                 every { entra.geoOgGlobaleGrupper(ansattId, nyOid) } returns forventet
 

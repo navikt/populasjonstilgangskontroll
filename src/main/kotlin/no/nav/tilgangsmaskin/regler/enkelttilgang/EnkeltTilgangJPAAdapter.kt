@@ -1,12 +1,12 @@
 package no.nav.tilgangsmaskin.regler.enkelttilgang
 
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.Leder
 import no.nav.tilgangsmaskin.bruker.BrukerId
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.stereotype.Repository
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.stereotype.Repository
 import java.time.Clock
 import java.time.Instant
 import java.time.Instant.now

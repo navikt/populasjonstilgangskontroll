@@ -1,5 +1,11 @@
 package no.nav.tilgangsmaskin.felles.cache
 
+import no.nav.sikkerhetstjenesten.felles.cache.CacheNøkkelMessageConverter
+import no.nav.sikkerhetstjenesten.felles.cache.CacheOppfrisker
+import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
+import no.nav.sikkerhetstjenesten.felles.cache.CachableRestConfig
+import no.nav.sikkerhetstjenesten.felles.cache.getMany
+import no.nav.sikkerhetstjenesten.felles.cache.getOne
 import com.ninjasquad.springmockk.MockkBean
 import com.redis.testcontainers.RedisContainer
 import com.redis.testcontainers.RedisContainer.DEFAULT_IMAGE_NAME
@@ -17,8 +23,13 @@ import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.mockk.verify
-import no.nav.tilgangsmaskin.bruker.AktørId
+import no.nav.sikkerhetstjenesten.felles.cache.CacheSizeAware
+import no.nav.sikkerhetstjenesten.felles.cache.ValkeyCacheOperations
 import no.nav.tilgangsmaskin.bruker.BrukerId
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils
+import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.Companion.isProd
+import no.nav.tilgangsmaskin.bruker.AktørId
 import no.nav.tilgangsmaskin.bruker.Familie
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem
 import no.nav.tilgangsmaskin.bruker.Familie.FamilieMedlem.FamilieRelasjon.MOR
@@ -32,9 +43,6 @@ import no.nav.tilgangsmaskin.bruker.pdl.Person
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.FORTROLIG
 import no.nav.tilgangsmaskin.bruker.pdl.Person.Gradering.UGRADERT
 import no.nav.tilgangsmaskin.felles.cache.ValkeyCacheOperationsTest.ValkeyCacheTestConfig
-import no.nav.tilgangsmaskin.felles.security.AuthContext
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils
-import no.nav.tilgangsmaskin.felles.utils.cluster.ClusterUtils.Companion.isProd
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest
 import org.springframework.boot.test.context.TestConfiguration
@@ -52,9 +60,10 @@ import java.time.Duration.ofSeconds
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
+import no.nav.sikkerhetstjenesten.felles.cache.ValkeyEventListeningCacheOppfrisker
 
 @DataRedisTest
-@TestPropertySource(properties = ["logging.level.no.nav.tilgangsmaskin.felles.cache.ValkeyEventListeningCacheOppfrisker=INFO"])
+@TestPropertySource(properties = ["logging.level.no.nav.sikkerhetstjenesten.entraproxy.felles.cache.ValkeyEventListeningCacheOppfrisker=INFO"])
 @ContextConfiguration(classes = [ValkeyCacheTestConfig::class,ValkeyEventListeningCacheOppfrisker::class])
 @EnableAutoConfiguration
 class ValkeyCacheOperationsTest(
@@ -230,10 +239,10 @@ class ValkeyCacheOperationsTest(
 
         Given("clear i prod-miljø") {
             beforeEach {
-                mockkObject(ClusterUtils.Companion)
+                mockkObject(ClusterUtils)
                 every { isProd } returns true
             }
-            afterEach { unmockkObject(ClusterUtils.Companion) }
+            afterEach { unmockkObject(ClusterUtils) }
 
             When("clear kalles") {
                 Then("kaster IllegalStateException fordi clear er blokkert i prod") {

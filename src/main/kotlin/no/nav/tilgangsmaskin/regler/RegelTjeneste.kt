@@ -2,12 +2,12 @@ package no.nav.tilgangsmaskin.regler
 
 import io.micrometer.core.annotation.Timed
 import io.micrometer.observation.annotation.Observed
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.sikkerhetstjenesten.felles.notifikasjon.Auditor
+import no.nav.sikkerhetstjenesten.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
-import no.nav.tilgangsmaskin.felles.rest.notifikasjon.Auditor
-import no.nav.tilgangsmaskin.felles.rest.NotFoundRestException
-import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.BrukerOgRegelsett
@@ -35,14 +35,16 @@ class RegelTjeneste(
         val elapsedTime = measureTime {
             log.info("Sjekker ${KOMPLETT_REGELTYPE.beskrivelse} for $ansattId og ${brukerId.maskFnr()}")
             bruker(brukerId)?.let { bruker ->
+                val ansatt = ansattTjeneste.ansatt(ansattId)
                 runCatching {
-                    motor.kompletteRegler(ansattTjeneste.ansatt(ansattId), bruker)
+                    motor.kompletteRegler(ansatt, bruker)
                 }.onFailure { e ->
                     when (e) {
                         is RegelException -> {
                             if (!enkeltTilgangTjeneste.harTilgang(ansattId, bruker.brukerId)) {
                                 throw e
                             }
+                            motor.kjerneregler(ansatt, bruker)
                             log.info("Enkelttilgang benyttet. {} fikk tilgang til {}", ansattId, brukerId.maskFnr())
                         }
                         else -> throw e

@@ -4,10 +4,13 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_26
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import java.lang.System.getProperty
 
-val javaVersion = JavaLanguageVersion.of(26)
+val javaVersion = JavaLanguageVersion.of(27)
 
 group = "no.nav.tilgangsmaskin.populasjonstilgangskontroll"
 version = "1.0.1"
+
+extra["jackson-bom.version"] = "3.2.2"
+extra["jackson-2-bom.version"] = "2.22.1"
 
 plugins {
     jacoco
@@ -57,6 +60,7 @@ dependencies {
         implementation("at.yawk.lz4:lz4-java:1.12.0")
         testImplementation("at.yawk.lz4:lz4-java:1.12.0")
     }
+    implementation(libs.sikkerhetstjenesten.lib)
     implementation(libs.contract.pdl.avro)
     implementation(libs.boot.conditionals)
     implementation(libs.bundles.observability)
@@ -126,6 +130,9 @@ tasks.withType<Jar> {
 }
 
 java {
+    sourceCompatibility = JavaVersion.VERSION_26
+    targetCompatibility = JavaVersion.VERSION_26
+
     toolchain {
         languageVersion.set(javaVersion)
     }

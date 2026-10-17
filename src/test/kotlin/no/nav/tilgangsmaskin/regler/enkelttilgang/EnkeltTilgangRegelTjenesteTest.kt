@@ -1,5 +1,7 @@
 package no.nav.tilgangsmaskin.regler.enkelttilgang
 
+import no.nav.tilgangsmaskin.ansatt.AnsattId
+
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldNotThrowAny
@@ -10,7 +12,6 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
-import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyEnhet.Enhet
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
@@ -27,12 +28,12 @@ import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.UtenlandskTilknytning
 import no.nav.tilgangsmaskin.bruker.Identifikator
-import no.nav.tilgangsmaskin.felles.rest.notifikasjon.LocalAuditor
+import no.nav.sikkerhetstjenesten.felles.notifikasjon.LocalAuditor
+import no.nav.sikkerhetstjenesten.felles.security.AuthContext
+import no.nav.sikkerhetstjenesten.felles.security.TokenType.CCF
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.IGÅR
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.felles.TimeBeanConfig
-import no.nav.tilgangsmaskin.felles.security.AuthContext
-import no.nav.tilgangsmaskin.felles.security.TokenType.CCF
-import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IGÅR
-import no.nav.tilgangsmaskin.felles.utils.extensions.TimeExtensions.IMORGEN
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
 import no.nav.tilgangsmaskin.regler.BrukerBuilder
 import no.nav.tilgangsmaskin.regler.BulkResponsAggregator
@@ -273,7 +274,7 @@ class EnkeltTilgangRegelTjenesteTest(
         every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
         every { oppfølging.enhetFor(Identifikator(vanligBrukerId.verdi)) } returns Enhetsnummer("1234")
         every { authContext.system } returns "test"
-        every { authContext.ansattId } returns ansattId
+        every { authContext.navIdent } returns "Z999999"
         every { authContext.clusterAndSystem } returns "cluster:test"
         every { authContext.systemNavn } returns "test"
         every { authContext.type } returns CCF

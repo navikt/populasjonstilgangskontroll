@@ -3,7 +3,7 @@ package no.nav.tilgangsmaskin.ansatt.oppfølging
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import org.springframework.stereotype.Repository
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 
 @Repository
 class OppfølgingJPAAdapter(private val repo: OppfølgingRepository) {

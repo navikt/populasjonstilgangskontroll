@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_26
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import java.lang.System.getProperty
 
-val javaVersion = JavaLanguageVersion.of(26)
+val javaVersion = JavaLanguageVersion.of(27)
 
 group = "no.nav.tilgangsmaskin.populasjonstilgangskontroll"
 version = "1.0.1"
@@ -130,6 +130,9 @@ tasks.withType<Jar> {
 }
 
 java {
+    sourceCompatibility = JavaVersion.VERSION_26
+    targetCompatibility = JavaVersion.VERSION_26
+
     toolchain {
         languageVersion.set(javaVersion)
     }

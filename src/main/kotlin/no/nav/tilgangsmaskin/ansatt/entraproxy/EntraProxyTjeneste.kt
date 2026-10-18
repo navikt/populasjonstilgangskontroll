@@ -17,7 +17,7 @@ class EntraProxyTjeneste(
 
     fun enheter(ansattId: AnsattId) = client.enheter(ansattId.verdi)
 
-    fun mail(message: SimpleMailMessage) = client.mail(message)
+    fun mail(message: SimpleMailMessage) = client.mail1()
 
     @NoCoverageAnalysis
     override fun toString() = "${javaClass.simpleName} [client=$client]"

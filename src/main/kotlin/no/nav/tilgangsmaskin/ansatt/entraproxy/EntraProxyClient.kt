@@ -32,11 +32,17 @@ interface EntraProxyClient {
         @RequestBody mail: SimpleMailMessage,
     )
 
+    @PostExchange(ENTRA_PROXY_MAIL_PATH1)
+    @ClientRegistrationId(ENTRAPROXY)
+    fun mail1()
+
     @GetExchange(ENTRA_PROXY_PING_PATH)
     fun ping(): Any?
 
     companion object {
         const val ENTRA_PROXY_MAIL_PATH = "/api/v1/mail"
+        const val ENTRA_PROXY_MAIL_PATH1 = "/api/v1/mail1"
+
         const val ENTRA_PROXY_ANSATT_PATH = "/api/v1/ansatt/{navIdent}"
         const val ENTRA_PROXY_ENHETER_PATH = "/api/v1/enhet/ansatt/{navIdent}"
         const val ENTRA_PROXY_PING_PATH = "/monitoring/health/liveness"

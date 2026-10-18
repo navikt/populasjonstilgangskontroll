@@ -3,10 +3,8 @@ package no.nav.tilgangsmaskin.ansatt.entraproxy
 import no.nav.sikkerhetstjenesten.felles.rest.DefaultRestErrorHandler.Companion.IDENTIFIKATOR
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyConfig.Companion.ENTRAPROXY
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyEnhet.Enhet
-import org.springframework.mail.SimpleMailMessage
 import org.springframework.security.oauth2.client.annotation.ClientRegistrationId
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.PostExchange
@@ -28,21 +26,13 @@ interface EntraProxyClient {
 
     @PostExchange(ENTRA_PROXY_MAIL_PATH)
     @ClientRegistrationId(ENTRAPROXY)
-    fun mail(
-        @RequestBody mail: SimpleMailMessage,
-    )
-
-    @PostExchange(ENTRA_PROXY_MAIL_PATH1)
-    @ClientRegistrationId(ENTRAPROXY)
-    fun mail1()
+    fun mail(message: String)
 
     @GetExchange(ENTRA_PROXY_PING_PATH)
     fun ping(): Any?
 
     companion object {
         const val ENTRA_PROXY_MAIL_PATH = "/api/v1/mail"
-        const val ENTRA_PROXY_MAIL_PATH1 = "/api/v1/mail1"
-
         const val ENTRA_PROXY_ANSATT_PATH = "/api/v1/ansatt/{navIdent}"
         const val ENTRA_PROXY_ENHETER_PATH = "/api/v1/enhet/ansatt/{navIdent}"
         const val ENTRA_PROXY_PING_PATH = "/monitoring/health/liveness"

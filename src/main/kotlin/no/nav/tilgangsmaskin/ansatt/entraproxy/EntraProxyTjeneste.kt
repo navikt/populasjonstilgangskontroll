@@ -4,8 +4,6 @@ import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
 import no.nav.sikkerhetstjenesten.felles.rest.RestRetryingWhenRecoverableService
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyConfig.Companion.ENTRAPROXY
-import org.springframework.mail.MailSender
-import org.springframework.mail.SimpleMailMessage
 import org.springframework.web.service.registry.ImportHttpServices
 
 @RestRetryingWhenRecoverableService
@@ -17,7 +15,7 @@ class EntraProxyTjeneste(
 
     fun enheter(ansattId: AnsattId) = client.enheter(ansattId.verdi)
 
-    fun mail(message: SimpleMailMessage) = client.mail1()
+    fun mail(message: String) = client.mail(message)
 
     @NoCoverageAnalysis
     override fun toString() = "${javaClass.simpleName} [client=$client]"

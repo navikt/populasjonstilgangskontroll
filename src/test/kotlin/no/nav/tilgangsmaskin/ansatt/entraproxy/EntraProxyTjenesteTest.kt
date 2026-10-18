@@ -11,9 +11,11 @@ import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyEnhet.Enhet
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
 import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
+import org.springframework.mail.SimpleMailMessage
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpMethod.GET
+import org.springframework.http.HttpMethod.POST
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.HttpStatus.UNAUTHORIZED
@@ -85,6 +87,20 @@ class EntraProxyTjenesteTest(private val tjeneste: EntraProxyTjeneste, private v
 
                     tjeneste.enheter(ANSATTID) shouldBe emptySet()
                 }
+            }
+        }
+
+        Given("sending av mail") {
+            Then("sender til mail-endepunktet i Entra Proxy") {
+                server.expect(requestTo("http://entra-proxy.sikkerhetstjenesten/api/v1/mail"))
+                    .andExpect(method(POST))
+                    .andRespond(withSuccess())
+
+                tjeneste.mail(SimpleMailMessage().apply {
+                    setTo("test@nav.no")
+                    subject = "Test"
+                    text = "Test"
+                })
             }
         }
 

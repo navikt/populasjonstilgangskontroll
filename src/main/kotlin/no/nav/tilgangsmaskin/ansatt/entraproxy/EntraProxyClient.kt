@@ -6,6 +6,7 @@ import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyConfig.Companion.ENTRAP
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyEnhet.Enhet
 import org.springframework.security.oauth2.client.annotation.ClientRegistrationId
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.PostExchange
@@ -27,7 +28,9 @@ interface EntraProxyClient {
 
     @PostExchange(ENTRA_PROXY_MAIL_PATH)
     @ClientRegistrationId(ENTRAPROXY)
-    fun mail(message: MailRequest)
+    fun mail(
+        @RequestBody message: MailRequest,
+    )
 
     @GetExchange(ENTRA_PROXY_PING_PATH)
     fun ping(): Any?

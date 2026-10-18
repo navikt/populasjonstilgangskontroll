@@ -110,23 +110,6 @@ class EntraProxyTjenesteTest(
             }
         }
 
-        xGiven("sending av mail") {
-            xThen("sender til mail-endepunktet i Entra Proxy") {
-                server
-                    .expect(requestTo("http://entra-proxy.sikkerhetstjenesten/api/v1/mail"))
-                    .andExpect(method(POST))
-                    .andRespond(withSuccess())
-
-                tjeneste.mail(
-                    SimpleMailMessage().apply {
-                        setTo("test@nav.no")
-                        subject = "Test"
-                        text = "Test"
-                    },
-                )
-            }
-        }
-
         Given("feilhaandtering") {
             When("tjenesten returnerer 404") {
                 Then("kaster NotFoundRestException uten retry") {

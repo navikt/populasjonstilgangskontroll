@@ -1,5 +1,6 @@
 package no.nav.tilgangsmaskin.ansatt.entraproxy
 
+import no.nav.sikkerhetstjenesten.felles.notifikasjon.MailRequest
 import no.nav.sikkerhetstjenesten.felles.rest.DefaultRestErrorHandler.Companion.IDENTIFIKATOR
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyConfig.Companion.ENTRAPROXY
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyEnhet.Enhet
@@ -26,7 +27,7 @@ interface EntraProxyClient {
 
     @PostExchange(ENTRA_PROXY_MAIL_PATH)
     @ClientRegistrationId(ENTRAPROXY)
-    fun mail(message: String)
+    fun mail(message: MailRequest)
 
     @GetExchange(ENTRA_PROXY_PING_PATH)
     fun ping(): Any?

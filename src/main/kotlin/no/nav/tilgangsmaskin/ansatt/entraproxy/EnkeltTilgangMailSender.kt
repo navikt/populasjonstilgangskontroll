@@ -7,6 +7,8 @@ import no.nav.sikkerhetstjenesten.felles.notifikasjon.MailRequest.MailMessage.Ma
 import no.nav.sikkerhetstjenesten.felles.notifikasjon.MailRequest.MailMessage.MailRecipient
 import no.nav.sikkerhetstjenesten.felles.notifikasjon.MailRequest.MailMessage.MailRecipient.MailAddress
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
+import no.nav.tilgangsmaskin.regler.enkelttilgang.INGEN_LEDER
+import no.nav.tilgangsmaskin.regler.enkelttilgang.LederEnkeltTilganger
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Component
@@ -31,7 +33,7 @@ class EnkeltTilgangMailSender(
 
     fun sendRapporter() {
         runCatching {
-            val data = enkelt.ikkeRapportertePrLeder()
+            val data = rapporterMedLeder(enkelt.ikkeRapportertePrLeder())
             data.forEach { rapport ->
                 val ansatte =
                     rapport.ansatte
@@ -49,7 +51,7 @@ class EnkeltTilgangMailSender(
                                 varighet(tilgang.created, tilgang.varighet),
                                 tilgang.gtNavn ?: tilgang.gt ?: MANGLER_DATA,
                                 tilgang.begrunnelse,
-                                tilgang.system?.substringAfterLast(':') ?: MANGLER_DATA,
+                                visningsnavnForSystem(tilgang.system),
                             )
                         }
                     val body = template.execute(mapOf("tilganger" to tilganger, "leder" to rapport.leder))
@@ -96,3 +98,16 @@ class EnkeltTilgangMailSender(
         }
     }
 }
+
+internal fun visningsnavnForSystem(system: String?): String =
+    system?.let { SYSTEM_VISNINGSNAVN[it] ?: it.substringAfterLast(':') } ?: ""
+
+internal fun rapporterMedLeder(rapporter: List<LederEnkeltTilganger>): List<LederEnkeltTilganger> =
+    rapporter.filterNot { it.leder == INGEN_LEDER }
+
+private val SYSTEM_VISNINGSNAVN =
+    mapOf(
+        "prod-fss:isa:gosys" to "Gosys personoppslag",
+        "prod-fss:histark:histark-core-api" to "Histark",
+        "prod-gcp:oppgavehandtering:gosys-oppgavebehandling-api" to "Gosys oppgaveliste",
+    )

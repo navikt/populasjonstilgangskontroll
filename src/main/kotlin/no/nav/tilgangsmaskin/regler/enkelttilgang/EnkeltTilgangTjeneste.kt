@@ -155,8 +155,9 @@ class EnkeltTilgangTjeneste(
 
     private companion object {
         private const val TAG = "overstyrt"
-        private val INGEN_LEDER = Leder("ingen@nav.no", AnsattId("A000000"), "Ingen leder")
         private val ENKELTTILGANG_GITT = Tag.of(TAG, "true")
         private val ENKELTTILGANG_AVVIST = Tag.of(TAG, "false")
     }
 }
+
+internal val INGEN_LEDER = Leder("ingen@nav.no", AnsattId("A000000"), "Ingen leder")

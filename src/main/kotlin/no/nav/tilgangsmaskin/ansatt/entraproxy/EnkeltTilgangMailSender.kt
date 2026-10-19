@@ -62,7 +62,7 @@ class EnkeltTilgangMailSender(
                             MailMessage(
                                 "TEST enkelttilgang rapport til - ${rapport.leder}",
                                 MailBody("html", body),
-                                listOf(MailRecipient(MailAddress(RECIPIENT))),
+                                listOf(MAILBOX, ME),
                                 emptyList(),
                                 emptyList(),
                                 emptyList(),
@@ -92,7 +92,8 @@ class EnkeltTilgangMailSender(
 
     companion object {
         private const val AREMARK = "10108000398"
-        private const val RECIPIENT = "teknologiavdelingen.team-sikkerhetstjenesten@nav.no"
+        private val MAILBOX = MailRecipient(MailAddress("teknologiavdelingen.team-sikkerhetstjenesten@nav.no"))
+        private val ME = MailRecipient(MailAddress("jan-olav.eide@nav.no"))
         private const val MANGLER_DATA = ""
         private val TIDSSONE = ZoneId.of("Europe/Oslo")
         private val DATO = DateTimeFormatter.ofPattern("dd.MM.yy").withZone(TIDSSONE)

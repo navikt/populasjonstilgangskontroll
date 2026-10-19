@@ -41,12 +41,6 @@ class EnkeltTilgangController(
         enkelt.registrerTilgang(principal.ansattId(), data)
     }
 
-    /*
-    @GetMapping("enkelt/ikkerapporterte")
-    fun ikkeRapportertePrLeder() =
-        enkelt.ikkeRapportertePrLeder()
-
-     */
     @ExceptionHandler(HandlerMethodValidationException::class)
     fun handleValidation(ex: HandlerMethodValidationException) = valideringsfeilRespons(ex)
 }

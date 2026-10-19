@@ -9,16 +9,16 @@ import org.springframework.stereotype.Component
 @Component
 @ConditionalOnGCP
 class EnkeltTilgangRapportør(
-    private val mailSender: EnkeltTilgangMailSender,
+    private val mailer: EnkeltTilgangMailSender,
 ) : LeaderAware() {
     @Scheduled(initialDelayString = "2m")
     fun sendRapporterVedOppstart() {
-        // mailSender.sendRapporter()
+        // mailer.sendRapporter()
     }
 
     @Scheduled(cron = "0 */10 * * * *", zone = "Europe/Oslo")
     fun sendRapporter() =
         somLeder {
-            mailSender.sendRapporter()
+            // mailer.sendRapporter()
         }
 }

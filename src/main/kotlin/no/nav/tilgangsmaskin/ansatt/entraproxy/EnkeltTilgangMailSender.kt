@@ -37,7 +37,7 @@ class EnkeltTilgangMailSender(
             data.forEach { rapport ->
                 val ansatte =
                     rapport.ansatte
-                        .filter { it.enhet == "0105" }
+                        //   .filter { it.enhet == SARPSBORG }
                         .filterNot { it.begrunnelse.startsWith("Oppgave") }
                         .sortedWith(compareBy(nullsLast()) { it.created })
                 if (ansatte.isEmpty()) return@forEach
@@ -89,6 +89,7 @@ class EnkeltTilgangMailSender(
     )
 
     companion object {
+        private val SARPSBORG = "0105"
         private const val AREMARK = "10108000398"
         private val MAILBOX = MailRecipient(MailAddress("teknologiavdelingen.team-sikkerhetstjenesten@nav.no"))
         private val ME = MailRecipient(MailAddress("jan-olav.eide@nav.no"))

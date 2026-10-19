@@ -84,7 +84,7 @@ class EnkeltTilgangMailSender(
 
     companion object {
         private const val RECIPIENT = "jan-olav.eide@nav.no"
-        private const val MANGLER_DATA = "Ikke tilgjengelig"
+        private const val MANGLER_DATA = ""
         private val TIDSSONE = ZoneId.of("Europe/Oslo")
         private val DATO = DateTimeFormatter.ofPattern("dd.MM.yy").withZone(TIDSSONE)
         private val TIDSPUNKT = DateTimeFormatter.ofPattern("HH:mm").withZone(TIDSSONE)

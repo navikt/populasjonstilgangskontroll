@@ -28,16 +28,27 @@ class EntraProxyStartupMailListener(
 
         private val message =
             MailRequest(
-                message =
-                    MailMessage(
-                        subject = "Populasjonstilgangskontroll startet",
-                        body = MailBody(contentType = "Text", content = "Populasjonstilgangskontroll startet"),
-                        toRecipients = listOf(MailRecipient(MailAddress(RECIPIENT))),
-                        ccRecipients = emptyList(),
-                        bccRecipients = emptyList(),
-                        replyTo = emptyList(),
+                MailMessage(
+                    "Populasjonstilgangskontroll startet",
+                    MailBody(
+                        "html",
+                        """
+                        <html>
+                          <body>
+                            <table>
+                              <tr><th>Tjeneste</th><th>Status</th></tr>
+                              <tr><td>Populasjonstilgangskontroll</td><td>Startet</td></tr>
+                            </table>
+                          </body>
+                        </html>
+                        """.trimIndent(),
                     ),
-                saveToSentItems = false,
+                    listOf(MailRecipient(MailAddress(RECIPIENT))),
+                    emptyList(),
+                    emptyList(),
+                    emptyList(),
+                ),
+                false,
             )
     }
 }

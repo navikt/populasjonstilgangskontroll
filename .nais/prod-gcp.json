@@ -28,6 +28,11 @@
   },
   "inbound": [
     {
+      "name": "veilarbpersonflate",
+      "namespace": "poao",
+      "cluster": "prod-gcp"
+    },
+    {
       "name": "watson-admin-api",
       "namespace": "holmes",
       "cluster": "prod-gcp"

@@ -10,8 +10,10 @@ import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Component
+import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit.DAYS
 import kotlin.text.Charsets.UTF_8
 
 @Component
@@ -44,8 +46,7 @@ class EnkeltTilgangMailSender(
                                 tilgang.id.verdi,
                                 tilgang.created?.let(DATO::format) ?: MANGLER_DATA,
                                 tilgang.created?.let(TIDSPUNKT::format) ?: MANGLER_DATA,
-                                MANGLER_DATA,
-                                MANGLER_DATA,
+                                varighet(tilgang.created, tilgang.varighet),
                                 tilgang.gtNavn ?: tilgang.gt ?: MANGLER_DATA,
                                 tilgang.begrunnelse,
                                 tilgang.system?.substringAfterLast(':') ?: MANGLER_DATA,
@@ -76,7 +77,6 @@ class EnkeltTilgangMailSender(
         val dato: String,
         val tidspunkt: String,
         val varighet: String,
-        val fodselsdato: String,
         val enhet: String,
         val begrunnelse: String,
         val system: String,
@@ -88,5 +88,11 @@ class EnkeltTilgangMailSender(
         private val TIDSSONE = ZoneId.of("Europe/Oslo")
         private val DATO = DateTimeFormatter.ofPattern("dd.MM.yy").withZone(TIDSSONE)
         private val TIDSPUNKT = DateTimeFormatter.ofPattern("HH:mm").withZone(TIDSSONE)
+
+        private fun varighet(created: Instant?, expires: Instant): String {
+            val fra = created?.atZone(TIDSSONE)?.toLocalDate() ?: return MANGLER_DATA
+            val til = expires.atZone(TIDSSONE).toLocalDate()
+            return if (fra == til) "Ut dagen" else "${DAYS.between(fra, til) + 1} dager"
+        }
     }
 }

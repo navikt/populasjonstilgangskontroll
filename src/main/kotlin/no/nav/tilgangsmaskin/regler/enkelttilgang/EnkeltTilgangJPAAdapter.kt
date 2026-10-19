@@ -61,6 +61,7 @@ class EnkeltTilgangJPAAdapter(
                     ansatt.gt,
                     ansatt.system,
                     ansatt.gtNavn,
+                    ansatt.enhet,
                 )
             }
 
@@ -86,6 +87,7 @@ data class EnkeltTilgang(
     val gt: String?,
     val system: String?,
     val gtNavn: String?,
+    val enhet: String,
 )
 
 data class LederEnkeltTilganger(

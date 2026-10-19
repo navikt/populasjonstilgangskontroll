@@ -31,9 +31,15 @@ class EnkeltTilgangMailSender(
         runCatching {
             val data = enkelt.ikkeRapportertePrLeder()
             data.forEach { rapport ->
+                val ansatte =
+                    rapport.ansatte
+                        .filter { it.enhet == "0105" }
+                        .sortedWith(compareBy(nullsLast()) { it.created })
+                if (ansatte.isEmpty()) return@forEach
+
                 runCatching {
                     val tilganger =
-                        rapport.ansatte.map { tilgang ->
+                        ansatte.map { tilgang ->
                             TilgangRad(
                                 tilgang.id.verdi,
                                 tilgang.created?.let(DATO::format) ?: MANGLER_DATA,

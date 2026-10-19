@@ -12,6 +12,7 @@ import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Component
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlin.text.Charsets.UTF_8
 
 @Component
 class EnkeltTilgangMailSender(
@@ -23,7 +24,7 @@ class EnkeltTilgangMailSender(
     private val template =
         ClassPathResource("templates/mail/enkelt-tilgang.mustache")
             .inputStream
-            .bufferedReader(Charsets.UTF_8)
+            .bufferedReader(UTF_8)
             .use { mustacheCompiler.compile(it) }
 
     fun sendRapporter() {

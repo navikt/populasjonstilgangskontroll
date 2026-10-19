@@ -13,10 +13,10 @@ class EnkeltTilgangRapportør(
 ) : LeaderAware() {
     @Scheduled(initialDelayString = "2m")
     fun sendRapporterVedOppstart() {
-        sendRapporter()
+        mailSender.sendRapporter()
     }
 
-    @Scheduled(cron = "0 0 8 * * *", zone = "Europe/Oslo")
+    @Scheduled(cron = "0 */10 * * * *", zone = "Europe/Oslo")
     fun sendRapporter() =
         somLeder {
             mailSender.sendRapporter()

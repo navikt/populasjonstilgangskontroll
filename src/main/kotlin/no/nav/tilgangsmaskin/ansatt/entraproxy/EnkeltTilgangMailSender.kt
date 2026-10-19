@@ -91,10 +91,14 @@ class EnkeltTilgangMailSender(
         private val DATO = DateTimeFormatter.ofPattern("dd.MM.yy").withZone(TIDSSONE)
         private val TIDSPUNKT = DateTimeFormatter.ofPattern("HH:mm").withZone(TIDSSONE)
 
-        private fun varighet(created: Instant?, expires: Instant): String {
+        internal fun varighet(created: Instant?, expires: Instant): String {
             val fra = created?.atZone(TIDSSONE)?.toLocalDate() ?: return MANGLER_DATA
             val til = expires.atZone(TIDSSONE).toLocalDate()
-            return if (fra == til) "Ut dagen" else "${DAYS.between(fra, til) + 1} dager"
+            return when (val dager = DAYS.between(fra, til)) {
+                0L -> "Ut dagen"
+                1L -> "1 dag"
+                else -> "$dager dager"
+            }
         }
     }
 }

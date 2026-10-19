@@ -19,6 +19,6 @@ class EnkeltTilgangRapportør(
     @Scheduled(cron = "0 */10 * * * *", zone = "Europe/Oslo")
     fun sendRapporter() =
         somLeder {
-            // mailer.sendRapporter()
+            mailer.sendRapporter()
         }
 }

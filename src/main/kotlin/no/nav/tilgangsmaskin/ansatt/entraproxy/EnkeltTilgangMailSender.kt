@@ -44,7 +44,7 @@ class EnkeltTilgangMailSender(
                                 MANGLER_DATA,
                             )
                         }
-                    val body = template.execute(mapOf("tilganger" to tilganger))
+                    val body = template.execute(mapOf("tilganger" to tilganger, "leder" to rapport.leder))
                     val message =
                         MailRequest(
                             MailMessage(

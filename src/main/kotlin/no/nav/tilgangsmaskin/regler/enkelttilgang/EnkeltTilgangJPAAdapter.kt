@@ -14,46 +14,68 @@ import java.time.Instant.now
 @Repository
 class EnkeltTilgangJPAAdapter(
     private val repo: EnkeltTilgangRepository,
-    private val clock: Clock) {
-
+    private val clock: Clock,
+) {
     private val log = getLogger(javaClass)
 
-
-    fun enkeltTilgang(ansattId: String, enhetsnummer: String, data: EnkeltTilgangData, gt: String? = null, gt_navn: String? = null): EnkeltTilgangEntity {
-        val expires = data.gyldigtil.plusDays(1)
-            .atStartOfDay(clock.zone).minusMinutes(1)
-            .toInstant()
+    fun enkeltTilgang(
+        ansattId: String,
+        enhetsnummer: String,
+        data: EnkeltTilgangData,
+        gt: String? = null,
+        gt_navn: String? = null,
+    ): EnkeltTilgangEntity {
+        val expires =
+            data.gyldigtil
+                .plusDays(1)
+                .atStartOfDay(clock.zone)
+                .minusMinutes(1)
+                .toInstant()
         repo.findByNavidAndFnrAndExpires(ansattId, data.brukerId.verdi, expires)?.let {
-            log.warn("Fant eksisterende enkelttilgang for navid=${ansattId}, fnr=${data.brukerId.verdi.maskFnr()}, expires=${expires}")
+            log.warn("Fant eksisterende enkelttilgang for navid=$ansattId, fnr=${data.brukerId.verdi.maskFnr()}, expires=$expires")
             return it
         }
 
-        val nyEnkeltTilgang = EnkeltTilgangEntity(ansattId, data.brukerId.verdi, data.begrunnelse, enhetsnummer, expires, gt,gt_navn)
+        val nyEnkeltTilgang = EnkeltTilgangEntity(ansattId, data.brukerId.verdi, data.begrunnelse, enhetsnummer, expires, gt, gt_navn)
 
         return try {
             repo.saveAndFlush(nyEnkeltTilgang)
         } catch (e: DataIntegrityViolationException) {
-            log.warn("Fant eksisterende enkelttilgang for navid=${ansattId}, fnr=${data.brukerId.verdi.maskFnr()}, expires=${expires} etter saveAndFlush, returnerer denne",e)
+            log.warn(
+                @Suppress("ktlint:standard:max-line-length")
+                "Fant eksisterende enkelttilgang for navid=$ansattId, fnr=${data.brukerId.verdi.maskFnr()}, expires=$expires etter saveAndFlush, returnerer denne",
+                e,
+            )
             repo.findByNavidAndFnrAndExpires(ansattId, data.brukerId.verdi, expires) ?: throw e
         }
     }
 
     fun ikkeRapporterte(): Set<EnkeltTilgang> =
-        repo.findAllByRapportertIsNull()
+        repo
+            .findAllByRapportertIsNull()
             .mapTo(mutableSetOf()) { ansatt ->
                 EnkeltTilgang(
                     AnsattId(ansatt.navid),
                     ansatt.begrunnelse,
                     ansatt.created,
                     ansatt.gt,
+                    ansatt.system,
+                    ansatt.gtNavn,
                 )
             }
 
-    fun gjeldendeTilgang(ansattId: String, brukerId: String, brukerIds: List<String>) =
-        repo.gjeldende(ansattId, setOf(brukerId) + brukerIds, now(clock))
+    fun gjeldendeTilgang(
+        ansattId: String,
+        brukerId: String,
+        brukerIds: List<String>,
+    ) = repo.gjeldende(ansattId, setOf(brukerId) + brukerIds, now(clock))
 
-    fun gjeldendeTilganger(ansattId: String, brukerIds: Set<String>): Set<BrukerId> =
-        repo.gjeldendeOverstyringer(ansattId, brukerIds, now(clock))
+    fun gjeldendeTilganger(
+        ansattId: String,
+        brukerIds: Set<String>,
+    ): Set<BrukerId> =
+        repo
+            .gjeldendeOverstyringer(ansattId, brukerIds, now(clock))
             .mapTo(mutableSetOf()) { BrukerId(it.fnr) }
 }
 
@@ -62,6 +84,11 @@ data class EnkeltTilgang(
     val begrunnelse: String,
     val created: Instant?,
     val gt: String?,
+    val system: String?,
+    val gtNavn: String?,
 )
 
-data class LederEnkeltTilganger(val leder: Leder, val ansatte: List<EnkeltTilgang>)
+data class LederEnkeltTilganger(
+    val leder: Leder,
+    val ansatte: List<EnkeltTilgang>,
+)

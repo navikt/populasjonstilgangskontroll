@@ -40,9 +40,9 @@ class EnkeltTilgangMailSender(
                                 tilgang.created?.let(TIDSPUNKT::format) ?: MANGLER_DATA,
                                 MANGLER_DATA,
                                 MANGLER_DATA,
-                                MANGLER_DATA,
+                                tilgang.gtNavn ?: tilgang.gt ?: MANGLER_DATA,
                                 tilgang.begrunnelse,
-                                MANGLER_DATA,
+                                tilgang.system?.substringAfterLast(':') ?: MANGLER_DATA,
                             )
                         }
                     val body = template.execute(mapOf("tilganger" to tilganger, "leder" to rapport.leder))

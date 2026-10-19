@@ -8,15 +8,13 @@ import no.nav.sikkerhetstjenesten.felles.notifikasjon.MailRequest.MailMessage.Ma
 import no.nav.sikkerhetstjenesten.felles.notifikasjon.MailRequest.MailMessage.MailRecipient.MailAddress
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.boot.context.event.ApplicationReadyEvent
-import org.springframework.context.event.EventListener
 import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Component
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @Component
-class EntraProxyStartupMailListener(
+class EnkeltTilgangMailSender(
     private val enkelt: EnkeltTilgangTjeneste,
     private val proxy: EntraProxyTjeneste,
     mustacheCompiler: Compiler,
@@ -28,8 +26,7 @@ class EntraProxyStartupMailListener(
             .bufferedReader(Charsets.UTF_8)
             .use { mustacheCompiler.compile(it) }
 
-    @EventListener(ApplicationReadyEvent::class)
-    fun sendStartupMail() {
+    fun sendRapporter() {
         runCatching {
             val data = enkelt.ikkeRapportertePrLeder()
             data.forEach { rapport ->
@@ -61,10 +58,10 @@ class EntraProxyStartupMailListener(
                             false,
                         )
                     proxy.mail(message)
-                }.onSuccess { log.info("Startup email sent for leader {}", rapport.leder.navident.verdi) }
-                    .onFailure { log.error("Failed to send startup email for leader ${rapport.leder.navident.verdi}", it) }
+                }.onSuccess { log.info("Report email sent for leader {}", rapport.leder.navident.verdi) }
+                    .onFailure { log.error("Failed to send report email for leader ${rapport.leder.navident.verdi}", it) }
             }
-        }.onFailure { log.error("Failed to load startup email data", it) }
+        }.onFailure { log.error("Failed to load report email data", it) }
     }
 
     data class TilgangRad(

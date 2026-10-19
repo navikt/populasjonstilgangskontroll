@@ -2,36 +2,23 @@ package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.sikkerhetstjenesten.felles.leder.LeaderAware
-import org.slf4j.LoggerFactory.getLogger
+import no.nav.tilgangsmaskin.ansatt.entraproxy.EnkeltTilgangMailSender
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
-import java.util.concurrent.TimeUnit.MINUTES
-import kotlin.time.measureTimedValue
-
 
 @Component
 @ConditionalOnGCP
-class EnkeltTilgangRapportør : LeaderAware() {
-
-    private val log = getLogger(javaClass)
-
-    @Scheduled(fixedRate = INTERVAL_MINUTES, timeUnit = MINUTES, initialDelay = 1)
-    fun oppdaterCache() =
-        somLeder {
-            val måling = measureTimedValue {
-                runCatching {
-
-                }
-            }
-            måling.value.onSuccess {
-
-            }.onFailure {
-                log.warn("Periodisk cache-oppdatering feilet", it)
-            }
-        }
-
-    companion object {
-
-        private const val INTERVAL_MINUTES = 15L
+class EnkeltTilgangRapportør(
+    private val mailSender: EnkeltTilgangMailSender,
+) : LeaderAware() {
+    @Scheduled(initialDelayString = "2m")
+    fun sendRapporterVedOppstart() {
+        sendRapporter()
     }
+
+    @Scheduled(cron = "0 0 8 * * *", zone = "Europe/Oslo")
+    fun sendRapporter() =
+        somLeder {
+            mailSender.sendRapporter()
+        }
 }

@@ -88,7 +88,7 @@ data class EnkeltTilgang(
     val gt: String?,
     val system: String?,
     val gtNavn: String?,
-    val enhet: String,
+    val enhet: String?,
     val varighet: Instant,
 )
 

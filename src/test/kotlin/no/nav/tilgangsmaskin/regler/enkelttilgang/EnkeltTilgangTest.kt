@@ -12,6 +12,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import io.opentelemetry.api.trace.Span
 import io.mockk.every
 import io.mockk.mockk
+import jakarta.persistence.EntityManager
 import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyEnhet.Enhet
@@ -48,6 +49,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ContextConfiguration
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.Clock
+import java.time.Instant
 import java.time.LocalDate
 
 @DataJpaTest
@@ -63,6 +65,7 @@ class EnkeltTilgangTest(
     private val registry: MeterRegistry,
     private val adapter: EnkeltTilgangJPAAdapter,
     private val repo: EnkeltTilgangRepository,
+    private val entityManager: EntityManager,
 ) : BehaviorSpec() {
 
     private val vanligBrukerId = BrukerId("08526835670")
@@ -126,6 +129,36 @@ class EnkeltTilgangTest(
                         span shouldBe Span.current().spanContext.spanId
                     }
                 }
+            }
+        }
+
+        Given("datogrense for ikke-rapporterte enkelttilganger") {
+            Then("hentes bare ikke-rapporterte rader med created strengt etter grensen") {
+                repo.deleteAll()
+                val grense = Instant.parse("2026-09-30T22:00:00Z")
+
+                fun lagre(ansatt: String, created: Instant): EnkeltTilgangEntity {
+                    val entity =
+                        adapter.enkeltTilgang(
+                            ansatt,
+                            "1234",
+                            EnkeltTilgangData(vanligBrukerId, "Begrunnelse for rapport", IMORGEN),
+                        )
+                    entityManager
+                        .createNativeQuery("UPDATE overstyring SET created = :created WHERE id = :id")
+                        .setParameter("created", created)
+                        .setParameter("id", entity.id)
+                        .executeUpdate() shouldBe 1
+                    return entity
+                }
+
+                lagre("Z100001", grense.minusSeconds(1))
+                lagre("Z100002", grense)
+                val nyere = lagre("Z100003", grense.plusSeconds(1))
+                val rapportert = lagre("Z100004", grense.plusSeconds(1))
+                repo.setRapportert(listOf(requireNotNull(rapportert.id)), grense.plusSeconds(2))
+
+                adapter.ikkeRapporterte(grense).map { it.id } shouldBe listOf(AnsattId(nyere.navid))
             }
         }
 

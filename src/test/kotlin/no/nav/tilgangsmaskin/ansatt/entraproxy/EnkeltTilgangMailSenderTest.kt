@@ -1,15 +1,35 @@
 package no.nav.tilgangsmaskin.ansatt.entraproxy
 
+import com.samskivert.mustache.Mustache
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
+import io.mockk.Called
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EnkeltTilgangMailSender.Companion.varighet
 import no.nav.tilgangsmaskin.ansatt.nom.Leder
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.regler.enkelttilgang.INGEN_LEDER
 import no.nav.tilgangsmaskin.regler.enkelttilgang.LederEnkeltTilganger
 import java.time.Instant
 
 class EnkeltTilgangMailSenderTest : BehaviorSpec({
+    Given("henting av data til e-postrapporten") {
+        Then("ekskluderes det angitte fødselsnummeret fra oppslaget") {
+            val enkelt = mockk<EnkeltTilgangTjeneste>()
+            val proxy = mockk<EntraProxyTjeneste>()
+            every { enkelt.ikkeRapportertePrLeder(setOf("10108000398")) } returns emptyList()
+            val sender = EnkeltTilgangMailSender(enkelt, proxy, Mustache.compiler())
+
+            sender.sendRapporter()
+
+            verify(exactly = 1) { enkelt.ikkeRapportertePrLeder(setOf("10108000398")) }
+            verify { proxy wasNot Called }
+        }
+    }
+
     Given("varighet i e-postrapporten") {
         val created = Instant.parse("2026-10-19T10:00:00Z")
 

@@ -16,16 +16,13 @@
         background: #c5d4cb;
       }
 
-      tbody tr:nth-child(even) {
-        background: #c5d4cb;
-      }
     </style>
   </head>
   <body style="margin: 0; background: #f3f3f4; color: #1f1f1f; font-family: Arial, sans-serif;">
     <main style="margin: 2rem 1rem; padding: 2rem; border-radius: 8px; background: #ffffff; border: 1px solid #d1d6db; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);">
     <p>Hei {{leder.visningsnavn}} ({{leder.navident.verdi}}, {{leder.epost}}), </p>
     <p>«Enkelttilgang» gir medarbeidere mulighet til å gi seg selv midlertidig tilgang til enkeltbrukere ved behov, mot å begrunne oppslaget. Begrunnelsen skal tydelig forklare hvorfor man trenger tilgang til brukeren, og skal ikke inneholde sensitive opplysninger. Vi ber deg som leder følge opp eventuelle mangelfulle begrunnelser med aktuelle medarbeidere.</p>
-    <p>Disse enkelttilgangene er gitt til dine medarbeidere den siste måneden:</p>
+    <p>Disse enkelttilgangene er gitt til dine medarbeidere denne måneden:</p>
     <table style="width: 100%; background: #d3dfd7; border-collapse: collapse; font-family: Arial, sans-serif; color: #1f1f1f;">
       <thead>
         <tr>
@@ -40,14 +37,14 @@
       </thead>
       <tbody>
         {{#tilganger}}
-        <tr>
-          <td>{{ansatt}}</td>
-          <td>{{dato}}</td>
-          <td>{{tidspunkt}}</td>
-          <td>{{varighet}}</td>
-          <td>{{enhet}}</td>
-          <td>{{begrunnelse}}</td>
-          <td>{{system}}</td>
+        <tr bgcolor="{{bakgrunnsfarge}}" style="background-color: {{bakgrunnsfarge}};">
+          <td style="background-color: {{bakgrunnsfarge}};">{{ansatt}}</td>
+          <td style="background-color: {{bakgrunnsfarge}};">{{dato}}</td>
+          <td style="background-color: {{bakgrunnsfarge}};">{{tidspunkt}}</td>
+          <td style="background-color: {{bakgrunnsfarge}};">{{varighet}}</td>
+          <td style="background-color: {{bakgrunnsfarge}};">{{enhet}}</td>
+          <td style="background-color: {{bakgrunnsfarge}};">{{begrunnelse}}</td>
+          <td style="background-color: {{bakgrunnsfarge}};">{{system}}</td>
         </tr>
         {{/tilganger}}
       </tbody>

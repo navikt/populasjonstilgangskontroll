@@ -50,9 +50,10 @@ class EnkeltTilgangJPAAdapter(
         }
     }
 
-    fun ikkeRapporterte(): Set<EnkeltTilgang> =
+    fun ikkeRapporterte(createdEtter: Instant, ekskluderteFnr: Set<String> = emptySet()): Set<EnkeltTilgang> =
         repo
-            .findAllByRapportertIsNull()
+            .findAllByRapportertIsNullAndCreatedAfter(createdEtter)
+            .filterNot { it.fnr in ekskluderteFnr }
             .mapTo(mutableSetOf()) { ansatt ->
                 EnkeltTilgang(
                     AnsattId(ansatt.navid),

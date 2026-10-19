@@ -8,7 +8,7 @@ import java.time.Instant
 
 interface EnkeltTilgangRepository : JpaRepository<EnkeltTilgangEntity, Long> {
 
-    fun findAllByRapportertIsNull(): List<EnkeltTilgangEntity>
+    fun findAllByRapportertIsNullAndCreatedAfter(createdEtter: Instant): List<EnkeltTilgangEntity>
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""

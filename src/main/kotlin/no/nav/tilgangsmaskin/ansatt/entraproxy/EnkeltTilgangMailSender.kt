@@ -33,7 +33,7 @@ class EnkeltTilgangMailSender(
 
     fun sendRapporter() {
         runCatching {
-            val data = rapporterMedLeder(enkelt.ikkeRapportertePrLeder())
+            val data = rapporterMedLeder(enkelt.ikkeRapportertePrLeder(ekskluderteFnr = setOf("10108000398")))
             data.forEach { rapport ->
                 val ansatte =
                     rapport.ansatte
@@ -43,7 +43,7 @@ class EnkeltTilgangMailSender(
 
                 runCatching {
                     val tilganger =
-                        ansatte.map { tilgang ->
+                        ansatte.mapIndexed { index, tilgang ->
                             TilgangRad(
                                 tilgang.id.verdi,
                                 tilgang.created?.let(DATO::format) ?: MANGLER_DATA,
@@ -52,6 +52,7 @@ class EnkeltTilgangMailSender(
                                 tilgang.gtNavn ?: tilgang.gt ?: MANGLER_DATA,
                                 tilgang.begrunnelse,
                                 visningsnavnForSystem(tilgang.system),
+                                if (index % 2 == 0) "#d3dfd7" else "#c5d4cb",
                             )
                         }
                     val body = template.execute(mapOf("tilganger" to tilganger, "leder" to rapport.leder))
@@ -82,6 +83,7 @@ class EnkeltTilgangMailSender(
         val enhet: String,
         val begrunnelse: String,
         val system: String,
+        val bakgrunnsfarge: String,
     )
 
     companion object {

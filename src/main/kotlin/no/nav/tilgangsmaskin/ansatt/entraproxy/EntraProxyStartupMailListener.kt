@@ -6,49 +6,65 @@ import no.nav.sikkerhetstjenesten.felles.notifikasjon.MailRequest.MailMessage
 import no.nav.sikkerhetstjenesten.felles.notifikasjon.MailRequest.MailMessage.MailBody
 import no.nav.sikkerhetstjenesten.felles.notifikasjon.MailRequest.MailMessage.MailRecipient
 import no.nav.sikkerhetstjenesten.felles.notifikasjon.MailRequest.MailMessage.MailRecipient.MailAddress
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.context.event.EventListener
 import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Component
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @Component
 class EntraProxyStartupMailListener(
+    private val enkelt: EnkeltTilgangTjeneste,
     private val proxy: EntraProxyTjeneste,
     mustacheCompiler: Compiler,
 ) {
     private val log = getLogger(javaClass)
     private val template =
-        ClassPathResource("templates/mail/enkelt-tilgang.mustache").inputStream
+        ClassPathResource("templates/mail/enkelt-tilgang.mustache")
+            .inputStream
             .bufferedReader(Charsets.UTF_8)
             .use { mustacheCompiler.compile(it) }
 
     @EventListener(ApplicationReadyEvent::class)
     fun sendStartupMail() {
         runCatching {
-            val tilganger =
-                listOf(
-                    TilgangRad("S123456", "02.10.26", "08:31", "Ut dagen", "02.08", "Orkland", "Tjenestlig behov", "Gosys personoppslag"),
-                    TilgangRad("F241472", "02.10.26", "08:29", "Ut dagen", "15.01", "Midtbyen", "Oppgave i Arena", "Gosys personoppslag"),
-                    TilgangRad("E031628", "02.10.26", "07:51", "29 dager", "02.11", "Arendal", "trenger til behandling", "Gosys oppgaveliste"),
-                )
-            val body = template.execute(mapOf("tilganger" to tilganger))
-            val message =
-                MailRequest(
-                    MailMessage(
-                        "Populasjonstilgangskontroll startet",
-                        MailBody("html", body),
-                        listOf(MailRecipient(MailAddress(RECIPIENT))),
-                        emptyList(),
-                        emptyList(),
-                        emptyList(),
-                    ),
-                    false,
-                )
-            proxy.mail(message)
-        }
-            .onSuccess { log.info("Startup email sent") }
-            .onFailure { log.error("Failed to send startup email", it) }
+            val data = enkelt.ikkeRapportertePrLeder()
+            data.forEach { rapport ->
+                runCatching {
+                    val tilganger =
+                        rapport.ansatte.map { tilgang ->
+                            TilgangRad(
+                                tilgang.id.verdi,
+                                tilgang.created?.let(DATO::format) ?: MANGLER_DATA,
+                                tilgang.created?.let(TIDSPUNKT::format) ?: MANGLER_DATA,
+                                MANGLER_DATA,
+                                MANGLER_DATA,
+                                MANGLER_DATA,
+                                tilgang.begrunnelse,
+                                MANGLER_DATA,
+                            )
+                        }
+                    val body = template.execute(mapOf("tilganger" to tilganger))
+                    val message =
+                        MailRequest(
+                            MailMessage(
+                                "TEST Enkelttilgang - ${rapport.leder.navident.verdi}",
+                                MailBody("html", body),
+                                listOf(MailRecipient(MailAddress(RECIPIENT))),
+                                emptyList(),
+                                emptyList(),
+                                emptyList(),
+                            ),
+                            false,
+                        )
+                    proxy.mail(message)
+                }.onSuccess { log.info("Startup email sent for leader {}", rapport.leder.navident.verdi) }
+                    .onFailure { log.error("Failed to send startup email for leader ${rapport.leder.navident.verdi}", it) }
+            }
+        }.onFailure { log.error("Failed to load startup email data", it) }
     }
 
     data class TilgangRad(
@@ -64,5 +80,9 @@ class EntraProxyStartupMailListener(
 
     companion object {
         private const val RECIPIENT = "jan-olav.eide@nav.no"
+        private const val MANGLER_DATA = "Ikke tilgjengelig"
+        private val TIDSSONE = ZoneId.of("Europe/Oslo")
+        private val DATO = DateTimeFormatter.ofPattern("dd.MM.yy").withZone(TIDSSONE)
+        private val TIDSPUNKT = DateTimeFormatter.ofPattern("HH:mm").withZone(TIDSSONE)
     }
 }

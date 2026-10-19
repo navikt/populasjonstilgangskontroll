@@ -33,11 +33,12 @@ class EnkeltTilgangMailSender(
 
     fun sendRapporter() {
         runCatching {
-            val data = rapporterMedLeder(enkelt.ikkeRapportertePrLeder(ekskluderteFnr = setOf("10108000398")))
+            val data = rapporterMedLeder(enkelt.ikkeRapportertePrLeder(setOf(AREMARK)))
             data.forEach { rapport ->
                 val ansatte =
                     rapport.ansatte
                         .filter { it.enhet == "0105" }
+                        .filterNot { it.begrunnelse.startsWith("Oppgave") }
                         .sortedWith(compareBy(nullsLast()) { it.created })
                 if (ansatte.isEmpty()) return@forEach
 
@@ -59,7 +60,7 @@ class EnkeltTilgangMailSender(
                     val message =
                         MailRequest(
                             MailMessage(
-                                "TEST Enkelttilgang - ${rapport.leder.navident.verdi}",
+                                "TEST enkelttilgang rapport til - ${rapport.leder}",
                                 MailBody("html", body),
                                 listOf(MailRecipient(MailAddress(RECIPIENT))),
                                 emptyList(),
@@ -69,10 +70,13 @@ class EnkeltTilgangMailSender(
                             false,
                         )
                     proxy.mail(message)
-                }.onSuccess { log.info("Report email sent for leader {}", rapport.leder.navident.verdi) }
-                    .onFailure { log.error("Failed to send report email for leader ${rapport.leder.navident.verdi}", it) }
+                }.onSuccess {
+                    log.info("Rapport sendt til {}", rapport.leder)
+                }.onFailure {
+                    log.error("Kunne ikke sende rapport til ${rapport.leder}", it)
+                }
             }
-        }.onFailure { log.error("Failed to load report email data", it) }
+        }.onFailure { log.warn("Kunne ikke lage rapport", it) }
     }
 
     data class TilgangRad(
@@ -87,13 +91,17 @@ class EnkeltTilgangMailSender(
     )
 
     companion object {
+        private const val AREMARK = "10108000398"
         private const val RECIPIENT = "jan-olav.eide@nav.no"
         private const val MANGLER_DATA = ""
         private val TIDSSONE = ZoneId.of("Europe/Oslo")
         private val DATO = DateTimeFormatter.ofPattern("dd.MM.yy").withZone(TIDSSONE)
         private val TIDSPUNKT = DateTimeFormatter.ofPattern("HH:mm").withZone(TIDSSONE)
 
-        internal fun varighet(created: Instant?, expires: Instant): String {
+        internal fun varighet(
+            created: Instant?,
+            expires: Instant,
+        ): String {
             val fra = created?.atZone(TIDSSONE)?.toLocalDate() ?: return MANGLER_DATA
             val til = expires.atZone(TIDSSONE).toLocalDate()
             return when (val dager = DAYS.between(fra, til)) {
@@ -105,8 +113,7 @@ class EnkeltTilgangMailSender(
     }
 }
 
-internal fun visningsnavnForSystem(system: String?): String =
-    system?.let { SYSTEM_VISNINGSNAVN[it] ?: it.substringAfterLast(':') } ?: ""
+internal fun visningsnavnForSystem(system: String?): String = system?.let { SYSTEM_VISNINGSNAVN[it] ?: it.substringAfterLast(':') } ?: ""
 
 internal fun rapporterMedLeder(rapporter: List<LederEnkeltTilganger>): List<LederEnkeltTilganger> =
     rapporter.filterNot { it.leder == INGEN_LEDER }

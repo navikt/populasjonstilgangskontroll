@@ -10,12 +10,49 @@ import io.mockk.verify
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EnkeltTilgangMailSender.Companion.varighet
 import no.nav.tilgangsmaskin.ansatt.nom.Leder
+import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgang
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.regler.enkelttilgang.INGEN_LEDER
 import no.nav.tilgangsmaskin.regler.enkelttilgang.LederEnkeltTilganger
 import java.time.Instant
 
 class EnkeltTilgangMailSenderTest : BehaviorSpec({
+    Given("filtrering av begrunnelser i e-postrapporten") {
+        listOf(
+            "Oppgave" to 0,
+            "Oppgave 12345 skal behandles" to 0,
+            "Behandling av Oppgave 12345" to 1,
+            "oppgave 12345 skal behandles" to 1,
+        ).forEach { (begrunnelse, antallEposter) ->
+            Then("sendes $antallEposter e-poster for begrunnelsen '$begrunnelse'") {
+                val enkelt = mockk<EnkeltTilgangTjeneste>()
+                val proxy = mockk<EntraProxyTjeneste>(relaxed = true)
+                val tilgang =
+                    EnkeltTilgang(
+                        id = AnsattId("Z123456"),
+                        begrunnelse = begrunnelse,
+                        created = Instant.parse("2026-10-19T10:00:00Z"),
+                        gt = null,
+                        system = null,
+                        gtNavn = null,
+                        enhet = "0105",
+                        varighet = Instant.parse("2026-10-20T21:59:00Z"),
+                    )
+                every { enkelt.ikkeRapportertePrLeder(setOf("10108000398")) } returns
+                    listOf(
+                        LederEnkeltTilganger(
+                            Leder("leder@nav.no", AnsattId("Z123457"), "Leder"),
+                            listOf(tilgang),
+                        ),
+                    )
+
+                EnkeltTilgangMailSender(enkelt, proxy, Mustache.compiler()).sendRapporter()
+
+                verify(exactly = antallEposter) { proxy.mail(any()) }
+            }
+        }
+    }
+
     Given("henting av data til e-postrapporten") {
         Then("ekskluderes det angitte fødselsnummeret fra oppslaget") {
             val enkelt = mockk<EnkeltTilgangTjeneste>()

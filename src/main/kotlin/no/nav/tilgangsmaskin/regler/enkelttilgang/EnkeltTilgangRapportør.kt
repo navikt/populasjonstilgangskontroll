@@ -11,11 +11,6 @@ import org.springframework.stereotype.Component
 class EnkeltTilgangRapportør(
     private val mailer: EnkeltTilgangMailSender,
 ) : LeaderAware() {
-    @Scheduled(initialDelayString = "2m")
-    fun sendRapporterVedOppstart() {
-        // mailer.sendRapporter()
-    }
-
     @Scheduled(cron = "0 */10 * * * *", zone = "Europe/Oslo")
     fun sendRapporter() =
         somLeder {

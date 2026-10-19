@@ -64,10 +64,8 @@ class EnkeltTilgangMailSender(
                                 MailBody("html", body),
                                 listOf(MAILBOX),
                                 listOf(ME),
-                                emptyList(),
-                                emptyList(),
                             ),
-                            false,
+                            true,
                         )
                     proxy.mail(message)
                 }.onSuccess {

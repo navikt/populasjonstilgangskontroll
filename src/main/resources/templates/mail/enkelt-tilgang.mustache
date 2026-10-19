@@ -17,9 +17,18 @@
         </tr>
       </thead>
       <tbody>
-        <tr><td>S123456</td><td>02.10.26</td><td>08:31</td><td>Ut dagen</td><td>02.08</td><td>Orkland</td><td>Tjenestlig behov</td><td>Gosys personoppslag</td></tr>
-        <tr><td>F241472</td><td>02.10.26</td><td>08:29</td><td>Ut dagen</td><td>15.01</td><td>Midtbyen</td><td>Oppgave i Arena</td><td>Gosys personoppslag</td></tr>
-        <tr><td>E031628</td><td>02.10.26</td><td>07:51</td><td>29 dager</td><td>02.11</td><td>Arendal</td><td>trenger til behandling</td><td>Gosys oppgaveliste</td></tr>
+        {{#tilganger}}
+        <tr>
+          <td>{{ansatt}}</td>
+          <td>{{dato}}</td>
+          <td>{{tidspunkt}}</td>
+          <td>{{varighet}}</td>
+          <td>{{fodselsdato}}</td>
+          <td>{{enhet}}</td>
+          <td>{{begrunnelse}}</td>
+          <td>{{system}}</td>
+        </tr>
+        {{/tilganger}}
       </tbody>
     </table>
     <p>Les mer om enkelttilgang på navet.</p>

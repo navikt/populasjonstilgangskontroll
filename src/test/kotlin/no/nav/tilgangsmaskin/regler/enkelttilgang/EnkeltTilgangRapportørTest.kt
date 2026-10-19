@@ -15,14 +15,15 @@ class EnkeltTilgangRapportørTest : BehaviorSpec({
     Given("planlagt utsending av rapporter") {
         val planer = EnkeltTilgangRapportør::class.java.getMethod("sendRapporter").getAnnotationsByType(Scheduled::class.java)
 
-        Then("kjøres rapporten hver morgen klokken 08 i Oslo") {
-            val daglig = planer.single { it.cron.isNotEmpty() }
-            daglig.zone shouldBe "Europe/Oslo"
-            val cron = CronExpression.parse(daglig.cron)
-            val fredag = ZonedDateTime.of(2026, 10, 23, 8, 0, 0, 0, ZoneId.of(daglig.zone))
+        Then("kjøres rapporten hver mandag klokken 08 i Oslo") {
+            val ukentlig = planer.single { it.cron.isNotEmpty() }
+            ukentlig.zone shouldBe "Europe/Oslo"
+            val cron = CronExpression.parse(ukentlig.cron)
+            val fredag = ZonedDateTime.of(2026, 10, 23, 8, 0, 0, 0, ZoneId.of(ukentlig.zone))
 
-            cron.next(fredag) shouldBe fredag.plusDays(1)
-            cron.next(fredag.plusDays(1)) shouldBe fredag.plusDays(2)
+            val mandag = fredag.plusDays(3)
+            cron.next(fredag) shouldBe mandag
+            cron.next(mandag) shouldBe mandag.plusWeeks(1)
         }
 
         Then("kjøres rapporten én gang to minutter etter oppstart") {

@@ -15,14 +15,14 @@ class EnkeltTilgangRapportør(
 ) : LeaderAware() {
     private val log = getLogger(javaClass)
 
-    @Scheduled(cron = "0 55 14 * * TUE", zone = "Europe/Oslo")
+    @Scheduled(cron = "0 10 15 * * TUE", zone = "Europe/Oslo")
     fun sendRapporter() =
         somLeder {
             runCatching {
                 val rapporter = generator.lagRapporter()
                 rapporter.forEach { rapport ->
                     mailer.sendRapport(rapport)
-                    enkelt.markerRapportert(rapport.databaseIds)
+                    enkelt.markerRapportert(rapport)
                 }
             }.onFailure { log.warn("Kunne ikke håndtere rapport", it) }
         }

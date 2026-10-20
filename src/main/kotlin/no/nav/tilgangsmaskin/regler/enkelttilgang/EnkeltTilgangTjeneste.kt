@@ -175,7 +175,7 @@ class EnkeltTilgangTjeneste(
     }
 
     @Transactional
-    fun markerRapportert(databaseIds: Set<Long>) = adapter.markerRapportert(databaseIds)
+    fun markerRapportert(rapport: EnkeltTilgangRapport) = adapter.markerRapportert(rapport.databaseIds)
 
     private fun enhetsNummerFor(ansattId: AnsattId) =
         runCatching {

@@ -38,8 +38,8 @@ class EnkeltTilgangMailSender(
             data.forEach { rapport ->
                 val ansatte =
                     rapport.ansatte
-                        .filter { it.enhet == SARPSBORG }
-                        .filterNot { it.begrunnelse.startsWith("Oppgave") }
+                        .filter { it.enhet == BÆRUM }
+                        .filterNot { it.begrunnelse.startsWith("Oppgave (") }
                         .sortedWith(compareBy(nullsLast()) { it.created })
                 if (ansatte.isEmpty()) return@forEach
 
@@ -61,7 +61,7 @@ class EnkeltTilgangMailSender(
                     val message =
                         MailRequest(
                             MailMessage(
-                                "TEST enkelttilgang rapport til - ${rapport.leder}",
+                                "TEST BÆRUM enkelttilgang rapport til - ${rapport.leder}",
                                 MailBody("html", body),
                                 listOf(MAILBOX),
                                 listOf(ME),
@@ -90,7 +90,7 @@ class EnkeltTilgangMailSender(
     )
 
     companion object {
-        private val SARPSBORG = "0105"
+        private val BÆRUM = "0219"
         private const val AREMARK = "10108000398"
         private val MAILBOX = MailRecipient(MailAddress("teknologiavdelingen.team-sikkerhetstjenesten@nav.no"))
         private val ME = MailRecipient(MailAddress("jan-olav.eide@nav.no"))

@@ -15,11 +15,11 @@ class EnkeltTilgangJPAAdapterTest : BehaviorSpec({
         val adapter = EnkeltTilgangJPAAdapter(repo, Clock.systemUTC())
         val createdEtter = Instant.parse("2026-09-30T22:00:00Z")
         val expires = Instant.parse("2026-10-20T21:59:00Z")
-        every { repo.findAllByRapportertIsNullAndCreatedAfter(createdEtter) } returns
+        every { repo.findAllByRapportertIsNullAndCreatedAfterAndGtNavnIsNotNull(createdEtter) } returns
             listOf(
-                EnkeltTilgangEntity("Z123456", ekskludertFnr, "Første begrunnelse", "0105", expires),
-                EnkeltTilgangEntity("Z123456", ekskludertFnr, "Andre begrunnelse", "0105", expires),
-                EnkeltTilgangEntity("Z123456", annetFnr, "Tredje begrunnelse", "0105", expires),
+                EnkeltTilgangEntity("Z123456", ekskludertFnr, "Første begrunnelse", "0105", expires, gtNavn = "Oslo"),
+                EnkeltTilgangEntity("Z123456", ekskludertFnr, "Andre begrunnelse", "0105", expires, gtNavn = "Oslo"),
+                EnkeltTilgangEntity("Z123456", annetFnr, "Tredje begrunnelse", "0105", expires, gtNavn = "Oslo"),
             )
 
         Then("beholdes alle tilganger uten eksplisitt filtrering") {

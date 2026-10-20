@@ -64,7 +64,7 @@ class EnkeltTilgangMailSender(
                                 "TEST enkelttilgang rapport til - ${rapport.leder}",
                                 MailBody("html", body),
                                 listOf(MAILBOX),
-                                // x'0 listOf(ME),
+                                listOf(ME),
                             ),
                             true,
                         )

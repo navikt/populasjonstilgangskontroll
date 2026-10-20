@@ -174,6 +174,9 @@ class EnkeltTilgangTjeneste(
             )
     }
 
+    @Transactional
+    fun markerRapportert(databaseIds: Set<Long>) = adapter.markerRapportert(databaseIds)
+
     private fun enhetsNummerFor(ansattId: AnsattId) =
         runCatching {
             proxy.enhet(ansattId).enhetnummer.verdi

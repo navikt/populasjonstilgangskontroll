@@ -7,6 +7,7 @@ import io.mockk.Called
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import io.mockk.verifyOrder
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EnkeltTilgangMailSender.Companion.varighet
 import no.nav.tilgangsmaskin.ansatt.nom.Leder
@@ -40,6 +41,7 @@ class EnkeltTilgangMailSenderTest : BehaviorSpec({
                         gtNavn = null,
                         enhet = "0219",
                         varighet = Instant.parse("2026-10-20T21:59:00Z"),
+                        databaseId = 1L,
                     )
                 every { enkelt.ikkeRapportertePrLeder(setOf("10108000398")) } returns
                     listOf(
@@ -48,10 +50,18 @@ class EnkeltTilgangMailSenderTest : BehaviorSpec({
                             listOf(tilgang),
                         ),
                     )
+                every { enkelt.markerRapportert(setOf(1L)) } returns 1
 
                 EnkeltTilgangMailSender(enkelt, proxy, Mustache.compiler()).sendRapporter()
 
                 verify(exactly = antallEposter) { proxy.mail(any()) }
+                verify(exactly = antallEposter) { enkelt.markerRapportert(setOf(1L)) }
+                if (antallEposter > 0) {
+                    verifyOrder {
+                        proxy.mail(any())
+                        enkelt.markerRapportert(setOf(1L))
+                    }
+                }
             }
         }
     }
@@ -67,6 +77,61 @@ class EnkeltTilgangMailSenderTest : BehaviorSpec({
 
             verify(exactly = 1) { enkelt.ikkeRapportertePrLeder(setOf("10108000398")) }
             verify { proxy wasNot Called }
+        }
+    }
+
+    Given("rapportering av sendte e-poster") {
+        listOf(false, true).forEach { feilerFørsteEpost ->
+            Then("markeres bare sendte rader og neste rapport behandles når første e-post feiler=$feilerFørsteEpost") {
+                val enkelt = mockk<EnkeltTilgangTjeneste>()
+                val proxy = mockk<EntraProxyTjeneste>(relaxed = true)
+                val tilgang =
+                    EnkeltTilgang(
+                        id = AnsattId("Z123456"),
+                        begrunnelse = "Begrunnelse for tilgang",
+                        created = Instant.parse("2026-10-19T10:00:00Z"),
+                        gt = null,
+                        system = null,
+                        gtNavn = null,
+                        enhet = "0219",
+                        varighet = Instant.parse("2026-10-20T21:59:00Z"),
+                        databaseId = 1L,
+                    )
+                val annenTilgang = tilgang.copy(databaseId = 2L)
+                val annenAnsatt = tilgang.copy(id = AnsattId("Z123458"), databaseId = 3L)
+                val annenEnhet = tilgang.copy(enhet = "0105", databaseId = 4L)
+                val oppgave = tilgang.copy(begrunnelse = "Oppgave (12345)", databaseId = 5L)
+                val utenLeder = tilgang.copy(databaseId = 6L)
+                every { enkelt.ikkeRapportertePrLeder(any()) } returns
+                    listOf(
+                        LederEnkeltTilganger(
+                            Leder("leder@nav.no", AnsattId("Z123457"), "Leder"),
+                            listOf(tilgang, annenTilgang, annenEnhet, oppgave),
+                        ),
+                        LederEnkeltTilganger(
+                            Leder("annenleder@nav.no", AnsattId("Z123459"), "Annen leder"),
+                            listOf(annenAnsatt),
+                        ),
+                        LederEnkeltTilganger(INGEN_LEDER, listOf(utenLeder)),
+                    )
+                every { enkelt.markerRapportert(any()) } answers { firstArg<Set<Long>>().size }
+                if (feilerFørsteEpost) {
+                    var antallKall = 0
+                    every { proxy.mail(any()) } answers {
+                        if (antallKall++ == 0) throw IllegalStateException("Kunne ikke sende e-post")
+                        Unit
+                    }
+                }
+
+                EnkeltTilgangMailSender(enkelt, proxy, Mustache.compiler()).sendRapporter()
+
+                verify(exactly = 2) { proxy.mail(any()) }
+                verify(exactly = if (feilerFørsteEpost) 0 else 1) {
+                    enkelt.markerRapportert(setOf(1L, 2L))
+                }
+                verify(exactly = 1) { enkelt.markerRapportert(setOf(3L)) }
+                verify(exactly = if (feilerFørsteEpost) 1 else 2) { enkelt.markerRapportert(any()) }
+            }
         }
     }
 

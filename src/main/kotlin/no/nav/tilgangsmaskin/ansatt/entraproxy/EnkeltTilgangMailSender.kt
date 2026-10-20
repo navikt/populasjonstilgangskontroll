@@ -26,7 +26,7 @@ class EnkeltTilgangMailSender(
 ) {
     private val log = getLogger(javaClass)
     private val template =
-        ClassPathResource("templates/mail/enkelt-tilgang.mustache")
+        ClassPathResource(TEMPLATE)
             .inputStream
             .bufferedReader(UTF_8)
             .use { mustacheCompiler.compile(it) }
@@ -46,16 +46,18 @@ class EnkeltTilgangMailSender(
                 runCatching {
                     val tilganger =
                         ansatte.mapIndexed { index, tilgang ->
-                            TilgangRad(
-                                tilgang.id.verdi,
-                                tilgang.created?.let(DATO::format) ?: MANGLER_DATA,
-                                tilgang.created?.let(TIDSPUNKT::format) ?: MANGLER_DATA,
-                                varighet(tilgang.created, tilgang.varighet),
-                                tilgang.gtNavn ?: tilgang.gt ?: MANGLER_DATA,
-                                tilgang.begrunnelse,
-                                visningsnavnForSystem(tilgang.system),
-                                if (index % 2 == 0) "#d3dfd7" else "#c5d4cb",
-                            )
+                            with(tilgang) {
+                                TilgangRad(
+                                    id.verdi,
+                                    created?.let(DATO::format) ?: MANGLER_DATA,
+                                    created?.let(TIDSPUNKT::format) ?: MANGLER_DATA,
+                                    varighet(created, varighet),
+                                    gtNavn ?: gt ?: MANGLER_DATA,
+                                    begrunnelse,
+                                    visningsnavnForSystem(system),
+                                    if (index % 2 == 0) "#d3dfd7" else "#c5d4cb",
+                                )
+                            }
                         }
                     val body = template.execute(mapOf("tilganger" to tilganger, "leder" to rapport.leder))
                     val message =
@@ -69,6 +71,9 @@ class EnkeltTilgangMailSender(
                             true,
                         )
                     proxy.mail(message)
+                    val ids = ansatte.mapTo(mutableSetOf()) { it.databaseId }
+                    log.info("Markerer $ids enkelttilganger som rapportert for ${rapport.leder}")
+                    // enkelt.markerRapportert(ids)
                 }.onSuccess {
                     log.info("Rapport sendt til {}", rapport.leder)
                 }.onFailure {
@@ -90,6 +95,7 @@ class EnkeltTilgangMailSender(
     )
 
     companion object {
+        private const val TEMPLATE = "templates/mail/enkelt-tilgang.mustache"
         private val BÆRUM = "0219"
         private const val AREMARK = "10108000398"
         private val MAILBOX = MailRecipient(MailAddress("teknologiavdelingen.team-sikkerhetstjenesten@nav.no"))

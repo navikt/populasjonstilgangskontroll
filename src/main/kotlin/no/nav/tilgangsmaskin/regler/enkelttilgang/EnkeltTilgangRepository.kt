@@ -7,28 +7,35 @@ import org.springframework.data.repository.query.Param
 import java.time.Instant
 
 interface EnkeltTilgangRepository : JpaRepository<EnkeltTilgangEntity, Long> {
-
     fun findAllByRapportertIsNullAndCreatedAfterAndGtNavnIsNotNull(createdEtter: Instant): List<EnkeltTilgangEntity>
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("""
+    @Query(
+        """
         UPDATE overstyring o
         SET o.rapportert = :now
         WHERE o.id IN :ids
           AND o.rapportert IS NULL
-    """)
+    """,
+    )
     fun setRapportert(
-        @Param("ids") ids: Collection<Long>,
+        @Param("ids") ids: Set<Long>,
         @Param("now") now: Instant,
     ): Int
-    fun markRapportert(entities: Collection<EnkeltTilgangEntity>): Int {
-        val ids = entities.mapNotNull { it.id }
+
+    fun markRapportert(entities: Set<EnkeltTilgangEntity>): Int {
+        val ids = entities.mapNotNull { it.id }.toSet()
         return if (ids.isEmpty()) 0 else setRapportert(ids, Instant.now())
     }
 
-    fun findByNavidAndFnrAndExpires(ansattId: String, brukerId: String, expires: Instant): EnkeltTilgangEntity?
+    fun findByNavidAndFnrAndExpires(
+        ansattId: String,
+        brukerId: String,
+        expires: Instant,
+    ): EnkeltTilgangEntity?
 
-    @Query("""
+    @Query(
+        """
         SELECT o FROM overstyring o
         WHERE o.navid = :ansattId
           AND o.fnr IN :brukerIds
@@ -37,13 +44,16 @@ interface EnkeltTilgangRepository : JpaRepository<EnkeltTilgangEntity, Long> {
               SELECT MAX(o2.created) FROM overstyring o2
               WHERE o2.navid = :ansattId AND o2.fnr IN :brukerIds
           )
-    """)
+    """,
+    )
     fun gjeldende(
         @Param("ansattId") ansattId: String,
         @Param("brukerIds") brukerIds: Set<String>,
-        @Param("cutoff") cutoff: Instant): EnkeltTilgangEntity?
+        @Param("cutoff") cutoff: Instant,
+    ): EnkeltTilgangEntity?
 
-    @Query("""
+    @Query(
+        """
     SELECT o FROM overstyring o
     WHERE o.navid = :ansattId
       AND o.fnr IN :brukerIds
@@ -52,10 +62,11 @@ interface EnkeltTilgangRepository : JpaRepository<EnkeltTilgangEntity, Long> {
           SELECT MAX(o2.created) FROM overstyring o2
           WHERE o2.fnr = o.fnr AND o2.navid = o.navid
       )
-""")
+""",
+    )
     fun gjeldendeOverstyringer(
         @Param("ansattId") ansattId: String,
         @Param("brukerIds") brukerIds: Set<String>,
-        @Param("cutoff") cutoff: Instant): Set<EnkeltTilgangEntity>
-
+        @Param("cutoff") cutoff: Instant,
+    ): Set<EnkeltTilgangEntity>
 }

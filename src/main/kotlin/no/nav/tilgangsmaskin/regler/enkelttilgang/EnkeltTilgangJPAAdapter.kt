@@ -50,7 +50,10 @@ class EnkeltTilgangJPAAdapter(
         }
     }
 
-    fun ikkeRapporterte(createdEtter: Instant, ekskluderteFnr: Set<String> = emptySet()): Set<EnkeltTilgang> =
+    fun ikkeRapporterte(
+        createdEtter: Instant,
+        ekskluderteFnr: Set<String> = emptySet(),
+    ): Set<EnkeltTilgang> =
         repo
             .findAllByRapportertIsNullAndCreatedAfterAndGtNavnIsNotNull(createdEtter)
             .filterNot { it.fnr in ekskluderteFnr }
@@ -64,8 +67,12 @@ class EnkeltTilgangJPAAdapter(
                     ansatt.gtNavn,
                     ansatt.enhet,
                     ansatt.expires,
+                    requireNotNull(ansatt.id),
                 )
             }
+
+    fun markerRapportert(databaseIds: Set<Long>): Int =
+        if (databaseIds.isEmpty()) 0 else repo.setRapportert(databaseIds, now(clock))
 
     fun gjeldendeTilgang(
         ansattId: String,
@@ -91,6 +98,7 @@ data class EnkeltTilgang(
     val gtNavn: String?,
     val enhet: String?,
     val varighet: Instant,
+    val databaseId: Long,
 )
 
 data class LederEnkeltTilganger(

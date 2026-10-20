@@ -19,9 +19,12 @@ import java.time.Instant
 class EnkeltTilgangMailSenderTest : BehaviorSpec({
     Given("filtrering av begrunnelser i e-postrapporten") {
         listOf(
-            "Oppgave" to 0,
-            "Oppgave 12345 skal behandles" to 0,
+            "Oppgave (12345) skal behandles" to 0,
+            "Oppgave" to 1,
+            "Oppgave 12345 skal behandles" to 1,
             "Behandling av Oppgave 12345" to 1,
+            "Behandling av Oppgave (12345)" to 1,
+            "oppgave (12345) skal behandles" to 1,
             "oppgave 12345 skal behandles" to 1,
         ).forEach { (begrunnelse, antallEposter) ->
             Then("sendes $antallEposter e-poster for begrunnelsen '$begrunnelse'") {
@@ -35,7 +38,7 @@ class EnkeltTilgangMailSenderTest : BehaviorSpec({
                         gt = null,
                         system = null,
                         gtNavn = null,
-                        enhet = "0105",
+                        enhet = "0219",
                         varighet = Instant.parse("2026-10-20T21:59:00Z"),
                     )
                 every { enkelt.ikkeRapportertePrLeder(setOf("10108000398")) } returns

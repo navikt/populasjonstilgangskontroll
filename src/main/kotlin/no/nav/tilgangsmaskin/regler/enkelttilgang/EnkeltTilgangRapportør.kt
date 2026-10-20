@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 class EnkeltTilgangRapportør(
     private val mailer: EnkeltTilgangMailSender,
 ) : LeaderAware() {
-    @Scheduled(cron = "0 35 11 * * TUE", zone = "Europe/Oslo")
+    @Scheduled(cron = "0 50 11 * * TUE", zone = "Europe/Oslo")
     fun sendRapporter() =
         somLeder {
             mailer.sendRapporter()

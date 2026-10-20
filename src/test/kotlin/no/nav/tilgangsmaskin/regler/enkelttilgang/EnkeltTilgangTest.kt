@@ -143,6 +143,8 @@ class EnkeltTilgangTest(
                             ansatt,
                             "1234",
                             EnkeltTilgangData(vanligBrukerId, "Begrunnelse for rapport", IMORGEN),
+                            gt = "0301",
+                            gt_navn = "Oslo",
                         )
                     entityManager
                         .createNativeQuery("UPDATE overstyring SET created = :created WHERE id = :id")
@@ -354,11 +356,15 @@ class EnkeltTilgangTest(
                             ansattMedLeder.verdi,
                             "1234",
                             EnkeltTilgangData(brukerMedLeder, "Begrunnelse med leder", IMORGEN),
+                            gt = "0301",
+                            gt_navn = "Oslo",
                         )
                         adapter.enkeltTilgang(
                             ansattUtenLeder.verdi,
                             "5678",
                             EnkeltTilgangData(brukerUtenLeder, "Begrunnelse uten leder", IMORGEN),
+                            gt = "0301",
+                            gt_navn = "Oslo",
                         )
                         every { nom.lederForAnsatt(ansattMedLeder) } returns NomRessurs(
                             ansattMedLeder,

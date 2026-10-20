@@ -23,11 +23,6 @@ interface EnkeltTilgangRepository : JpaRepository<EnkeltTilgangEntity, Long> {
         @Param("now") now: Instant,
     ): Int
 
-    fun markRapportert(entities: Set<EnkeltTilgangEntity>): Int {
-        val ids = entities.mapNotNull { it.id }.toSet()
-        return if (ids.isEmpty()) 0 else setRapportert(ids, Instant.now())
-    }
-
     fun findByNavidAndFnrAndExpires(
         ansattId: String,
         brukerId: String,

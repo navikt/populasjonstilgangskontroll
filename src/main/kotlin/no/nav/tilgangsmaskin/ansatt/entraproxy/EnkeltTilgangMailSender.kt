@@ -34,6 +34,7 @@ class EnkeltTilgangMailSender(
     fun sendRapporter() {
         runCatching {
             val data = rapporterMedLeder(enkelt.ikkeRapportertePrLeder(setOf(AREMARK)))
+            log.info("Sender enkelttilgang rapporter til ${data.size} ledere")
             data.forEach { rapport ->
                 val ansatte =
                     rapport.ansatte
@@ -63,7 +64,7 @@ class EnkeltTilgangMailSender(
                                 "TEST enkelttilgang rapport til - ${rapport.leder}",
                                 MailBody("html", body),
                                 listOf(MAILBOX),
-                                // listOf(ME),
+                                // x'0 listOf(ME),
                             ),
                             true,
                         )

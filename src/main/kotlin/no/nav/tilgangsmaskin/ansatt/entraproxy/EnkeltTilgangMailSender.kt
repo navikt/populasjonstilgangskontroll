@@ -37,7 +37,7 @@ class EnkeltTilgangMailSender(
             data.forEach { rapport ->
                 val ansatte =
                     rapport.ansatte
-                        //   .filter { it.enhet == SARPSBORG }
+                        .filter { it.enhet == SARPSBORG }
                         .filterNot { it.begrunnelse.startsWith("Oppgave") }
                         .sortedWith(compareBy(nullsLast()) { it.created })
                 if (ansatte.isEmpty()) return@forEach
@@ -63,7 +63,7 @@ class EnkeltTilgangMailSender(
                                 "TEST enkelttilgang rapport til - ${rapport.leder}",
                                 MailBody("html", body),
                                 listOf(MAILBOX),
-                                listOf(ME),
+                                // listOf(ME),
                             ),
                             true,
                         )

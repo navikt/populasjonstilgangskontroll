@@ -15,7 +15,7 @@ class EnkeltTilgangRapportør(
 ) : LeaderAware() {
     private val log = getLogger(javaClass)
 
-    @Scheduled(cron = "0 10 15 * * TUE", zone = "Europe/Oslo")
+    @Scheduled(cron = "0 0 * * * *", zone = "Europe/Oslo")
     fun sendRapporter() =
         somLeder {
             runCatching {

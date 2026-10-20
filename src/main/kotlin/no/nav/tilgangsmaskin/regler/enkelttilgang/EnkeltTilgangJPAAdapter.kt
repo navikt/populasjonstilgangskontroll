@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.OSLO
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.nom.Leder
 import no.nav.tilgangsmaskin.bruker.BrukerId
@@ -28,7 +29,7 @@ class EnkeltTilgangJPAAdapter(
         val expires =
             data.gyldigtil
                 .plusDays(1)
-                .atStartOfDay(clock.zone)
+                .atStartOfDay(OSLO)
                 .minusMinutes(1)
                 .toInstant()
         repo.findByNavidAndFnrAndExpires(ansattId, data.brukerId.verdi, expires)?.let {
@@ -71,8 +72,7 @@ class EnkeltTilgangJPAAdapter(
                 )
             }
 
-    fun markerRapportert(databaseIds: Set<Long>): Int =
-        if (databaseIds.isEmpty()) 0 else repo.setRapportert(databaseIds, now(clock))
+    fun markerRapportert(databaseIds: Set<Long>): Int = if (databaseIds.isEmpty()) 0 else repo.setRapportert(databaseIds, now(clock))
 
     fun gjeldendeTilgang(
         ansattId: String,

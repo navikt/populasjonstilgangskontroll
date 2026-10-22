@@ -19,6 +19,7 @@ import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.kodeverk.KodeverkTjeneste
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withAnsattContext
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
@@ -64,6 +65,7 @@ class EnkeltTilgangTjeneste(
             log.trace("Enkelttilgang er gyldig i {} til for {} og {}", it.diffFromNow(clock), ansattId, brukerId)
         } != null
 
+
     @Transactional
     fun registrerTilgang(
         ansattId: AnsattId,
@@ -85,7 +87,7 @@ class EnkeltTilgangTjeneste(
                 kafka.publiser(ansattId).also {
                     teller.tell(INGEN_REGEL_TAG, ENKELTTILGANG_GITT)
                     log.info(
-                        "Enkelttilgang OK. $ansattId ved enhet $enhetsnummer ($navn) har fått tilgang til ${data.brukerId} til og med ${data.gyldigtil}",
+                        "Enkelttilgang OK. $ansattId ved enhet $enhetsnummer har fått tilgang til ${data.brukerId} ($navn) til og med ${data.gyldigtil}",
                     )
                 }
                 true

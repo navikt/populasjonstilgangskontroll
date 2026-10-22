@@ -19,7 +19,6 @@ import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.BydelTilknytning
 import no.nav.tilgangsmaskin.bruker.GeografiskTilknytning.KommuneTilknytning
 import no.nav.tilgangsmaskin.bruker.kodeverk.KodeverkTjeneste
-import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.tilgangsmaskin.felles.utils.extensions.DomainExtensions.withAnsattContext
 import no.nav.tilgangsmaskin.regler.motor.RegelException
 import no.nav.tilgangsmaskin.regler.motor.RegelMotor
@@ -32,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneId
 
 @Observed
 @Service
@@ -64,7 +62,6 @@ class EnkeltTilgangTjeneste(
         ?.also {
             log.trace("Enkelttilgang er gyldig i {} til for {} og {}", it.diffFromNow(clock), ansattId, brukerId)
         } != null
-
 
     @Transactional
     fun registrerTilgang(

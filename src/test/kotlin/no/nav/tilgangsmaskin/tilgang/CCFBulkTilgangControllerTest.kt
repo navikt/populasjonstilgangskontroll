@@ -114,7 +114,7 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                             RegelSett(KOMPLETT_REGELTYPE to listOf(StrengtFortroligRegel())),
                             mockk<RegelMotorLogger>(relaxed = true),
                         )
-                    val aggregator = BulkResponsAggregator(enkeltTilgangTjeneste, auditor)
+                    val aggregator = BulkResponsAggregator(enkeltTilgangTjeneste, auditor, motor)
                     val realRegelTjeneste =
                         RegelTjeneste(
                             motor,

@@ -10,6 +10,7 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import no.nav.sikkerhetstjenesten.felles.notifikasjon.Auditor
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.regler.AnsattBuilder
@@ -23,6 +24,7 @@ import no.nav.tilgangsmaskin.regler.motor.BulkResultat.Companion.avvist
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat.Companion.ok
 import no.nav.tilgangsmaskin.regler.motor.Regel
 import no.nav.tilgangsmaskin.regler.motor.RegelException
+import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.regler.motor.RegelSett.RegelType.KOMPLETT_REGELTYPE
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.NO_CONTENT
@@ -31,7 +33,8 @@ class BulkResponsAggregatorTest : BehaviorSpec({
 
     val enkeltTilgangTjeneste = mockk<EnkeltTilgangTjeneste>()
     val auditor = mockk<Auditor>(relaxed = true)
-    val aggregator = BulkResponsAggregator(enkeltTilgangTjeneste, auditor)
+    val motor = mockk<RegelMotor>(relaxed = true)
+    val aggregator = BulkResponsAggregator(enkeltTilgangTjeneste, auditor, motor)
 
     val ansattId = AnsattId("Z999999")
     val ansatt = AnsattBuilder(ansattId).build()
@@ -129,6 +132,33 @@ class BulkResponsAggregatorTest : BehaviorSpec({
                     godkjente shouldHaveSize 2
                     avviste.shouldBeEmpty()
                 }
+            }
+        }
+    }
+
+    Given("en bruker er avvist med enkelttilgang men feiler en kjerneregel") {
+        val brukerIdMedKjerneavslag = BrukerId("01010112345")
+        val brukerMedKjerneavslag = BrukerBuilder(brukerIdMedKjerneavslag).build()
+        val kjerneAvslag = RegelException(ansatt, brukerMedKjerneavslag, testRegel)
+        val resultater = setOf(avvist(brukerMedKjerneavslag, RegelException(ansatt, brukerMedKjerneavslag, testRegel)))
+        val oppgitt = setOf(BrukerIdOgRegelsett(brukerIdMedKjerneavslag.verdi, KOMPLETT_REGELTYPE))
+        val brukere = setOf(BrukerOgRegelsett(brukerMedKjerneavslag, KOMPLETT_REGELTYPE))
+
+        every { enkeltTilgangTjeneste.tilganger(ansattId, setOf(brukerIdMedKjerneavslag)) } returns setOf(brukerIdMedKjerneavslag)
+        every { motor.kjerneregler(ansatt, brukerMedKjerneavslag) } throws kjerneAvslag
+
+        When("aggreger kalles") {
+            val respons = aggregator.aggreger(ansattId, ansatt, resultater, oppgitt, brukere)
+
+            Then("brukeren avvises selv om enkelttilgang finnes") {
+                assertSoftly(respons) {
+                    godkjente.shouldBeEmpty()
+                    avviste shouldHaveSize 1
+                    avviste.first().brukerId shouldBe brukerIdMedKjerneavslag.verdi
+                    avviste.first().status shouldBe FORBIDDEN.value()
+                    ukjente.shouldBeEmpty()
+                }
+                verify(exactly = 1) { motor.kjerneregler(ansatt, brukerMedKjerneavslag) }
             }
         }
     }

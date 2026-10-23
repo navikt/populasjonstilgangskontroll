@@ -1,7 +1,5 @@
 package no.nav.tilgangsmaskin.regler
 
-import no.nav.tilgangsmaskin.ansatt.AnsattId
-
 import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
@@ -14,11 +12,12 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifyOrder
+import no.nav.sikkerhetstjenesten.felles.notifikasjon.LocalAuditor
+import no.nav.sikkerhetstjenesten.felles.rest.NotFoundRestException
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.tilgangsmaskin.bruker.BrukerTjeneste
-import no.nav.sikkerhetstjenesten.felles.notifikasjon.LocalAuditor
-import no.nav.sikkerhetstjenesten.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
 import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat
@@ -29,10 +28,9 @@ import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import java.net.URI
 
 class RegelTjenesteTest : BehaviorSpec() {
-
-    private val motor      = mockk<RegelMotor>()
-    private val brukere    = mockk<BrukerTjeneste>()
-    private val ansatte    = mockk<AnsattTjeneste>()
+    private val motor = mockk<RegelMotor>()
+    private val brukere = mockk<BrukerTjeneste>()
+    private val ansatte = mockk<AnsattTjeneste>()
     private val enkeltTilgang = mockk<EnkeltTilgangTjeneste>()
 
     init {
@@ -44,7 +42,15 @@ class RegelTjenesteTest : BehaviorSpec() {
         beforeEach {
             clearAllMocks()
             every { ansatte.ansatt(ansattId) } returns AnsattBuilder(ansattId).build()
-            regler = RegelTjeneste(motor, brukere, ansatte, enkeltTilgang, LocalAuditor(), BulkResponsAggregator(enkeltTilgang, LocalAuditor()))
+            regler =
+                RegelTjeneste(
+                    motor,
+                    brukere,
+                    ansatte,
+                    enkeltTilgang,
+                    LocalAuditor(),
+                    BulkResponsAggregator(enkeltTilgang, LocalAuditor(), motor),
+                )
         }
 
         Given("bulk-tilgangskontroll") {
@@ -55,6 +61,7 @@ class RegelTjenesteTest : BehaviorSpec() {
                     every { brukere.brukere(setOf(vanligBrukerId.verdi)) } returns setOf(funnetBruker)
                     every { motor.bulkRegler(any(), any()) } returns setOf(BulkResultat.avvist(funnetBruker, regelException))
                     every { enkeltTilgang.tilganger(any(), any()) } returns setOf(vanligBrukerId)
+                    every { motor.kjerneregler(any(), funnetBruker) } returns Unit
 
                     val resultater = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi)))
                     assertSoftly(resultater) {
@@ -88,7 +95,11 @@ class RegelTjenesteTest : BehaviorSpec() {
                     every { motor.bulkRegler(any(), any()) } returns setOf(BulkResultat.ok(funnetBruker))
                     every { enkeltTilgang.tilganger(any(), any()) } returns emptySet()
 
-                    val resultater = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi), BrukerIdOgRegelsett(ikkeFunnetId.verdi)))
+                    val resultater =
+                        regler.bulkRegler(
+                            ansattId,
+                            setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi), BrukerIdOgRegelsett(ikkeFunnetId.verdi)),
+                        )
                     assertSoftly(resultater) {
                         godkjente.map { it.brukerId } shouldContainExactlyInAnyOrder listOf(vanligBrukerId.verdi, ikkeFunnetId.verdi)
                         avviste.shouldBeEmpty()
@@ -104,7 +115,11 @@ class RegelTjenesteTest : BehaviorSpec() {
                     every { motor.bulkRegler(any(), any()) } returns setOf(BulkResultat.ok(funnetBruker))
                     every { enkeltTilgang.tilganger(any(), any()) } returns emptySet()
 
-                    val resultater = regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi), BrukerIdOgRegelsett(historiskId.verdi)))
+                    val resultater =
+                        regler.bulkRegler(
+                            ansattId,
+                            setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi), BrukerIdOgRegelsett(historiskId.verdi)),
+                        )
                     assertSoftly(resultater) {
                         godkjente.map { it.brukerId } shouldContainExactlyInAnyOrder listOf(vanligBrukerId.verdi)
                         avviste.shouldBeEmpty()
@@ -118,7 +133,8 @@ class RegelTjenesteTest : BehaviorSpec() {
                     every { brukere.brukere(setOf(vanligBrukerId.verdi)) } returns setOf(funnetBruker)
                     every { motor.bulkRegler(any(), any()) } throws RuntimeException("noe gikk galt")
                     shouldThrow<RuntimeException> {
-                        regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi))) }
+                        regler.bulkRegler(ansattId, setOf(BrukerIdOgRegelsett(vanligBrukerId.verdi)))
+                    }
                 }
             }
         }

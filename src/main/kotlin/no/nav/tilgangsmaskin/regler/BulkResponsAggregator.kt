@@ -1,8 +1,8 @@
 package no.nav.tilgangsmaskin.regler
 
 import io.micrometer.observation.annotation.Observed
-import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.sikkerhetstjenesten.felles.notifikasjon.Auditor
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.ansatt.Ansatt
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
@@ -10,6 +10,7 @@ import no.nav.tilgangsmaskin.regler.motor.BrukerIdOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.BrukerOgRegelsett
 import no.nav.tilgangsmaskin.regler.motor.BulkResultat
 import no.nav.tilgangsmaskin.regler.motor.RegelException
+import no.nav.tilgangsmaskin.regler.motor.RegelMotor
 import no.nav.tilgangsmaskin.tilgang.openapi.AggregertBulkRespons
 import no.nav.tilgangsmaskin.tilgang.openapi.AggregertBulkRespons.EnkeltBulkRespons
 import no.nav.tilgangsmaskin.tilgang.openapi.AggregertBulkRespons.EnkeltBulkRespons.Companion.ok
@@ -21,83 +22,112 @@ import org.springframework.stereotype.Service
 @Service
 class BulkResponsAggregator(
     private val enkeltTilgangTjeneste: EnkeltTilgangTjeneste,
-    private val auditor: Auditor) {
+    private val auditor: Auditor,
+    private val motor: RegelMotor,
+) {
     private val log = getLogger(javaClass)
 
-    fun aggreger(ansattId: AnsattId,
-                 ansatt: Ansatt,
-                 resultater: Set<BulkResultat>,
-                 oppgitt: Set<BrukerIdOgRegelsett>,
-                 brukere: Set<BrukerOgRegelsett>): AggregertBulkRespons {
-        log.debug("${resultater.size} bulk resultater {}", resultater.map { resultat ->
-            "${resultat.bruker.oppslagId.maskFnr()}: ${resultat.status}"
-        })
+    fun aggreger(
+        ansattId: AnsattId,
+        ansatt: Ansatt,
+        resultater: Set<BulkResultat>,
+        oppgitt: Set<BrukerIdOgRegelsett>,
+        brukere: Set<BrukerOgRegelsett>,
+    ): AggregertBulkRespons {
+        log.debug(
+            "${resultater.size} bulk resultater {}",
+            resultater.map { resultat ->
+                "${resultat.bruker.oppslagId.maskFnr()}: ${resultat.status}"
+            },
+        )
         val godkjente = godkjente(ansatt, resultater)
         val avviste = avviste(ansatt, godkjente, resultater, brukere)
         val ikkeFunnet = ikkeFunnet(oppgitt, resultater)
         return AggregertBulkRespons(ansattId, godkjente + avviste + ikkeFunnet)
     }
 
-    private fun godkjente(ansatt: Ansatt, resultater: Set<BulkResultat>) =
-        buildSet {
-            val (godkjente, avviste) = resultater.partition { it.status.is2xxSuccessful }
-            godkjente.forEach { add(ok(it.bruker.oppslagId)) }
-            enkeltTilgangTjeneste.tilganger(ansatt.ansattId, avviste.map { it.bruker.brukerId }.toSet())
-                .forEach { enkelt -> add(ok(enkelt.verdi)) }
-        }.also { respons ->
-            if (respons.isNotEmpty()) {
-                log.debug("${respons.size} godkjent av bulk ({})", respons.map { it.brukerId.maskFnr() })
+    private fun godkjente(
+        ansatt: Ansatt,
+        resultater: Set<BulkResultat>,
+    ) = buildSet {
+        val (godkjente, avviste) = resultater.partition { it.status.is2xxSuccessful }
+        godkjente.forEach { add(ok(it.bruker.oppslagId)) }
+        val tilganger =
+            enkeltTilgangTjeneste
+                .tilganger(ansatt.ansattId, avviste.map { it.bruker.brukerId }.toSet())
+        avviste.filter { it.bruker.brukerId in tilganger }.forEach { resultat ->
+            try {
+                motor.kjerneregler(ansatt, resultat.bruker)
+                add(ok(resultat.bruker.oppslagId))
+            } catch (e: RegelException) {
+                log.debug("Enkelttilgang avvist av kjerneregel {} for {}", e.regel.kode, resultat.bruker.oppslagId.maskFnr())
             }
         }
-
-    private fun avviste(ansatt: Ansatt,
-                        godkjente: Set<EnkeltBulkRespons>,
-                        resultater: Set<BulkResultat>,
-                        brukere: Set<BrukerOgRegelsett>) =
-        buildSet {
-            val godkjenteIds = godkjente.map { it.brukerId }.toSet()
-            for (resultat in resultater) {
-                if (resultat.status == FORBIDDEN && resultat.bruker.oppslagId !in godkjenteIds) {
-                    log.trace("Bulk avvist ident {} har ingen enkelttilgang", resultat.bruker.oppslagId.maskFnr())
-                    add(EnkeltBulkRespons(RegelException(ansatt,
-                        brukere.finnBruker(resultat.bruker.oppslagId),
-                        resultat.regel!!,
-                        resultat.status)))
-                }
-            }
-        }.also {
-            if (it.isNotEmpty()) {
-                log.debug("${it.size} avvist av bulk ({})", it.map { ident -> ident.brukerId.maskFnr() })
-            }
+    }.also { respons ->
+        if (respons.isNotEmpty()) {
+            log.debug("${respons.size} godkjent av bulk ({})", respons.map { it.brukerId.maskFnr() })
         }
+    }.also { log.info("${it.size} brukere med identer ${it.map { ident -> ident.brukerId }} godkjent av bulk") }
 
-    private fun ikkeFunnet(oppgitt: Set<BrukerIdOgRegelsett>, funnet: Set<BulkResultat>) =
-        buildSet {
-            for (item in (oppgitt - funnet)) {
-                add(ok(item.brukerId))
-            }
-        }.also {
-            if (it.isNotEmpty()) {
-                auditor.info("${it.size} brukere med identer ${it.map { ident -> ident.brukerId }} ikke funnet i PDL ved oppslag")
-                log.debug("${it.size} ikke funnet i bulk ({})", it.map { ident -> ident.brukerId.maskFnr() })
-            }
-        }
-
-    private operator fun Set<BrukerIdOgRegelsett>.minus(funnet: Set<BulkResultat>): List<BrukerIdOgRegelsett> {
-        val kjenteIds = funnet.asSequence()
-            .flatMap { resultat ->
-                sequenceOf(
-                    resultat.bruker.oppslagId,
-                    *resultat.bruker.historiskeIds.map { id -> id.verdi }.toTypedArray()
+    private fun avviste(
+        ansatt: Ansatt,
+        godkjente: Set<EnkeltBulkRespons>,
+        resultater: Set<BulkResultat>,
+        brukere: Set<BrukerOgRegelsett>,
+    ) = buildSet {
+        val godkjenteIds = godkjente.map { it.brukerId }.toSet()
+        for (resultat in resultater) {
+            if (resultat.status == FORBIDDEN && resultat.bruker.oppslagId !in godkjenteIds) {
+                log.trace("Bulk avvist ident {} har ingen enkelttilgang", resultat.bruker.oppslagId.maskFnr())
+                add(
+                    EnkeltBulkRespons(
+                        RegelException(
+                            ansatt,
+                            brukere.finnBruker(resultat.bruker.oppslagId),
+                            resultat.regel!!,
+                            resultat.status,
+                        ),
+                    ),
                 )
             }
-            .toSet()
+        }
+    }.also {
+        if (it.isNotEmpty()) {
+            log.debug("${it.size} avvist av bulk ({})", it.map { ident -> ident.brukerId.maskFnr() })
+        }
+    }
+
+    private fun ikkeFunnet(
+        oppgitt: Set<BrukerIdOgRegelsett>,
+        funnet: Set<BulkResultat>,
+    ) = buildSet {
+        for (item in (oppgitt - funnet)) {
+            add(ok(item.brukerId))
+        }
+    }.also {
+        if (it.isNotEmpty()) {
+            auditor.info("${it.size} brukere med identer ${it.map { ident -> ident.brukerId }} ikke funnet i PDL ved oppslag")
+            log.debug("${it.size} ikke funnet i bulk ({})", it.map { ident -> ident.brukerId.maskFnr() })
+        }
+    }
+
+    private operator fun Set<BrukerIdOgRegelsett>.minus(funnet: Set<BulkResultat>): List<BrukerIdOgRegelsett> {
+        val kjenteIds =
+            funnet
+                .asSequence()
+                .flatMap { resultat ->
+                    sequenceOf(
+                        resultat.bruker.oppslagId,
+                        *resultat.bruker.historiskeIds
+                            .map { id -> id.verdi }
+                            .toTypedArray(),
+                    )
+                }.toSet()
 
         return filterNot { brukerIdOgRegelsett ->
             brukerIdOgRegelsett.brukerId in kjenteIds
         }
     }
 
-    private fun Set<BrukerOgRegelsett>.finnBruker(oppslagId: String) =
-        first { it.bruker.oppslagId == oppslagId }.bruker
+    private fun Set<BrukerOgRegelsett>.finnBruker(oppslagId: String) = first { it.bruker.oppslagId == oppslagId }.bruker
 }

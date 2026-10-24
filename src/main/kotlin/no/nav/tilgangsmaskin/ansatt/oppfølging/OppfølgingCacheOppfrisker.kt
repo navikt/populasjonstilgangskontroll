@@ -9,8 +9,9 @@ import org.springframework.stereotype.Component
 
 @Component
 class OppfølgingCacheOppfrisker(
+    cfg: OppfølgingConfig,
     private val oppfølging: OppfølgingTjeneste,
-) : AbstractCacheOppfrisker(setOf(OPPFØLGING_CACHE)) {
+) : AbstractCacheOppfrisker(cfg) {
     override fun doOppfrisk(nøkkelElementer: CacheNøkkel) {
         oppfølging.enhetFor(Identifikator(nøkkelElementer.id))
     }

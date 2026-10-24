@@ -11,7 +11,8 @@ import org.springframework.stereotype.Component
 @Component
 class VergemålCacheOppfrisker(
     private val vergemål: VergemålTjeneste,
-) : AbstractCacheOppfrisker(setOf(VERGE_CACHE)) {
+    cfg: VergemålConfig,
+) : AbstractCacheOppfrisker(cfg) {
     override fun doOppfrisk(nøkkelElementer: CacheNøkkel) {
         vergemål.alle(AnsattId(nøkkelElementer.id))
     }

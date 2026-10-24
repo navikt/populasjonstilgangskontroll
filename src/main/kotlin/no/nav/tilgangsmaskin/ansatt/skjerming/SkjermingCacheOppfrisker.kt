@@ -11,7 +11,8 @@ import org.springframework.stereotype.Component
 @Component
 class SkjermingCacheOppfrisker(
     private val skjerming: SkjermingTjeneste,
-) : AbstractCacheOppfrisker(setOf(SKJERMING_CACHE)) {
+    cfg: SkjermingConfig,
+) : AbstractCacheOppfrisker(cfg) {
     @Timed
     override fun doOppfrisk(nøkkelElementer: CacheNøkkel) {
         skjerming.skjerming(BrukerId(nøkkelElementer.id))

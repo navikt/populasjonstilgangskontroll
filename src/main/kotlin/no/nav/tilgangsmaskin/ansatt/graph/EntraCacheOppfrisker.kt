@@ -18,7 +18,8 @@ class EntraCacheOppfrisker(
     private val entra: EntraTjeneste,
     private val oidTjeneste: EntraOidTjeneste,
     private val cache: CacheOperations,
-) : AbstractCacheOppfrisker(ENTRA_CACHES) {
+    private val cfg: EntraGrupperConfig,
+) : AbstractCacheOppfrisker(cfg) {
     override fun doOppfrisk(nøkkelElementer: CacheNøkkel) {
         val ansattId = AnsattId(nøkkelElementer.id)
         withMDC(USER_ID to ansattId.verdi) {

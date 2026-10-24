@@ -6,20 +6,21 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
 import io.mockk.verify
 import no.nav.sikkerhetstjenesten.felles.cache.CacheNøkkel
+import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
+import no.nav.sikkerhetstjenesten.felles.rest.NotFoundRestException
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO
 import no.nav.tilgangsmaskin.ansatt.graph.EntraCacheOppfrisker.Companion.GEO_OG_GLOBALE
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidConfig.Companion.OID_CACHE
 import no.nav.tilgangsmaskin.ansatt.graph.oid.EntraOidTjeneste
-import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
-import no.nav.sikkerhetstjenesten.felles.rest.NotFoundRestException
 import org.springframework.test.context.ContextConfiguration
 import java.net.URI
 import java.util.*
 
-@ContextConfiguration(classes = [EntraCacheOppfrisker::class])
-class EntraCacheOppfriskerTest(private val oppfrisker: EntraCacheOppfrisker) : BehaviorSpec() {
-
+@ContextConfiguration(classes = [EntraCacheOppfrisker::class, EntraGrupperConfig::class])
+class EntraCacheOppfriskerTest(
+    private val oppfrisker: EntraCacheOppfrisker,
+) : BehaviorSpec() {
     @MockkBean(relaxed = true)
     private lateinit var entra: EntraTjeneste
 
@@ -186,6 +187,7 @@ class EntraCacheOppfriskerTest(private val oppfrisker: EntraCacheOppfrisker) : B
 
         private val OID = UUID.randomUUID()
         private val NY_OID = UUID.randomUUID()
+
         private fun nøkkel(metode: String) = CacheNøkkel("graph::$metode:${ansattId.verdi}")
     }
 }

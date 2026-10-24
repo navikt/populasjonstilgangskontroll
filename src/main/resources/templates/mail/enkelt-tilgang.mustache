@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="no">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Enkelttilgang</title>
+    <style>
+      th, td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #d1d6db;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background: #c5d4cb;
+      }
+
+    </style>
+  </head>
+  <body style="margin: 0; background: #f3f3f4; color: #1f1f1f; font-family: Arial, sans-serif;">
+    <main style="margin: 2rem 1rem; padding: 2rem; border-radius: 8px; background: #ffffff; border: 1px solid #d1d6db; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);">
+    <p>Hei {{leder.visningsnavn}},</p>
+    <p>«Enkelttilgang» gir medarbeidere mulighet til å gi seg selv midlertidig tilgang til enkeltbrukere ved behov, mot å begrunne oppslaget. Begrunnelsen skal tydelig forklare hvorfor man trenger tilgang til brukeren, og skal ikke inneholde sensitive opplysninger. Vi ber deg som leder følge opp eventuelle mangelfulle begrunnelser med aktuelle medarbeidere.</p>
+    <p>Disse enkelttilgangene er gitt til dine medarbeidere denne måneden:</p>
+    <table style="width: 100%; background: #d3dfd7; border-collapse: collapse; font-family: Arial, sans-serif; color: #1f1f1f;">
+      <thead>
+        <tr>
+          <th>Ansatt</th>
+          <th>Dato</th>
+          <th>Tidspunkt</th>
+          <th>Varighet</th>
+          <th>Brukers enhet</th>
+          <th>Oppgitt begrunnelse</th>
+          <th>Utført fra system</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#tilganger}}
+        <tr bgcolor="{{bakgrunnsfarge}}" style="background-color: {{bakgrunnsfarge}};">
+          <td style="background-color: {{bakgrunnsfarge}};">{{ansatt}}</td>
+          <td style="background-color: {{bakgrunnsfarge}};">{{dato}}</td>
+          <td style="background-color: {{bakgrunnsfarge}};">{{tidspunkt}}</td>
+          <td style="background-color: {{bakgrunnsfarge}};">{{varighet}}</td>
+          <td style="background-color: {{bakgrunnsfarge}};">{{enhet}}</td>
+          <td style="background-color: {{bakgrunnsfarge}};">{{begrunnelse}}</td>
+          <td style="background-color: {{bakgrunnsfarge}};">{{system}}</td>
+        </tr>
+        {{/tilganger}}
+      </tbody>
+    </table>
+    <p>Les mer om enkelttilgang på <a href="https://navno.sharepoint.com/sites/fag-og-ytelser-fagsystemer/SitePages/Enkelttilgang---utpr%C3%B8ving-av-ny-tilgang.aspx">navet</a>.</p>
+    <p>Dersom du har spørsmål om konkrete tilganger gitt til dine ansatte så meld fra til teknologiavdelingen.team-sikkerhetstjenesten@nav.no</p>
+    <p>Generelle spørsmål og tilbakemeldinger om løsningen kan stilles på Viva Engage (Pilot enkelttilgang).</p>
+    </main>
+  </body>
+</html>

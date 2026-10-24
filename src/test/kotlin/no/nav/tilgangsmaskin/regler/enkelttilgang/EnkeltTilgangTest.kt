@@ -12,6 +12,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import io.opentelemetry.api.trace.Span
 import io.mockk.every
 import io.mockk.mockk
+import jakarta.persistence.EntityManager
 import no.nav.tilgangsmaskin.SharedPostgresContainer.postgreSQLContainer
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyEnhet.Enhet
@@ -48,6 +49,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.test.context.ContextConfiguration
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.Clock
+import java.time.Instant
 import java.time.LocalDate
 
 @DataJpaTest
@@ -63,6 +65,7 @@ class EnkeltTilgangTest(
     private val registry: MeterRegistry,
     private val adapter: EnkeltTilgangJPAAdapter,
     private val repo: EnkeltTilgangRepository,
+    private val entityManager: EntityManager,
 ) : BehaviorSpec() {
 
     private val vanligBrukerId = BrukerId("08526835670")
@@ -126,6 +129,68 @@ class EnkeltTilgangTest(
                         span shouldBe Span.current().spanContext.spanId
                     }
                 }
+            }
+        }
+
+        Given("datogrense for ikke-rapporterte enkelttilganger") {
+            Then("hentes bare ikke-rapporterte rader med created strengt etter grensen") {
+                repo.deleteAll()
+                val grense = Instant.parse("2026-09-30T22:00:00Z")
+
+                fun lagre(ansatt: String, created: Instant): EnkeltTilgangEntity {
+                    val entity =
+                        adapter.enkeltTilgang(
+                            ansatt,
+                            "1234",
+                            EnkeltTilgangData(vanligBrukerId, "Begrunnelse for rapport", IMORGEN),
+                            gt = "0301",
+                            gt_navn = "Oslo",
+                        )
+                    entityManager
+                        .createNativeQuery("UPDATE overstyring SET created = :created WHERE id = :id")
+                        .setParameter("created", created)
+                        .setParameter("id", entity.id)
+                        .executeUpdate() shouldBe 1
+                    return entity
+                }
+
+                lagre("Z100001", grense.minusSeconds(1))
+                lagre("Z100002", grense)
+                val nyere = lagre("Z100003", grense.plusSeconds(1))
+                val rapportert = lagre("Z100004", grense.plusSeconds(1))
+                repo.setRapportert(setOf(requireNotNull(rapportert.id)), grense.plusSeconds(2))
+
+                adapter.ikkeRapporterte(grense).map { it.id } shouldBe listOf(AnsattId(nyere.navid))
+            }
+        }
+
+        Given("markering av rapporterte enkelttilganger") {
+            Then("oppdateres bare angitte ID-er, og tidligere rapportering beholdes") {
+                repo.deleteAll()
+                val now = Instant.parse("2026-10-20T10:00:00Z")
+                val tidligere = now.minusSeconds(60)
+                val første =
+                    adapter.enkeltTilgang(
+                        "Z100001", "0219",
+                        EnkeltTilgangData(vanligBrukerId, "Begrunnelse for rapport", IMORGEN),
+                    )
+                val andre =
+                    adapter.enkeltTilgang(
+                        "Z100002", "0219",
+                        EnkeltTilgangData(vanligBrukerId, "Begrunnelse for rapport", IMORGEN),
+                    )
+                val førsteId = requireNotNull(første.id)
+                val andreId = requireNotNull(andre.id)
+
+                repo.setRapportert(setOf(førsteId), tidligere) shouldBe 1
+                repo.setRapportert(setOf(førsteId), now) shouldBe 0
+
+                repo.findById(førsteId).orElseThrow().rapportert shouldBe tidligere
+                repo.findById(andreId).orElseThrow().rapportert shouldBe null
+
+                repo.setRapportert(setOf(førsteId, andreId), now) shouldBe 1
+                repo.findById(førsteId).orElseThrow().rapportert shouldBe tidligere
+                repo.findById(andreId).orElseThrow().rapportert shouldBe now
             }
         }
 
@@ -321,11 +386,15 @@ class EnkeltTilgangTest(
                             ansattMedLeder.verdi,
                             "1234",
                             EnkeltTilgangData(brukerMedLeder, "Begrunnelse med leder", IMORGEN),
+                            gt = "0301",
+                            gt_navn = "Oslo",
                         )
                         adapter.enkeltTilgang(
                             ansattUtenLeder.verdi,
                             "5678",
                             EnkeltTilgangData(brukerUtenLeder, "Begrunnelse uten leder", IMORGEN),
+                            gt = "0301",
+                            gt_navn = "Oslo",
                         )
                         every { nom.lederForAnsatt(ansattMedLeder) } returns NomRessurs(
                             ansattMedLeder,

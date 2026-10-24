@@ -9,14 +9,14 @@ import org.springframework.stereotype.Component
 import java.net.URI
 
 @Component
-class EntraProxyConfig(@Value("\${spring.http.serviceclient.entraproxy.base-url}") baseUrl: URI) : RestConfig(baseUrl, ENTRA_PROXY_PING_PATH, ENTRAPROXY) {
+class EntraProxyConfig(
+    @Value($$"${spring.http.serviceclient.entraproxy.base-url}") baseUrl: URI,
+) : RestConfig(baseUrl, ENTRA_PROXY_PING_PATH, ENTRAPROXY) {
+    fun ansattUri(id: String) = uri(ENTRA_PROXY_ANSATT_PATH, id)
 
-    fun ansattUri(id: String) = uri(ENTRA_PROXY_ANSATT_PATH,id)
-
-    fun enheterUri(id: String) = uri(ENTRA_PROXY_ENHETER_PATH,id)
-
+    fun enheterUri(id: String) = uri(ENTRA_PROXY_ENHETER_PATH, id)
 
     companion object {
-        const val ENTRAPROXY  = "entraproxy"
+        const val ENTRAPROXY = "entraproxy"
     }
 }

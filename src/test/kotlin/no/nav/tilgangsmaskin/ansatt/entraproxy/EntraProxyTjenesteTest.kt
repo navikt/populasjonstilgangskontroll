@@ -3,10 +3,10 @@ package no.nav.tilgangsmaskin.ansatt.entraproxy
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
-import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.sikkerhetstjenesten.felles.rest.IrrecoverableRestException
 import no.nav.sikkerhetstjenesten.felles.rest.NotFoundRestException
 import no.nav.sikkerhetstjenesten.felles.rest.RecoverableRestException
+import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyEnhet.Enhet
 import no.nav.tilgangsmaskin.bruker.Enhetsnummer
 import no.nav.tilgangsmaskin.felles.rest.OAuth2ClientTestConfig
@@ -14,10 +14,12 @@ import no.nav.tilgangsmaskin.felles.rest.PropertySettingTestContextInitializer
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpMethod.GET
+import org.springframework.http.HttpMethod.POST
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.mail.SimpleMailMessage
 import org.springframework.resilience.annotation.EnableResilientMethods
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.client.ExpectedCount.times
@@ -27,13 +29,18 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers.request
 import org.springframework.test.web.client.response.MockRestResponseCreators.withStatus
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 
-
 @RestClientTest
 @EnableResilientMethods
-@ContextConfiguration(classes = [EntraProxyTjeneste::class, EntraProxyConfig::class], initializers = [PropertySettingTestContextInitializer::class])
+@ContextConfiguration(
+    classes = [EntraProxyTjeneste::class, EntraProxyConfig::class],
+    initializers = [PropertySettingTestContextInitializer::class],
+)
 @Import(OAuth2ClientTestConfig::class)
-class EntraProxyTjenesteTest(private val tjeneste: EntraProxyTjeneste, private val server: MockRestServiceServer, private val cfg: EntraProxyConfig) : BehaviorSpec() {
-
+class EntraProxyTjenesteTest(
+    private val tjeneste: EntraProxyTjeneste,
+    private val server: MockRestServiceServer,
+    private val cfg: EntraProxyConfig,
+) : BehaviorSpec() {
     init {
         afterEach {
             server.verify()
@@ -42,17 +49,23 @@ class EntraProxyTjenesteTest(private val tjeneste: EntraProxyTjeneste, private v
         Given("oppslag av enhet for ansatt") {
             When("ansatt eksisterer") {
                 Then("returnerer enhet for ansatt") {
-                    server.expect(requestTo(cfg.ansattUri(ANSATTID.verdi)))
+                    server
+                        .expect(requestTo(cfg.ansattUri(ANSATTID.verdi)))
                         .andExpect(method(GET))
-                        .andRespond(withSuccess("""
-                            {
-                              "navIdent": "Z999999",
-                              "enhet": {
-                                "enhetnummer": "1234",
-                                "navn": "NAV Testkontor"
-                              }
-                            }
-                        """.trimIndent(), APPLICATION_JSON))
+                        .andRespond(
+                            withSuccess(
+                                """
+                                {
+                                  "navIdent": "Z999999",
+                                  "enhet": {
+                                    "enhetnummer": "1234",
+                                    "navn": "NAV Testkontor"
+                                  }
+                                }
+                                """.trimIndent(),
+                                APPLICATION_JSON,
+                            ),
+                        )
 
                     tjeneste.enhet(ANSATTID) shouldBe Enhet(Enhetsnummer("1234"), "NAV Testkontor")
                 }
@@ -62,24 +75,33 @@ class EntraProxyTjenesteTest(private val tjeneste: EntraProxyTjeneste, private v
         Given("oppslag av enheter for ansatt") {
             When("ansatt er tilknyttet enheter") {
                 Then("returnerer liste av enheter for ansatt") {
-                    server.expect(requestTo(cfg.enheterUri(ANSATTID.verdi)))
+                    server
+                        .expect(requestTo(cfg.enheterUri(ANSATTID.verdi)))
                         .andExpect(method(GET))
-                        .andRespond(withSuccess("""
-                            [
-                              { "enhetnummer": "1234", "navn": "NAV Testkontor" },
-                              { "enhetnummer": "5678", "navn": "NAV Annenkontor" }
-                            ]
-                        """.trimIndent(), APPLICATION_JSON))
+                        .andRespond(
+                            withSuccess(
+                                """
+                                [
+                                  { "enhetnummer": "1234", "navn": "NAV Testkontor" },
+                                  { "enhetnummer": "5678", "navn": "NAV Annenkontor" }
+                                ]
+                                """.trimIndent(),
+                                APPLICATION_JSON,
+                            ),
+                        )
 
-                    tjeneste.enheter(ANSATTID) shouldBe setOf(
-                        Enhet(Enhetsnummer("1234"), "NAV Testkontor"),
-                        Enhet(Enhetsnummer("5678"), "NAV Annenkontor"))
+                    tjeneste.enheter(ANSATTID) shouldBe
+                        setOf(
+                            Enhet(Enhetsnummer("1234"), "NAV Testkontor"),
+                            Enhet(Enhetsnummer("5678"), "NAV Annenkontor"),
+                        )
                 }
             }
 
             When("ansatt ikke er tilknyttet enheter") {
                 Then("returneres tom liste") {
-                    server.expect(requestTo(cfg.enheterUri(ANSATTID.verdi)))
+                    server
+                        .expect(requestTo(cfg.enheterUri(ANSATTID.verdi)))
                         .andExpect(method(GET))
                         .andRespond(withSuccess("[]", APPLICATION_JSON))
 
@@ -91,7 +113,8 @@ class EntraProxyTjenesteTest(private val tjeneste: EntraProxyTjeneste, private v
         Given("feilhaandtering") {
             When("tjenesten returnerer 404") {
                 Then("kaster NotFoundRestException uten retry") {
-                    server.expect(requestTo(cfg.ansattUri(ANSATTID.verdi)))
+                    server
+                        .expect(requestTo(cfg.ansattUri(ANSATTID.verdi)))
                         .andExpect(method(GET))
                         .andRespond(withStatus(NOT_FOUND))
 
@@ -103,7 +126,8 @@ class EntraProxyTjenesteTest(private val tjeneste: EntraProxyTjeneste, private v
 
             When("tjenesten returnerer 401") {
                 Then("kaster IrrecoverableRestException uten retry") {
-                    server.expect(requestTo(cfg.ansattUri(ANSATTID.verdi)))
+                    server
+                        .expect(requestTo(cfg.ansattUri(ANSATTID.verdi)))
                         .andExpect(method(GET))
                         .andRespond(withStatus(UNAUTHORIZED))
 
@@ -115,7 +139,8 @@ class EntraProxyTjenesteTest(private val tjeneste: EntraProxyTjeneste, private v
 
             When("tjenesten returnerer 500") {
                 Then("kaster RecoverableRestException etter 4 forsøk") {
-                    server.expect(times(4), requestTo(cfg.ansattUri(ANSATTID.verdi)))
+                    server
+                        .expect(times(4), requestTo(cfg.ansattUri(ANSATTID.verdi)))
                         .andExpect(method(GET))
                         .andRespond(withStatus(INTERNAL_SERVER_ERROR))
 
@@ -127,7 +152,7 @@ class EntraProxyTjenesteTest(private val tjeneste: EntraProxyTjeneste, private v
         }
     }
 
-    companion object  {
+    companion object {
         private val ANSATTID = AnsattId("Z999999")
     }
 }

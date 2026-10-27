@@ -23,11 +23,8 @@ class EnkeltTilgangMailSender(
                     MailMessage(
                         "TEST BÆRUM enkelttilgang rapport til - ${rapport.leder}",
                         MailBody("html", rapport.html),
-                        listOf(MAILBOX),
-                        listOf(ME),
-                    ),
-                    true,
-                )
+                        listOf(MAILBOX)),
+                    true)
             proxy.mail(message)
         }.onSuccess {
             log.info("Rapport sendt til {}", rapport.leder)
@@ -37,7 +34,5 @@ class EnkeltTilgangMailSender(
     }
 
     companion object {
-        private val MAILBOX = MailRecipient(MailAddress("teknologiavdelingen.team-sikkerhetstjenesten@nav.no"))
-        private val ME = MailRecipient(MailAddress("jan-olav.eide@nav.no"))
-    }
+        private val MAILBOX = MailRecipient(MailAddress("teknologiavdelingen.team-sikkerhetstjenesten@nav.no")) }
 }

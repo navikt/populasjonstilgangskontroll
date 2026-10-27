@@ -1,6 +1,4 @@
-name: Build (reusable)
-name: Build (reusable)
-
+name: Build 
 # Gjenbrukbar workflow som kompilerer, tester, bygger image med Dockerfile og genererer SBOM.
 
 on:

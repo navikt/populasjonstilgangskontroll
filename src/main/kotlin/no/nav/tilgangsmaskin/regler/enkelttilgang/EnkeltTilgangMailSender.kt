@@ -6,7 +6,6 @@ import no.nav.sikkerhetstjenesten.felles.notifikasjon.MailRequest.MailMessage.Ma
 import no.nav.sikkerhetstjenesten.felles.notifikasjon.MailRequest.MailMessage.MailRecipient
 import no.nav.sikkerhetstjenesten.felles.notifikasjon.MailRequest.MailMessage.MailRecipient.MailAddress
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
-import org.checkerframework.checker.units.qual.radians
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
@@ -24,7 +23,7 @@ class EnkeltTilgangMailSender(
                     MailMessage(
                         "Enkelttilgang rapport",
                         MailBody("html", rapport.html),
-                        listOf(MAILBOX)),  // TODO endre ved prodsetting
+                        listOf(MOTTAGER)),  // TODO endre ved prodsetting
                          //listOf(rapport.leder.epost),
                     true)
             proxy.mail(message)
@@ -36,5 +35,6 @@ class EnkeltTilgangMailSender(
     }
 
     companion object {
-        private val MAILBOX = MailRecipient(MailAddress("teknologiavdelingen.team-sikkerhetstjenesten@nav.no")) }
+        private const val POSTBOKS = "teknologiavdelingen.team-sikkerhetstjenesten@nav.no"
+        private val MOTTAGER = MailRecipient(MailAddress(POSTBOKS))
 }

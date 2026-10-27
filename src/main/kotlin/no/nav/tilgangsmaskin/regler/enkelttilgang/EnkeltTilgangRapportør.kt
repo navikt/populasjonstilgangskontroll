@@ -18,12 +18,12 @@ class EnkeltTilgangRapportør(
     @Scheduled(cron = "0 0 * * * *", zone = "Europe/Oslo")
     fun sendRapporter() =
         somLeder {
-            runCatching {
-                val rapporter = generator.lagRapporter()
-                rapporter.forEach { rapport ->
+            val rapporter = generator.lagRapporter()
+            rapporter.forEach { rapport ->
+                runCatching {
                     mailer.sendRapport(rapport)
                     enkelt.markerRapportert(rapport)
-                }
-            }.onFailure { log.warn("Kunne ikke håndtere rapport", it) }
+                }.onFailure { log.warn("Kunne ikke håndtere rapport til ${rapport.leder}", it) }
+            }
         }
 }

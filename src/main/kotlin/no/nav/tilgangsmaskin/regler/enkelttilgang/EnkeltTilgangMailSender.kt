@@ -33,7 +33,7 @@ class EnkeltTilgangMailSender(
             log.info("Rapport sendt til {}", rapport.leder)
         }.onFailure {
             log.error("Kunne ikke sende rapport til ${rapport.leder}", it)
-        }
+        }.getOrThrow()
     }
 
     companion object {

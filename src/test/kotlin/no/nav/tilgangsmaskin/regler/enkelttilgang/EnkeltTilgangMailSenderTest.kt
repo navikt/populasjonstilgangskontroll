@@ -1,6 +1,7 @@
 package no.nav.tilgangsmaskin.regler.enkelttilgang
 
 import com.samskivert.mustache.Mustache
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
@@ -8,10 +9,12 @@ import io.mockk.Called
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import io.mockk.verifyOrder
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
 import no.nav.tilgangsmaskin.ansatt.nom.Leder
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangRapportGenerator.Companion.varighet
+import org.springframework.test.util.ReflectionTestUtils
 import java.time.Instant
 
 class EnkeltTilgangMailSenderTest :
@@ -109,7 +112,7 @@ class EnkeltTilgangMailSenderTest :
 
         Given("rapportering av sendte e-poster") {
             listOf(false, true).forEach { feilerFørsteEpost ->
-                Then("behandles begge rapporter uten databasemarkering når første e-post feiler=$feilerFørsteEpost") {
+                Then("stoppes sending ved feil uten databasemarkering når første e-post feiler=$feilerFørsteEpost") {
                     val enkelt = mockk<EnkeltTilgangTjeneste>()
                     val proxy = mockk<EntraProxyTjeneste>(relaxed = true)
                     val tilgang =
@@ -141,20 +144,69 @@ class EnkeltTilgangMailSenderTest :
                             ),
                             LederEnkeltTilganger(INGEN_LEDER, listOf(utenLeder)),
                         )
+                    val feil = IllegalStateException("Kunne ikke sende e-post")
                     if (feilerFørsteEpost) {
                         var antallKall = 0
                         every { proxy.mail(any()) } answers {
-                            if (antallKall++ == 0) throw IllegalStateException("Kunne ikke sende e-post")
+                            if (antallKall++ == 0) throw feil
                             Unit
                         }
                     }
 
                     val rapporter = EnkeltTilgangRapportGenerator(Mustache.compiler(), enkelt).lagRapporter()
                     val sender = EnkeltTilgangMailSender(proxy)
-                    rapporter.forEach(sender::sendRapport)
+                    if (feilerFørsteEpost) {
+                        shouldThrow<IllegalStateException> {
+                            rapporter.forEach(sender::sendRapport)
+                        } shouldBe feil
+                    } else {
+                        rapporter.forEach(sender::sendRapport)
+                    }
+
+                    verify(exactly = if (feilerFørsteEpost) 1 else 2) { proxy.mail(any()) }
+                    verify(exactly = 0) { enkelt.markerRapportert(any()) }
+                }
+            }
+        }
+
+        Given("markering av rapporter i rapportøren") {
+            listOf(false to false, true to false, false to true).forEach { (sendingFeiler, markeringFeiler) ->
+                Then("behandles neste rapport når sending feiler=$sendingFeiler og markering feiler=$markeringFeiler") {
+                    val enkelt = mockk<EnkeltTilgangTjeneste>()
+                    val proxy = mockk<EntraProxyTjeneste>()
+                    val generator = mockk<EnkeltTilgangRapportGenerator>()
+                    val rapport = EnkeltTilgangRapport("rapport", setOf(1L), Leder("leder@nav.no", AnsattId("Z123457"), "Leder"))
+                    val nesteRapport = EnkeltTilgangRapport("neste rapport", setOf(2L), Leder("annenleder@nav.no", AnsattId("Z123459"), "Annen leder"))
+                    every { generator.lagRapporter() } returns mutableSetOf(rapport, nesteRapport)
+                    if (markeringFeiler) {
+                        every { enkelt.markerRapportert(rapport) } throws IllegalStateException("Kunne ikke markere rapport")
+                    } else {
+                        every { enkelt.markerRapportert(rapport) } returns 1
+                    }
+                    every { enkelt.markerRapportert(nesteRapport) } returns 1
+                    var antallSendinger = 0
+                    every { proxy.mail(any()) } answers {
+                        if (antallSendinger++ == 0 && sendingFeiler) throw IllegalStateException("Kunne ikke sende e-post")
+                        Unit
+                    }
+                    val rapportør = EnkeltTilgangRapportør(EnkeltTilgangMailSender(proxy), enkelt, generator)
+                    ReflectionTestUtils.setField(rapportør, "erLeder", true)
+
+                    rapportør.sendRapporter()
 
                     verify(exactly = 2) { proxy.mail(any()) }
-                    verify(exactly = 0) { enkelt.markerRapportert(any()) }
+                    verify(exactly = if (sendingFeiler) 0 else 1) { enkelt.markerRapportert(rapport) }
+                    verify(exactly = 1) { enkelt.markerRapportert(nesteRapport) }
+                    verifyOrder {
+                        proxy.mail(any())
+                        enkelt.markerRapportert(nesteRapport)
+                    }
+                    if (!sendingFeiler) {
+                        verifyOrder {
+                            proxy.mail(any())
+                            enkelt.markerRapportert(rapport)
+                        }
+                    }
                 }
             }
         }

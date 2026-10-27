@@ -6,6 +6,7 @@ import no.nav.sikkerhetstjenesten.felles.notifikasjon.MailRequest.MailMessage.Ma
 import no.nav.sikkerhetstjenesten.felles.notifikasjon.MailRequest.MailMessage.MailRecipient
 import no.nav.sikkerhetstjenesten.felles.notifikasjon.MailRequest.MailMessage.MailRecipient.MailAddress
 import no.nav.tilgangsmaskin.ansatt.entraproxy.EntraProxyTjeneste
+import org.checkerframework.checker.units.qual.radians
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
@@ -21,9 +22,10 @@ class EnkeltTilgangMailSender(
             val message =
                 MailRequest(
                     MailMessage(
-                        "TEST BÆRUM enkelttilgang rapport til - ${rapport.leder}",
+                        "Enkelttilgang rapport",
                         MailBody("html", rapport.html),
-                        listOf(MAILBOX)),
+                        listOf(MAILBOX)),  // TODO endre ved prodsetting
+                         //listOf(rapport.leder.epost),
                     true)
             proxy.mail(message)
         }.onSuccess {

@@ -30,6 +30,11 @@
   },
   "inbound": [
     {
+      "name": "genie",
+      "namespace": "infotek",
+      "cluster": "dev-gcp"
+    },
+    {
       "name": "veilarbpersonflate",
       "namespace": "poao",
       "cluster": "dev-gcp"

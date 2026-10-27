@@ -29,9 +29,9 @@ class EnkeltTilgangMailSender(
                     true)
             proxy.mail(message)
         }.onSuccess {
-            log.info("Rapport sendt til {}", rapport.leder)
+            log.info("Rapport sendt til {}", rapport.leder.epost)
         }.onFailure {
-            log.error("Kunne ikke sende rapport til ${rapport.leder}", it)
+            log.error("Kunne ikke sende rapport til ${rapport.leder.epost}", it)
         }.getOrThrow()
     }
 

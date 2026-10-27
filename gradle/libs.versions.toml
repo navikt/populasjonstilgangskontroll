@@ -4,6 +4,7 @@ commons-pool2 = "2.13.1"
 confluent = "8.3.1"
 contract-pdl-avro = "20"
 cyclonedx = "3.4.1"
+git-properties = "4.0.1"
 kotlin = "2.4.21"
 kotest = "6.2.6"
 logstash = "9.0"
@@ -79,6 +80,7 @@ observability = ["opentelemetry-instrumentation-annotations", "opentelemetry-log
 
 [plugins]
 cyclonedx = { id = "org.cyclonedx.bom", version.ref = "cyclonedx" }
+git-properties = { id = "com.gorylenko.gradle-git-properties", version.ref = "git-properties" }
 kotest = { id = "io.kotest", version.ref = "kotest" }
 kotlin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

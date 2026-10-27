@@ -20,6 +20,7 @@ plugins {
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.spring.dependency.management)
     alias(libs.plugins.cyclonedx)
+    alias(libs.plugins.git.properties)
     alias(libs.plugins.kotest)
 }
 
@@ -135,40 +136,16 @@ java {
     }
 }
 
-val generateGitProperties = tasks.register("generateGitProperties") {
-    description = "Generates git.properties file with Git metadata"
-    val outputFile = layout.buildDirectory.file("resources/main/git.properties")
-    outputs.file(outputFile)
-    val buildVersion = version.toString()
-
-    fun git(vararg args: String) = providers.exec {
-        commandLine("git", *args)
-        isIgnoreExitValue = true
-    }.standardOutput.asText.map { it.trim() }
-
-    val branch      = git("rev-parse", "--abbrev-ref", "HEAD")
-    val commitId    = git("rev-parse", "HEAD")
-    val commitShort = git("rev-parse", "--short", "HEAD")
-    val commitTime  = git("log", "-1", "--format=%cI")
-    val dirty       = git("status", "--porcelain").map { it.isNotEmpty() }
-
-    doLast {
-        outputFile.get().asFile.apply {
-            parentFile.mkdirs()
-            writeText(buildString {
-                appendLine("git.branch=${branch.get()}")
-                appendLine("git.commit.id=${commitId.get()}")
-                appendLine("git.commit.id.abbrev=${commitShort.get()}")
-                appendLine("git.commit.time=${commitTime.get()}")
-                appendLine("git.dirty=${dirty.get()}")
-                appendLine("git.build.version=$buildVersion")
-            })
-        }
-    }
-}
-
-tasks.named("processResources") {
-    dependsOn(generateGitProperties)
+gitProperties {
+    keys = listOf(
+        "git.branch",
+        "git.commit.id",
+        "git.commit.id.abbrev",
+        "git.commit.time",
+        "git.dirty",
+        "git.build.version",
+    )
+    dateFormat = "yyyy-MM-dd'T'HH:mm:ssXXX"
 }
 
 tasks.named<Test>("test") {

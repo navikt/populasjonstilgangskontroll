@@ -1,9 +1,10 @@
-import org.gradle.api.file.DuplicatesStrategy.EXCLUDE
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_26
+import org.gradle.api.JavaVersion.toVersion
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget.Companion.fromTarget
 import org.springframework.boot.gradle.tasks.bundling.BootJar
-import java.lang.System.getProperty
+import java.lang.Runtime.getRuntime
 
 val javaVersion = JavaLanguageVersion.of(27)
+val jvmTargetVersion = 26
 
 group = "no.nav.tilgangsmaskin.populasjonstilgangskontroll"
 version = "1.0.1"
@@ -24,13 +25,23 @@ plugins {
     alias(libs.plugins.kotest)
 }
 
+java {
+    sourceCompatibility = toVersion(jvmTargetVersion)
+    targetCompatibility = toVersion(jvmTargetVersion)
+
+    toolchain {
+        languageVersion.set(javaVersion)
+    }
+}
+
 springBoot {
     buildInfo {
         properties {
+            val javaMetadata = javaToolchains.launcherFor(java.toolchain).get().metadata
             additional = mapOf(
                 "kotlin.version" to libs.versions.kotlin.get(),
-                "jdk.version" to javaVersion.asInt().toString(),
-                "jdk.vendor" to getProperty("java.vendor"),
+                "jdk.version" to javaMetadata.languageVersion.asInt().toString(),
+                "jdk.vendor" to javaMetadata.vendor,
                 "spring-boot.version" to libs.versions.spring.boot.get(),
             )
         }
@@ -39,7 +50,6 @@ springBoot {
 
 repositories {
     mavenCentral()
-    mavenLocal()
     maven { url = uri("https://packages.confluent.io/maven/") }
     maven {
         url = uri("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
@@ -55,9 +65,10 @@ repositories {
 
 
 dependencies {
-    constraints {  // TODO midlertidig
-        implementation("at.yawk.lz4:lz4-java:1.12.0")
-        testImplementation("at.yawk.lz4:lz4-java:1.12.0")
+    constraints {
+        implementation("at.yawk.lz4:lz4-java:1.12.0") {
+            because("Upgrade Kafka's transitive LZ4 dependency from 1.11.2 to 1.12.0")
+        }
     }
     implementation(libs.sikkerhetstjenesten.lib)
     implementation(libs.contract.pdl.avro)
@@ -118,22 +129,8 @@ dependencyManagement {
 }
 
 
-tasks.withType<BootJar> {
+tasks.withType<BootJar>().configureEach {
     archiveFileName = "app.jar"
-    duplicatesStrategy = EXCLUDE
-}
-
-tasks.withType<Jar> {
-    duplicatesStrategy = EXCLUDE
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_26
-    targetCompatibility = JavaVersion.VERSION_26
-
-    toolchain {
-        languageVersion.set(javaVersion)
-    }
 }
 
 gitProperties {
@@ -152,7 +149,7 @@ tasks.named<Test>("test") {
     useJUnitPlatform()
 
     maxHeapSize = "4g"
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
+    maxParallelForks = (getRuntime().availableProcessors() / 2).coerceIn(1, 2)
     jvmArgs =
         listOf(
             "--add-opens",
@@ -179,10 +176,8 @@ tasks.jacocoTestReport {
     }
 }
 kotlin {
-    jvmToolchain(javaVersion.asInt())
-
     compilerOptions {
-        jvmTarget.set(JVM_26)
+        jvmTarget.set(fromTarget(jvmTargetVersion.toString()))
         freeCompilerArgs.add("-Xjsr305=strict")
     }
 }

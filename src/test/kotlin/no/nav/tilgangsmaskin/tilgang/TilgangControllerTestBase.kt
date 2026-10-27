@@ -12,32 +12,13 @@ import tools.jackson.module.kotlin.KotlinModule
 import no.nav.tilgangsmaskin.regler.RegelTjeneste
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangController
 import no.nav.tilgangsmaskin.regler.enkelttilgang.EnkeltTilgangTjeneste
-import no.nav.tilgangsmaskin.regler.motor.AvvisningsKode
 import no.nav.tilgangsmaskin.regler.motor.RegelMetadata
-import no.nav.tilgangsmaskin.regler.motor.RegelMetadata.Companion.TYPE_URI
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
-import org.springframework.http.HttpHeaders.AUTHORIZATION
-import org.springframework.http.HttpHeaders.HOST
 import org.springframework.http.ProblemDetail
 import org.springframework.http.converter.json.ProblemDetailJacksonMixin
 import org.springframework.core.MethodParameter
-import org.springframework.restdocs.ManualRestDocumentation
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
-import org.springframework.restdocs.operation.preprocess.Preprocessors.modifyHeaders
-import org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest
-import org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse
-import org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint
-import org.springframework.restdocs.payload.JsonFieldType.ARRAY
-import org.springframework.restdocs.payload.JsonFieldType.BOOLEAN
-import org.springframework.restdocs.payload.JsonFieldType.NUMBER
-import org.springframework.restdocs.payload.JsonFieldType.STRING
-import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
-import org.springframework.restdocs.payload.PayloadDocumentation.relaxedResponseFields
-import org.springframework.restdocs.snippet.Snippet
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup
-import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
 import org.springframework.web.bind.support.WebDataBinderFactory
 import org.springframework.web.context.request.NativeWebRequest
@@ -52,19 +33,6 @@ import org.springframework.security.oauth2.core.DefaultOAuth2AuthenticatedPrinci
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal
 
 abstract class TilgangControllerTestBase : BehaviorSpec() {
-
-    protected fun dokumenterMedAuth(identifier: String, vararg snippets: Snippet) =
-        document(
-            identifier,
-            preprocessRequest(
-                modifyHeaders()
-                    .set(HOST, "tilgangsmaskin.intern.nav.no")
-                    .set(AUTHORIZATION, "Bearer ey....."),
-                prettyPrint()
-            ),
-            preprocessResponse(prettyPrint()),
-            *snippets
-        )
 
     protected val mapper: JsonMapper = JsonMapper.builder()
         .addModule(KotlinModule.Builder().build())
@@ -83,7 +51,6 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
 
     protected lateinit var mockMvc: MockMvc
 
-    private val restDocumentation = ManualRestDocumentation()
     private lateinit var validator: LocalValidatorFactoryBean
     private val principal = DefaultOAuth2AuthenticatedPrincipal(
         mapOf(NAVIDENT to ansattId.verdi),
@@ -112,27 +79,6 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
         ) = principal
     }
 
-    protected companion object {
-        private val avvisningskoder = AvvisningsKode.entries.joinToString(", ") { it.name }
-
-        val problemDetailFields = relaxedResponseFields(
-            fieldWithPath("title").type(STRING)
-                .description("Avvisningskode, En av: $avvisningskoder").optional(),
-            fieldWithPath("status").type(NUMBER).description("HTTP-statuskode").optional(),
-            fieldWithPath("detail").type(STRING).description("Beskrivelse av feilen").optional(),
-            fieldWithPath("instance").type(STRING).description("ansattId/brukerId").optional(),
-            fieldWithPath("type").type(STRING).description("Link til utdypende info: $TYPE_URI").optional(),
-            fieldWithPath("brukerIdent").type(STRING).description("Identen til bruker").optional(),
-            fieldWithPath("navIdent").type(STRING).description("NAV-identen til den ansatte").optional(),
-            fieldWithPath("begrunnelse").type(STRING).description("Menneskelesbar begrunnelse for avvisning").optional(),
-            fieldWithPath("traceId").type(STRING).description("OTEL trace-ID for feilsøking").optional(),
-            fieldWithPath("kanOverstyres").type(BOOLEAN).description("Om regelen kan overstyres med enkelttilgang").optional(),
-            fieldWithPath("feil").type(ARRAY).description("Liste over valideringsfeil for felter").optional(),
-            fieldWithPath("feil[].felt").type(STRING).description("Feltnavn som feilet").optional(),
-            fieldWithPath("feil[].melding").type(STRING).description("Feilmelding for feltet").optional()
-        )
-    }
-
     init {
         beforeSpec {
             RegelMetadata.messageSource = ReloadableResourceBundleMessageSource().apply {
@@ -141,9 +87,8 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
             validator = LocalValidatorFactoryBean().also { it.afterPropertiesSet() }
         }
 
-        beforeEach { case ->
+        beforeEach {
             clearAllMocks()
-            restDocumentation.beforeTest(TilgangControllerTestBase::class.java, case.name.name)
             mockMvc = standaloneSetup(
                 TilgangController(regelTjeneste),
                 EnkeltTilgangController(enkeltTilgangTjeneste),
@@ -152,24 +97,7 @@ abstract class TilgangControllerTestBase : BehaviorSpec() {
                 .setCustomArgumentResolvers(AuthenticationPrincipalArgumentResolver())
                 .setControllerAdvice(ErrorResponseAdvice())
                 .setValidator(validator)
-                .apply<StandaloneMockMvcBuilder>(documentationConfiguration(restDocumentation)
-                    .uris()
-                    .withScheme("https")
-                    .withHost("tilgangsmaskin.intern.nav.no")
-                    .and()
-                    .operationPreprocessors()
-                    .withRequestDefaults(
-                        modifyHeaders()
-                            .set(HOST, "tilgangsmaskin.intern.nav.no"),
-                        prettyPrint()
-                    )
-                    .withResponseDefaults(prettyPrint())
-                )
                 .build()
-        }
-
-        afterEach {
-            restDocumentation.afterTest()
         }
     }
 }

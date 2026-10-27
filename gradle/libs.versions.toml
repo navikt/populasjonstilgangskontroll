@@ -1,5 +1,4 @@
 [versions]
-asciidoctor = "4.0.5"
 boot-conditionals = "6.0.9"
 commons-pool2 = "2.13.1"
 confluent = "8.3.1"
@@ -66,7 +65,6 @@ spring-boot-starter-webclient = { module = "org.springframework.boot:spring-boot
 spring-boot-testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers" }
 spring-security-test = { module = "org.springframework.security:spring-security-test" }
 mock-oauth2-server = { module = "no.nav.security:mock-oauth2-server", version.ref = "mock-oauth2-server" }
-spring-restdocs-mockmvc = { module = "org.springframework.restdocs:spring-restdocs-mockmvc" }
 springdoc-openapi-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
 springmockk = { module = "com.ninja-squad:springmockk", version.ref = "springmockk" }
 sikkerhetstjenesten-lib = { module = "no.nav.felles:sikkerhetstjenesten-lib", version.ref = "sikkerhetstjenesten-lib" }
@@ -80,7 +78,6 @@ kotest = ["kotest-runner-junit5", "kotest-assertions-core", "kotest-extensions-s
 observability = ["opentelemetry-instrumentation-annotations", "opentelemetry-logback-mdc", "micrometer-registry-prometheus"]
 
 [plugins]
-asciidoctor = { id = "org.asciidoctor.jvm.convert", version.ref = "asciidoctor" }
 cyclonedx = { id = "org.cyclonedx.bom", version.ref = "cyclonedx" }
 kotest = { id = "io.kotest", version.ref = "kotest" }
 kotlin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }

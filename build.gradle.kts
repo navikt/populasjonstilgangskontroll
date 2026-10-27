@@ -1,4 +1,3 @@
-import org.asciidoctor.gradle.jvm.AsciidoctorTask
 import org.gradle.api.file.DuplicatesStrategy.EXCLUDE
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_26
 import org.springframework.boot.gradle.tasks.bundling.BootJar
@@ -22,7 +21,6 @@ plugins {
     alias(libs.plugins.spring.dependency.management)
     alias(libs.plugins.cyclonedx)
     alias(libs.plugins.kotest)
-    alias(libs.plugins.asciidoctor)
 }
 
 springBoot {
@@ -106,7 +104,6 @@ dependencies {
     testImplementation(libs.spring.boot.testcontainers)
     testImplementation(libs.spring.security.test)
     testImplementation(libs.mock.oauth2.server)
-    testImplementation(libs.spring.restdocs.mockmvc)
     testImplementation(libs.springmockk)
 }
 
@@ -177,11 +174,6 @@ tasks.named("processResources") {
 tasks.named<Test>("test") {
     useJUnitPlatform()
 
-    doFirst {
-        delete(layout.buildDirectory.dir("generated-snippets"))
-        delete(layout.buildDirectory.dir("generated-restdocs-index"))
-    }
-
     maxHeapSize = "4g"
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
     jvmArgs =
@@ -192,37 +184,6 @@ tasks.named<Test>("test") {
             "-Dkotlinx.coroutines.debug=off",
             "-Xshare:off",
         )
-}
-
-val generateRestDocsIndex = tasks.register<GenerateRestDocsIndexTask>("generateRestDocsIndex") {
-    description = "Generates index.adoc from REST Docs snippets"
-    dependsOn(tasks.test)
-    snippetsDir = layout.buildDirectory.dir("generated-snippets")
-    outputDir = layout.buildDirectory.dir("generated-restdocs-index")
-    openApiPropertiesFile = layout.projectDirectory.file("src/main/resources/openapi/prod/tilgang.properties")
-    tilgangControllerFile = layout.projectDirectory.file("src/main/kotlin/no/nav/tilgangsmaskin/tilgang/TilgangController.kt")
-}
-
-tasks.named("asciidoctor") {
-    dependsOn(generateRestDocsIndex)
-    inputs.dir(layout.buildDirectory.dir("generated-snippets"))
-}
-
-tasks.withType<AsciidoctorTask> {
-    sourceDir(layout.buildDirectory.dir("generated-restdocs-index"))
-    baseDirFollowsSourceDir()
-    sources {
-        include("index.adoc")
-    }
-    attributes(
-        mapOf(
-            "snippets" to layout.buildDirectory.dir("generated-snippets").get().asFile.absolutePath,
-            "source-highlighter" to "highlight.js",
-            "toc" to "left",
-            "toclevels" to "3",
-            "sectlinks" to "",
-        )
-    )
 }
 
 tasks.jacocoTestReport {

@@ -83,8 +83,6 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                             jsonPath("$.ansattId") { value(ansattId.verdi) }
                             jsonPath("$.resultater[1].brukerId") { value(avvistBrukerId) }
                             jsonPath("$.resultater[1].status") { value(403) }
-                        }.andDo {
-                            handle(dokumenterMedAuth("ccf-bulk"))
                         }
                 }
             }
@@ -161,8 +159,6 @@ class CCFBulkTilgangControllerTest : TilgangControllerTestBase() {
                             status {
                                 isMultiStatus()
                             }
-                        }.andDo {
-                            handle(dokumenterMedAuth("ccf-bulk-regeltype"))
                         }
                 }
             }

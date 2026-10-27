@@ -37,4 +37,5 @@ class EnkeltTilgangMailSender(
     companion object {
         private const val POSTBOKS = "teknologiavdelingen.team-sikkerhetstjenesten@nav.no"
         private val MOTTAGER = MailRecipient(MailAddress(POSTBOKS))
+    }
 }

@@ -2,7 +2,7 @@ package no.nav.tilgangsmaskin
 
 import no.nav.boot.conditionals.ConditionalOnGCP
 import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
-import no.nav.sikkerhetstjenesten.felles.cache.CacheSizeAware
+import no.nav.sikkerhetstjenesten.felles.cache.CacheOperations
 import no.nav.sikkerhetstjenesten.felles.utils.cluster.ClusterUtils.Companion.profiler
 import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.local
 import no.nav.tilgangsmaskin.felles.TimeBeanConfig.Companion.AUDITING_TIME_PROVIDER
@@ -38,12 +38,12 @@ fun main(args: Array<String>) {
 
 @Component
 @Lazy
-class StartupInfoContributor(private val caches : CacheSizeAware, private val ctx: ConfigurableApplicationContext, vararg val regelsett: RegelSett) :
+class StartupInfoContributor(private val cache : CacheOperations, private val ctx: ConfigurableApplicationContext, vararg val regelsett: RegelSett) :
     InfoContributor {
 
     override fun contribute(builder: Builder) {
         builder.withDetail("startup", ctx.startupDate.local())
-        builder.withDetail("cache størrelser", caches.sizes())
+        builder.withDetail("cache størrelser", cache.sizes())
         regelsett.filter { it.regler.isNotEmpty() }.forEach {
             builder.withDetail(it.beskrivelse, it.regler.map { regel -> "(${regel.javaClass.simpleName}) ${regel.kortNavn}" })
         }

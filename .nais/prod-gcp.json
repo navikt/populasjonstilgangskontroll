@@ -28,6 +28,11 @@
   },
   "inbound": [
     {
+      "name": "sp-medlemskap",
+      "namespace": "tbd",
+      "cluster": "prod-gcp"
+    },
+    {
       "name": "veilarbpersonflate",
       "namespace": "poao",
       "cluster": "prod-gcp"

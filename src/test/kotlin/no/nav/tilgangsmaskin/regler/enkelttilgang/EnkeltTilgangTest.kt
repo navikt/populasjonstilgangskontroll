@@ -4,6 +4,7 @@ import no.nav.tilgangsmaskin.ansatt.AnsattId
 
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.assertions.assertSoftly
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
@@ -46,18 +47,25 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Import
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.test.context.ContextConfiguration
+import org.springframework.transaction.PlatformTransactionManager
+import org.springframework.transaction.TransactionDefinition
+import org.springframework.transaction.support.TransactionTemplate
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
+import java.util.concurrent.CyclicBarrier
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 @DataJpaTest
 @EnableJpaAuditing
 @Testcontainers
 @AutoConfigureMetrics
 @ContextConfiguration(initializers = [PropertySettingTestContextInitializer::class],classes = [LocalAuditor::class,EnkeltTilgangJPAAdapter::class])
-@Import(TimeBeanConfig::class)
+@Import(TimeBeanConfig::class, EnkeltTilgangEntityListener::class)
 @EnableAutoConfiguration
 @ComponentScan("no.nav.tilgangsmaskin.regler.motor")
 class EnkeltTilgangTest(
@@ -66,6 +74,7 @@ class EnkeltTilgangTest(
     private val adapter: EnkeltTilgangJPAAdapter,
     private val repo: EnkeltTilgangRepository,
     private val entityManager: EntityManager,
+    private val transactionManager: PlatformTransactionManager,
 ) : BehaviorSpec() {
 
     private val vanligBrukerId = BrukerId("08526835670")
@@ -144,7 +153,7 @@ class EnkeltTilgangTest(
                             "1234",
                             EnkeltTilgangData(vanligBrukerId, "Begrunnelse for rapport", IMORGEN),
                             gt = "0301",
-                            gt_navn = "Oslo",
+                            gtNavn = "Oslo",
                         )
                     entityManager
                         .createNativeQuery("UPDATE overstyring SET created = :created WHERE id = :id")
@@ -360,6 +369,59 @@ class EnkeltTilgangTest(
         }
 
         Given("unikhetsbegrensning på navid, fnr og expires") {
+            When("samme tilgang registreres samtidig i to transaksjoner") {
+                Then("fullføres begge transaksjonene med samme entity") {
+                    val samtidigAnsatt = "Z200001"
+                    val transaksjon = TransactionTemplate(transactionManager).apply {
+                        propagationBehavior = TransactionDefinition.PROPAGATION_REQUIRES_NEW
+                    }
+                    val start = CyclicBarrier(2)
+                    val executor = Executors.newFixedThreadPool(2)
+                    try {
+                        val resultater = (1..2).map {
+                            executor.submit<Long> {
+                                requireNotNull(transaksjon.execute {
+                                    start.await(10, TimeUnit.SECONDS)
+                                    requireNotNull(
+                                        adapter.enkeltTilgang(
+                                            samtidigAnsatt,
+                                            "1234",
+                                            EnkeltTilgangData(vanligBrukerId, "Samtidig registrering", IMORGEN),
+                                        ).id,
+                                    )
+                                })
+                            }
+                        }.map { it.get(20, TimeUnit.SECONDS) }
+
+                        resultater.distinct().size shouldBe 1
+                        repo.findAll().count { it.navid == samtidigAnsatt } shouldBe 1
+                    } finally {
+                        executor.shutdownNow()
+                        executor.awaitTermination(10, TimeUnit.SECONDS)
+                        transaksjon.executeWithoutResult {
+                            repo.deleteAll(repo.findAll().filter { it.navid == samtidigAnsatt })
+                        }
+                    }
+                }
+            }
+
+            When("innsetting bryter en annen databasebegrensning") {
+                Then("propageres feilen") {
+                    val transaksjon = TransactionTemplate(transactionManager).apply {
+                        propagationBehavior = TransactionDefinition.PROPAGATION_REQUIRES_NEW
+                    }
+                    shouldThrow<DataIntegrityViolationException> {
+                        transaksjon.executeWithoutResult {
+                            adapter.enkeltTilgang(
+                                ansattId.verdi,
+                                "1234",
+                                EnkeltTilgangData(vanligBrukerId, "En for lang begrunnelse".repeat(30), IMORGEN),
+                            )
+                        }
+                    }
+                }
+            }
+
             When("samme ansatt, bruker og utløp lagres to ganger") {
                 Then("returneres eksisterende entity og duplikat lagres ikke") {
                     val første = adapter.enkeltTilgang(ansattId.verdi, "1234", EnkeltTilgangData(vanligBrukerId, "Dette er en begrunnelse", IMORGEN))
@@ -368,7 +430,19 @@ class EnkeltTilgangTest(
                     andre.id shouldBe første.id
                     andre.enhet shouldBe første.enhet
                     andre.begrunnelse shouldBe første.begrunnelse
+                    andre.created shouldBe første.created
+                    andre.updated shouldBe første.updated
+                    andre.oppretter shouldBe første.oppretter
+                    andre.system shouldBe første.system
+                    andre.span shouldBe første.span
                     repo.findAll().size shouldBe 1
+
+                    adapter.enkeltTilgang(
+                        "Z100001",
+                        "1234",
+                        EnkeltTilgangData(vanligBrukerId, "Tilgang etter duplikat", IMORGEN),
+                    )
+                    repo.findAll().size shouldBe 2
                 }
             }
 
@@ -387,14 +461,14 @@ class EnkeltTilgangTest(
                             "1234",
                             EnkeltTilgangData(brukerMedLeder, "Begrunnelse med leder", IMORGEN),
                             gt = "0301",
-                            gt_navn = "Oslo",
+                            gtNavn = "Oslo",
                         )
                         adapter.enkeltTilgang(
                             ansattUtenLeder.verdi,
                             "5678",
                             EnkeltTilgangData(brukerUtenLeder, "Begrunnelse uten leder", IMORGEN),
                             gt = "0301",
-                            gt_navn = "Oslo",
+                            gtNavn = "Oslo",
                         )
                         every { nom.lederForAnsatt(ansattMedLeder) } returns NomRessurs(
                             ansattMedLeder,

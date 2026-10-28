@@ -7,6 +7,25 @@ import org.springframework.data.repository.query.Param
 import java.time.Instant
 
 interface EnkeltTilgangRepository : JpaRepository<EnkeltTilgangEntity, Long> {
+    @Modifying(flushAutomatically = true)
+    @Query(
+        value = """
+        INSERT INTO overstyring (
+            navid, fnr, begrunnelse, enhet_ansatt, expires, gt_bruker, gt_navn,
+            created, updated, oppretter, system, span
+        )
+        VALUES (
+            :#{#tilgang.navid}, :#{#tilgang.fnr}, :#{#tilgang.begrunnelse},
+            :#{#tilgang.enhet}, :#{#tilgang.expires}, :#{#tilgang.gt}, :#{#tilgang.gtNavn},
+            :#{#tilgang.created}, :#{#tilgang.updated}, :#{#tilgang.oppretter},
+            :#{#tilgang.system}, :#{#tilgang.span}
+        )
+        ON CONFLICT ON CONSTRAINT uq_overstyring_navid_fnr_expires DO NOTHING
+        """,
+        nativeQuery = true,
+    )
+    fun insertIfAbsent(@Param("tilgang") tilgang: EnkeltTilgangEntity): Int
+
     fun findAllByRapportertIsNullAndCreatedAfterAndGtNavnIsNotNull(createdEtter: Instant): List<EnkeltTilgangEntity>
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)

@@ -10,10 +10,7 @@ import java.time.temporal.ChronoUnit.DAYS
 import kotlin.text.Charsets.UTF_8
 
 @Component
-class EnkeltTilgangRapportGenerator(
-    mustacheCompiler: Compiler,
-    private val enkelt: EnkeltTilgangTjeneste,
-) {
+class EnkeltTilgangRapportGenerator(mustacheCompiler: Compiler, private val enkelt: EnkeltTilgangTjeneste) {
     private val template =
         ClassPathResource(TEMPLATE)
             .inputStream

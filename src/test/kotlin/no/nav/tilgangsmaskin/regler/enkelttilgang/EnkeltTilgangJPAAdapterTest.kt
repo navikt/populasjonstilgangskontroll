@@ -13,7 +13,7 @@ class EnkeltTilgangJPAAdapterTest : BehaviorSpec({
     Given("markering av rapporterte tilganger") {
         val repo = mockk<EnkeltTilgangRepository>()
         val now = Instant.parse("2026-10-20T10:00:00Z")
-        val adapter = EnkeltTilgangJPAAdapter(repo, Clock.fixed(now, ZoneOffset.UTC))
+        val adapter = EnkeltTilgangJPAAdapter(repo, Clock.fixed(now, ZoneOffset.UTC), mockk())
         Then("oppdateres alle ID-er samlet uavhengig av NAV-ident med tidspunkt fra klokken") {
             every { repo.setRapportert(setOf(1L, 2L, 3L), now) } returns 3
 
@@ -31,7 +31,7 @@ class EnkeltTilgangJPAAdapterTest : BehaviorSpec({
         val ekskludertFnr = "10108000398"
         val annetFnr = "08526835670"
         val repo = mockk<EnkeltTilgangRepository>()
-        val adapter = EnkeltTilgangJPAAdapter(repo, Clock.systemUTC())
+        val adapter = EnkeltTilgangJPAAdapter(repo, Clock.systemUTC(), mockk())
         val createdEtter = Instant.parse("2026-09-30T22:00:00Z")
         val expires = Instant.parse("2026-10-20T21:59:00Z")
         every { repo.findAllByRapportertIsNullAndCreatedAfterAndGtNavnIsNotNull(createdEtter) } returns

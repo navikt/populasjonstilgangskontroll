@@ -30,6 +30,11 @@
   },
   "inbound": [
     {
+      "name": "sp-medlemskap",
+      "namespace": "tbd",
+      "cluster": "dev-gcp"
+    },
+    {
       "name": "genie",
       "namespace": "infotek",
       "cluster": "dev-gcp"

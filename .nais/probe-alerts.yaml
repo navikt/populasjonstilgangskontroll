@@ -52,7 +52,7 @@ spec:
             namespace: tilgangsmaskin
             severity: critical
         - alert: HelsesjekkValKeyFeilet
-          expr: probe_success{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/valKey", namespace="tilgangsmaskin"} == 0
+          expr: probe_success{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/cache", namespace="tilgangsmaskin"} == 0
           for: 2m
           annotations:
             consequence: Valkey er nede

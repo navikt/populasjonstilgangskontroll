@@ -30,6 +30,16 @@
   },
   "inbound": [
     {
+      "name": "saksbehandler-ui",
+      "namespace": "repr",
+      "cluster": "dev-gcp"
+    },
+    {
+      "name": "sp-rettighetskategori",
+      "namespace": "tbd",
+      "cluster": "dev-gcp"
+    },
+    {
       "name": "sp-medlemskap",
       "namespace": "tbd",
       "cluster": "dev-gcp"

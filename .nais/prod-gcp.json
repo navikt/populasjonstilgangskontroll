@@ -28,6 +28,16 @@
   },
   "inbound": [
     {
+      "name": "saksbehandler-ui",
+      "namespace": "repr",
+      "cluster": "prod-gcp"
+    },
+    {
+      "name": "sp-rettighetskategori",
+      "namespace": "tbd",
+      "cluster": "prod-gcp"
+    },
+    {
       "name": "sp-medlemskap",
       "namespace": "tbd",
       "cluster": "prod-gcp"

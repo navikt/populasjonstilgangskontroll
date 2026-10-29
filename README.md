@@ -1,11 +1,14 @@
 # Populasjonstilgangskontroll
 Backendsystem for å tilby tilgangskontroll basert på populasjonen, også kjent som tilgangsmaskinen.
-Fagsystemer kan spørre tilgangsmaskinen om den ansatte har tilgang til brukeren, men ikke domenespesifikk tilgangskontroll (f.eks om den ansatte har tilgang til fagsystemet, eller til å godkjenne forslag til vedtak).
+Fagsystemer kan spørre tilgangsmaskinen om den ansatte har tilgang til brukeren, men ikke domenespesifikk tilgangskontroll 
+(f.eks om den ansatte har tilgang til fagsystemet, eller til å godkjenne forslag til vedtak).
+
+Kjernereglene skal aldri overstyres. `EnkeltTilgangController` lar ansatte gi seg selv midlertidig tilgang til en enkelt bruker ved `AVVIST_GEOGRAFISK` eller `AVVIST_AVDØD`.
 
 Dokumentasjon på Confluence: https://confluence.adeo.no/spaces/TM/pages/760466828/Tilgangsmaskinen
 
-
 Slack-kanal: [team-tilgangsmaskinen-værsågod](https://nav-it.slack.com/archives/C07GGDP38S2)
+
 ## Swagger
 Prod: https://tilgangsmaskin.intern.nav.no/swagger-ui/index.html#/
 

@@ -6,14 +6,13 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.PostExchange
 
+@ClientRegistrationId(SKJERMING)
 interface SkjermingClient {
 
     @PostExchange(SKJERMING_PATH)
-    @ClientRegistrationId(SKJERMING)
     fun skjerming(@RequestBody body: Map<String, String>): Boolean
 
     @PostExchange(SKJERMING_BULK_PATH)
-    @ClientRegistrationId(SKJERMING)
     fun skjerminger(@RequestBody body: Map<String, Set<String>>): Map<String, Boolean>
 
     @GetExchange(SKJERMING_PING_PATH)
@@ -22,7 +21,7 @@ interface SkjermingClient {
     companion object {
         const val SKJERMING_PATH = "/skjermet"
         const val SKJERMING_BULK_PATH = "/skjermetBulk"
-        const val SKJERMING_PING_PATH = "/internal/health/liveness"
+        private const val SKJERMING_PING_PATH = "/internal/health/liveness"
     }
 }
 

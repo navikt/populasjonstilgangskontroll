@@ -30,7 +30,7 @@ class PdlSyncGraphQLClientAdapter(
         }.getOrThrow()
 
     companion object {
-        private const val IDENT = "ident"
+        const val IDENT = "ident"
         private fun ident(ident: String) = mapOf(IDENT to ident)
         private val SIVILSTAND_QUERY = "query-sivilstand" to "hentPerson"
     }

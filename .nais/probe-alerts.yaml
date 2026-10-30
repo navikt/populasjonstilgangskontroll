@@ -10,7 +10,7 @@ spec:
     - name: probe-errors
       rules:
         - alert: HelsesjekkPdlPipFeilet
-          expr: up{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/pdl", namespace="tilgangsmaskin"} == 0
+          expr: probe_success{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/pdl", namespace="tilgangsmaskin"} == 0
           for: 2m
           annotations:
             consequence: PDL-pip er nede
@@ -24,7 +24,7 @@ spec:
             namespace: tilgangsmaskin
             severity: critical
         - alert: HelsesjekkPdlGraphQLFeilet
-          expr: up{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/pdlGraph", namespace="tilgangsmaskin"} == 0
+          expr: probe_success{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/pdlGraph", namespace="tilgangsmaskin"} == 0
           for: 2m
           annotations:
             consequence: PDL er nede
@@ -38,7 +38,7 @@ spec:
             namespace: tilgangsmaskin
             severity: critical
         - alert: HelsesjekkSkjermingFeilet
-          expr: up{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/skjerming", namespace="tilgangsmaskin"} == 0
+          expr: probe_success{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/skjerming", namespace="tilgangsmaskin"} == 0
           for: 2m
           annotations:
             consequence: Skjermingsløsninen er nede
@@ -52,7 +52,7 @@ spec:
             namespace: tilgangsmaskin
             severity: critical
         - alert: HelsesjekkValKeyFeilet
-          expr: up{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/valkey", namespace="tilgangsmaskin"} == 0
+          expr: probe_success{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/cache", namespace="tilgangsmaskin"} == 0
           for: 2m
           annotations:
             consequence: Valkey er nede
@@ -66,7 +66,7 @@ spec:
             namespace: tilgangsmaskin
             severity: critical
         - alert: HelsesjekkEntraFeilet
-          expr: up{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/graph", namespace="tilgangsmaskin"} == 0
+          expr: probe_success{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/graph", namespace="tilgangsmaskin"} == 0
           for: 2m
           annotations:
             consequence: Entra er nede
@@ -80,7 +80,7 @@ spec:
             namespace: tilgangsmaskin
             severity: critical
         - alert: HelsesjekkEntraProxyFeilet
-          expr: up{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/entraProxy", namespace="tilgangsmaskin"} == 0
+          expr: probe_success{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/entraProxy", namespace="tilgangsmaskin"} == 0
           for: 2m
           annotations:
             consequence: Entra Proxy er nede
@@ -94,7 +94,7 @@ spec:
             namespace: tilgangsmaskin
             severity: critical
         - alert: HelsesjekkDatabaseFeilet
-          expr: up{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/db", namespace="tilgangsmaskin"} == 0
+          expr: probe_success{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/db", namespace="tilgangsmaskin"} == 0
           for: 2m
           annotations:
             consequence: Databasen er nede
@@ -108,7 +108,7 @@ spec:
             namespace: tilgangsmaskin
             severity: critical
         - alert: HelsesjekkVergemålFeilet
-          expr: up{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/verge", namespace="tilgangsmaskin"} == 0
+          expr: probe_success{instance="http://populasjonstilgangskontroll.tilgangsmaskin/monitoring/health/verge", namespace="tilgangsmaskin"} == 0
           for: 2m
           annotations:
             consequence: Vergemålstjenesten er nede

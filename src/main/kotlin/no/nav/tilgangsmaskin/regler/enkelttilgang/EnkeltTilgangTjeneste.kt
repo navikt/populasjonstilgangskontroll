@@ -6,6 +6,7 @@ import io.micrometer.observation.annotation.Observed
 import no.nav.sikkerhetstjenesten.felles.rest.ConsumerAwareHandlerInterceptor.Companion.USER_ID
 import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.UTILGJENGELIG
 import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.OSLO
 import no.nav.sikkerhetstjenesten.felles.utils.extensions.TimeExtensions.diffFromNow
 import no.nav.tilgangsmaskin.ansatt.AnsattId
 import no.nav.tilgangsmaskin.ansatt.AnsattTjeneste
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Clock
 import java.time.Instant
+import java.time.LocalDate
 
 @Observed
 @Service
@@ -129,8 +131,14 @@ class EnkeltTilgangTjeneste(
                 },
             )?.expires
 
-    fun ikkeRapportertePrLeder(): List<LederEnkeltTilganger> {
-        val ikkeRapporterte = adapter.ikkeRapporterte()
+    fun ikkeRapportertePrLeder(ekskluderteFnr: Set<String> = emptySet()): List<LederEnkeltTilganger> {
+        val maanedsstart =
+            LocalDate
+                .now(clock.withZone(OSLO))
+                .withDayOfMonth(1)
+                .atStartOfDay(OSLO)
+                .toInstant()
+        val ikkeRapporterte = adapter.ikkeRapporterte(maanedsstart, ekskluderteFnr)
         val lederePerAnsatt =
             ikkeRapporterte
                 .map { it.id }
@@ -165,6 +173,9 @@ class EnkeltTilgangTjeneste(
             )
     }
 
+    @Transactional
+    fun markerRapportert(rapport: EnkeltTilgangRapport) = adapter.markerRapportert(rapport.databaseIds)
+
     private fun enhetsNummerFor(ansattId: AnsattId) =
         runCatching {
             proxy.enhet(ansattId).enhetnummer.verdi
@@ -172,8 +183,9 @@ class EnkeltTilgangTjeneste(
 
     private companion object {
         private const val TAG = "overstyrt"
-        private val INGEN_LEDER = Leder("ingen@nav.no", AnsattId("A000000"), "Ingen leder")
         private val ENKELTTILGANG_GITT = Tag.of(TAG, "true")
         private val ENKELTTILGANG_AVVIST = Tag.of(TAG, "false")
     }
 }
+
+internal val INGEN_LEDER = Leder("ingen@nav.no", AnsattId("A000000"), "Ingen leder")

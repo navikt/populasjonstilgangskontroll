@@ -19,31 +19,28 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.method.annotation.HandlerMethodValidationException
 
 private const val ENKELTTILGANG_CONTROLLER_TAG_DESCRIPTION = "${MSG}openapi.tilgang.tag.description"
- const val SUMMARY_ENKELTTILGANG = "${MSG}openapi.tilgang.enkelttilgang.summary"
- const val DESCRIPTION_ENKELTTILGANG = "${MSG}openapi.tilgang.enkelttilgang.description"
-  const val ENKELTTILGANG_PATH = "$PROD_BASE_PATH/overstyr"
-
+const val SUMMARY_ENKELTTILGANG = "${MSG}openapi.tilgang.enkelttilgang.summary"
+const val DESCRIPTION_ENKELTTILGANG = "${MSG}openapi.tilgang.enkelttilgang.description"
+const val ENKELTTILGANG_PATH = "$PROD_BASE_PATH/overstyr"
 
 @RestController
 @RequestMapping(PROD_BASE_PATH)
 @Tag(name = "EnkeltTilgangController", description = ENKELTTILGANG_CONTROLLER_TAG_DESCRIPTION)
-class EnkeltTilgangController(private val enkelt: EnkeltTilgangTjeneste) {
-
+class EnkeltTilgangController(
+    private val enkelt: EnkeltTilgangTjeneste,
+) {
     @PostMapping("overstyr")
     @ResponseStatus(NO_CONTENT)
     @Operation(summary = SUMMARY_ENKELTTILGANG, description = DESCRIPTION_ENKELTTILGANG)
     @EnkeltTilgangApiResponse
     @RequireOAuth2OBOAndEnkelt
-    fun enkeltTilgang(@AuthenticationPrincipal principal: OAuth2AuthenticatedPrincipal, @RequestBody @EnkeltTilgangGyldig data: EnkeltTilgangData) {
+    fun enkeltTilgang(
+        @AuthenticationPrincipal principal: OAuth2AuthenticatedPrincipal,
+        @RequestBody @EnkeltTilgangGyldig data: EnkeltTilgangData,
+    ) {
         enkelt.registrerTilgang(principal.ansattId(), data)
     }
 
-    /*
-    @GetMapping("enkelt/ikkerapporterte")
-    fun ikkeRapportertePrLeder() =
-        enkelt.ikkeRapportertePrLeder()
-
-     */
     @ExceptionHandler(HandlerMethodValidationException::class)
     fun handleValidation(ex: HandlerMethodValidationException) = valideringsfeilRespons(ex)
 }

@@ -59,8 +59,8 @@ import java.time.LocalDate
 @AutoConfigureMetrics
 @Testcontainers
 @EnableAutoConfiguration
-@Import(TimeBeanConfig::class)
-@ComponentScan("no.nav.tilgangsmaskin.regler.motor", "no.nav.tilgangsmaskin.regler.enkelttilgang")
+@Import(TimeBeanConfig::class, EnkeltTilgangTeller::class, EnkeltTilgangEntityListener::class)
+@ComponentScan("no.nav.tilgangsmaskin.regler.motor")
 class EnkeltTilgangRegelTjenesteTest(
     private val enkeltTilgang: EnkeltTilgangTjeneste,
     private val regler: RegelTjeneste) : BehaviorSpec() {

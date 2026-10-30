@@ -65,7 +65,8 @@ class BrukerIdTest : BehaviorSpec({
         When("verdien er verken AktørId eller BrukerId") {
             Then("kastes IllegalArgumentException") {
                 shouldThrow<IllegalArgumentException> {
-                    Identifikator("abc") }
+                    Identifikator("abc")
+                }
             }
         }
     }

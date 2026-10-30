@@ -20,8 +20,6 @@ class CCFEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         status {
                             isNoContent()
                         }
-                    }.andDo {
-                        handle(dokumenterMedAuth("ccf-komplett"))
                     }
                 }
             }
@@ -36,8 +34,6 @@ class CCFEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         status {
                             isNoContent()
                         }
-                    }.andDo {
-                        handle(dokumenterMedAuth("ccf-kjerne"))
                     }
                 }
             }

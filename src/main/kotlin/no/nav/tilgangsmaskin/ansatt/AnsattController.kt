@@ -13,8 +13,6 @@ private const val SUMMARY_ANSATT = "${MSG}openapi.dev.ansatt.ansatt.summary"
 private const val DESCRIPTION_ANSATT = "${MSG}openapi.dev.ansatt.ansatt.description"
 private const val SUMMARY_PROXY_ENHET = "${MSG}openapi.dev.ansatt.proxy.enhet.summary"
 private const val DESCRIPTION_PROXY_ENHET = "${MSG}openapi.dev.ansatt.proxy.enhet.description"
-private const val SUMMARY_PROXY_ENHETER = "${MSG}openapi.dev.ansatt.proxy.enheter.summary"
-private const val DESCRIPTION_PROXY_ENHETER = "${MSG}openapi.dev.ansatt.proxy.enheter.description"
 
 
 @DevController(
@@ -34,7 +32,4 @@ class AnsattController(
     @Operation(summary = SUMMARY_PROXY_ENHET, description = DESCRIPTION_PROXY_ENHET)
     fun enhet(@PathVariable ansattId: AnsattId) = proxy.enhet(ansattId)
 
-    @GetMapping("enheter/{ansattId}")
-    @Operation(summary = SUMMARY_PROXY_ENHETER, description = DESCRIPTION_PROXY_ENHETER)
-    fun enheter(@PathVariable ansattId: AnsattId) = proxy.enheter(ansattId)
 }

@@ -41,7 +41,7 @@ class NomBeanConfig {
         builder
             .requestInterceptors {
                 it.add(DownstreamUriCapturingInterceptor())
-                it.add(OAuth2ClientHttpRequestInterceptor(mgr).apply {
+                it.addFirst(OAuth2ClientHttpRequestInterceptor(mgr).apply {
                     setClientRegistrationIdResolver { NOMGRAPH }
                     setAuthorizationFailureHandler(failureHandler)
                 })

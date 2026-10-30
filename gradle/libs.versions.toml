@@ -1,10 +1,10 @@
 [versions]
-asciidoctor = "4.0.5"
 boot-conditionals = "6.0.9"
 commons-pool2 = "2.13.1"
 confluent = "8.3.1"
 contract-pdl-avro = "20"
 cyclonedx = "3.4.1"
+git-properties = "4.0.1"
 kotlin = "2.4.21"
 kotest = "6.2.6"
 logstash = "9.0"
@@ -17,7 +17,7 @@ spring-boot = "4.1.2"
 spring-dependency-management = "1.1.7"
 springdoc = "3.1.1"
 springmockk = "5.0.1"
-sikkerhetstjenesten-lib = "0.0.51"
+sikkerhetstjenesten-lib = "0.0.77"
 testcontainers = "2.0.5"
 
 [libraries]
@@ -61,12 +61,10 @@ spring-boot-starter-restclient-test = { module = "org.springframework.boot:sprin
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
 spring-boot-starter-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test" }
 spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
-spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
-spring-boot-starter-webclient = { module = "org.springframework.boot:spring-boot-starter-webclient" }
+spring-boot-starter-webmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
 spring-boot-testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers" }
 spring-security-test = { module = "org.springframework.security:spring-security-test" }
 mock-oauth2-server = { module = "no.nav.security:mock-oauth2-server", version.ref = "mock-oauth2-server" }
-spring-restdocs-mockmvc = { module = "org.springframework.restdocs:spring-restdocs-mockmvc" }
 springdoc-openapi-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
 springmockk = { module = "com.ninja-squad:springmockk", version.ref = "springmockk" }
 sikkerhetstjenesten-lib = { module = "no.nav.felles:sikkerhetstjenesten-lib", version.ref = "sikkerhetstjenesten-lib" }
@@ -80,8 +78,8 @@ kotest = ["kotest-runner-junit5", "kotest-assertions-core", "kotest-extensions-s
 observability = ["opentelemetry-instrumentation-annotations", "opentelemetry-logback-mdc", "micrometer-registry-prometheus"]
 
 [plugins]
-asciidoctor = { id = "org.asciidoctor.jvm.convert", version.ref = "asciidoctor" }
 cyclonedx = { id = "org.cyclonedx.bom", version.ref = "cyclonedx" }
+git-properties = { id = "com.gorylenko.gradle-git-properties", version.ref = "git-properties" }
 kotest = { id = "io.kotest", version.ref = "kotest" }
 kotlin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

@@ -23,7 +23,6 @@ import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.mockk.verify
-import no.nav.sikkerhetstjenesten.felles.cache.CacheSizeAware
 import no.nav.sikkerhetstjenesten.felles.cache.ValkeyCacheOperations
 import no.nav.tilgangsmaskin.bruker.BrukerId
 import no.nav.sikkerhetstjenesten.felles.security.AuthContext
@@ -68,7 +67,6 @@ import no.nav.sikkerhetstjenesten.felles.cache.ValkeyEventListeningCacheOppfrisk
 @EnableAutoConfiguration
 class ValkeyCacheOperationsTest(
     private val cache: CacheOperations,
-    private val cacheSizeAware: CacheSizeAware,
     private val valkey: StringRedisTemplate) : BehaviorSpec() {
 
     @TestConfiguration
@@ -97,15 +95,6 @@ class ValkeyCacheOperationsTest(
                     override val varighet = ofSeconds(DEFAULT_TTL_SECONDS)
                 }
             )
-
-        @Bean
-        fun cacheSizeAware(cache: CacheOperations) =
-            CacheSizeAware(
-                cache,
-                object : CachableRestConfig {
-                    override val navn = "pdl-test"
-                    override val caches = setOf(PDL_MED_FAMILIE_CACHE)
-                })
     }
 
     @MockkBean
@@ -399,13 +388,13 @@ class ValkeyCacheOperationsTest(
         Given("antall innslag via CacheSizeAware") {
             When("cache er tom") {
                 Then("returnerer cache-størrelse fra valkey") {
-                    cacheSizeAware.sizes() shouldBe mapOf(PDL_MED_FAMILIE_CACHE.fullName to 0L)
+                    cache.sizes() shouldBe mapOf(PDL_MED_FAMILIE_CACHE.fullName to 0L)
                 }
             }
             When("cache inneholder verdier") {
                 Then("returnerer antall innslag fra valkey") {
                     cache.putMany(PDL_MED_FAMILIE_CACHE, mapOf(I1 to P1, I2 to P2), ofSeconds(5))
-                    cacheSizeAware.sizes() shouldBe mapOf(PDL_MED_FAMILIE_CACHE.fullName to 2L)
+                    cache.sizes() shouldBe mapOf(PDL_MED_FAMILIE_CACHE.fullName to 2L)
                 }
             }
         }

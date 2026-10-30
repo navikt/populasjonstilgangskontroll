@@ -16,7 +16,7 @@ class EnkeltTilgangEntityListener(private val authContext: AuthContext) {
     @PreUpdate
     private fun oppdaterer(entity: EnkeltTilgangEntity) = setSource(entity)
 
-    private fun setSource(entity: EnkeltTilgangEntity) {
+    internal fun setSource(entity: EnkeltTilgangEntity) {
         entity.system = authContext.system
         entity.oppretter = authContext.navIdent ?: authContext.system
         entity.span = Span.current().spanContext.spanId

@@ -40,8 +40,6 @@ open class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         status {
                             isNoContent()
                         }
-                    }.andDo {
-                        handle(dokumenterMedAuth("obo-komplett"))
                     }
                 }
             }
@@ -65,8 +63,6 @@ open class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         status {
                             isForbidden()
                         }
-                    }.andDo {
-                        handle(dokumenterMedAuth("obo-komplett-avvist", problemDetailFields))
                     }.andReturn()
 
                     assertSoftly(mapper.readValue<ProblemDetail>(result.response.contentAsByteArray)) {
@@ -88,7 +84,7 @@ open class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                     }.andExpect {
                         status { isNoContent()
                         }
-                    }.andDo { handle(dokumenterMedAuth("obo-kjerne")) }
+                    }
                 }
             }
 
@@ -171,7 +167,7 @@ open class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
             val request = EnkeltTilgangData(BrukerId(brukerId), "En god begrunnelse", gyldigTil)
 
             When("enkelttilgang kalles med gyldig request og OBO-token") {
-                Then("returnerer 204 og dokumenteres i rest docs") {
+                Then("returnerer 204") {
                     every { enkeltTilgangTjeneste.registrerTilgang(ansattId, request) } returns true
                     mockMvc.post(ENKELTTILGANG_PATH) {
                         contentType = APPLICATION_JSON
@@ -180,7 +176,7 @@ open class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         status {
                             isNoContent()
                         }
-                    }.andDo { handle(dokumenterMedAuth("obo-enkelttilgang")) }
+                    }
                 }
             }
 
@@ -193,8 +189,6 @@ open class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         status {
                             isBadRequest()
                         }
-                    }.andDo {
-                        handle(dokumenterMedAuth("obo-enkelttilgang-begrunnelse-for-kort", problemDetailFields))
                     }
                 }
             }
@@ -222,8 +216,6 @@ open class OBOEnkeltTilgangControllerTest : TilgangControllerTestBase() {
                         status {
                             isBadRequest()
                         }
-                    }.andDo {
-                        handle(dokumenterMedAuth("obo-enkelttilgang-validering-gyldigtil", problemDetailFields))
                     }
                 }
             }

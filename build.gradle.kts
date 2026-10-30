@@ -1,15 +1,15 @@
-import org.asciidoctor.gradle.jvm.AsciidoctorTask
-import org.gradle.api.file.DuplicatesStrategy.EXCLUDE
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_26
+import org.gradle.api.JavaVersion.toVersion
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget.Companion.fromTarget
 import org.springframework.boot.gradle.tasks.bundling.BootJar
-import java.lang.System.getProperty
+import java.lang.Runtime.getRuntime
 
 val javaVersion = JavaLanguageVersion.of(27)
+val jvmTargetVersion = 26
 
 group = "no.nav.tilgangsmaskin.populasjonstilgangskontroll"
 version = "1.0.1"
 
-extra["jackson-bom.version"] = "3.2.2"
+//extra["jackson-bom.version"] = "3.2.2"
 extra["jackson-2-bom.version"] = "2.22.1"
 
 plugins {
@@ -21,17 +21,27 @@ plugins {
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.spring.dependency.management)
     alias(libs.plugins.cyclonedx)
+    alias(libs.plugins.git.properties)
     alias(libs.plugins.kotest)
-    alias(libs.plugins.asciidoctor)
+}
+
+java {
+    sourceCompatibility = toVersion(jvmTargetVersion)
+    targetCompatibility = toVersion(jvmTargetVersion)
+
+    toolchain {
+        languageVersion.set(javaVersion)
+    }
 }
 
 springBoot {
     buildInfo {
         properties {
+            val javaMetadata = javaToolchains.launcherFor(java.toolchain).get().metadata
             additional = mapOf(
                 "kotlin.version" to libs.versions.kotlin.get(),
-                "jdk.version" to javaVersion.asInt().toString(),
-                "jdk.vendor" to getProperty("java.vendor"),
+                "jdk.version" to javaMetadata.languageVersion.asInt().toString(),
+                "jdk.vendor" to javaMetadata.vendor,
                 "spring-boot.version" to libs.versions.spring.boot.get(),
             )
         }
@@ -40,7 +50,6 @@ springBoot {
 
 repositories {
     mavenCentral()
-    mavenLocal()
     maven { url = uri("https://packages.confluent.io/maven/") }
     maven {
         url = uri("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
@@ -56,11 +65,14 @@ repositories {
 
 
 dependencies {
-    constraints {  // TODO midlertidig
-        implementation("at.yawk.lz4:lz4-java:1.12.1")
-        testImplementation("at.yawk.lz4:lz4-java:1.12.1")
+    constraints {
+        implementation("at.yawk.lz4:lz4-java:1.12.0") {
+            because("Upgrade Kafka's transitive LZ4 dependency from 1.11.2 to 1.12.0")
+        }
     }
-    implementation(libs.sikkerhetstjenesten.lib)
+    implementation(libs.sikkerhetstjenesten.lib) {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-web")
+    }
     implementation(libs.contract.pdl.avro)
     implementation(libs.boot.conditionals)
     implementation(libs.bundles.observability)
@@ -85,11 +97,10 @@ dependencies {
     implementation(libs.spring.boot.starter.oauth2.resource.server)
     implementation(libs.spring.boot.restclient)
     implementation(libs.spring.boot.starter.validation)
-    implementation(libs.spring.boot.starter.web) {
+    implementation(libs.spring.boot.starter.webmvc) {
         exclude(group = "org.springframework.boot", "spring-boot-starter-tomcat")
     }
     implementation(libs.spring.boot.starter.mustache)
-    implementation(libs.spring.boot.starter.webclient)
     implementation(libs.springdoc.openapi.webmvc.ui)
     testImplementation(libs.caffeine)
     testImplementation(libs.bundles.kotest)
@@ -106,7 +117,6 @@ dependencies {
     testImplementation(libs.spring.boot.testcontainers)
     testImplementation(libs.spring.security.test)
     testImplementation(libs.mock.oauth2.server)
-    testImplementation(libs.spring.restdocs.mockmvc)
     testImplementation(libs.springmockk)
 }
 
@@ -120,70 +130,27 @@ dependencyManagement {
 }
 
 
-tasks.withType<BootJar> {
+tasks.withType<BootJar>().configureEach {
     archiveFileName = "app.jar"
-    duplicatesStrategy = EXCLUDE
 }
 
-tasks.withType<Jar> {
-    duplicatesStrategy = EXCLUDE
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_26
-    targetCompatibility = JavaVersion.VERSION_26
-
-    toolchain {
-        languageVersion.set(javaVersion)
-    }
-}
-
-val generateGitProperties = tasks.register("generateGitProperties") {
-    description = "Generates git.properties file with Git metadata"
-    val outputFile = layout.buildDirectory.file("resources/main/git.properties")
-    outputs.file(outputFile)
-    val buildVersion = version.toString()
-
-    fun git(vararg args: String) = providers.exec {
-        commandLine("git", *args)
-        isIgnoreExitValue = true
-    }.standardOutput.asText.map { it.trim() }
-
-    val branch      = git("rev-parse", "--abbrev-ref", "HEAD")
-    val commitId    = git("rev-parse", "HEAD")
-    val commitShort = git("rev-parse", "--short", "HEAD")
-    val commitTime  = git("log", "-1", "--format=%cI")
-    val dirty       = git("status", "--porcelain").map { it.isNotEmpty() }
-
-    doLast {
-        outputFile.get().asFile.apply {
-            parentFile.mkdirs()
-            writeText(buildString {
-                appendLine("git.branch=${branch.get()}")
-                appendLine("git.commit.id=${commitId.get()}")
-                appendLine("git.commit.id.abbrev=${commitShort.get()}")
-                appendLine("git.commit.time=${commitTime.get()}")
-                appendLine("git.dirty=${dirty.get()}")
-                appendLine("git.build.version=$buildVersion")
-            })
-        }
-    }
-}
-
-tasks.named("processResources") {
-    dependsOn(generateGitProperties)
+gitProperties {
+    keys = listOf(
+        "git.branch",
+        "git.commit.id",
+        "git.commit.id.abbrev",
+        "git.commit.time",
+        "git.dirty",
+        "git.build.version",
+    )
+    dateFormat = "yyyy-MM-dd'T'HH:mm:ssXXX"
 }
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
 
-    doFirst {
-        delete(layout.buildDirectory.dir("generated-snippets"))
-        delete(layout.buildDirectory.dir("generated-restdocs-index"))
-    }
-
     maxHeapSize = "4g"
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
+    maxParallelForks = (getRuntime().availableProcessors() / 2).coerceIn(1, 2)
     jvmArgs =
         listOf(
             "--add-opens",
@@ -192,37 +159,6 @@ tasks.named<Test>("test") {
             "-Dkotlinx.coroutines.debug=off",
             "-Xshare:off",
         )
-}
-
-val generateRestDocsIndex = tasks.register<GenerateRestDocsIndexTask>("generateRestDocsIndex") {
-    description = "Generates index.adoc from REST Docs snippets"
-    dependsOn(tasks.test)
-    snippetsDir = layout.buildDirectory.dir("generated-snippets")
-    outputDir = layout.buildDirectory.dir("generated-restdocs-index")
-    openApiPropertiesFile = layout.projectDirectory.file("src/main/resources/openapi/prod/tilgang.properties")
-    tilgangControllerFile = layout.projectDirectory.file("src/main/kotlin/no/nav/tilgangsmaskin/tilgang/TilgangController.kt")
-}
-
-tasks.named("asciidoctor") {
-    dependsOn(generateRestDocsIndex)
-    inputs.dir(layout.buildDirectory.dir("generated-snippets"))
-}
-
-tasks.withType<AsciidoctorTask> {
-    sourceDir(layout.buildDirectory.dir("generated-restdocs-index"))
-    baseDirFollowsSourceDir()
-    sources {
-        include("index.adoc")
-    }
-    attributes(
-        mapOf(
-            "snippets" to layout.buildDirectory.dir("generated-snippets").get().asFile.absolutePath,
-            "source-highlighter" to "highlight.js",
-            "toc" to "left",
-            "toclevels" to "3",
-            "sectlinks" to "",
-        )
-    )
 }
 
 tasks.jacocoTestReport {
@@ -241,10 +177,8 @@ tasks.jacocoTestReport {
     }
 }
 kotlin {
-    jvmToolchain(javaVersion.asInt())
-
     compilerOptions {
-        jvmTarget.set(JVM_26)
+        jvmTarget.set(fromTarget(jvmTargetVersion.toString()))
         freeCompilerArgs.add("-Xjsr305=strict")
     }
 }

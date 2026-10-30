@@ -32,6 +32,9 @@ management:
       base-path: /monitoring
 
 spring:
+  flyway:
+    postgresql:
+      transactional-lock: false
   jpa:
     open-in-view: false
   http:

@@ -10,10 +10,10 @@ import java.net.URI
 
 @Component
 class SkjermingConfig(
-    @Value("\${spring.http.serviceclient.skjerming.base-url}")
+    @Value($$"${spring.http.serviceclient.skjerming.base-url}")
     baseUrl: URI,
-) : CachableRestConfig, RestConfig(baseUrl, SKJERMING_PING_PATH, SKJERMING) {
-
+) : RestConfig(baseUrl, SKJERMING_PING_PATH, SKJERMING),
+    CachableRestConfig {
     override val navn = name
     override val caches = setOf(SKJERMING_CACHE)
 

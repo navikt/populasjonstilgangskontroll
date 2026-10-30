@@ -70,7 +70,9 @@ dependencies {
             because("Upgrade Kafka's transitive LZ4 dependency from 1.11.2 to 1.12.0")
         }
     }
-    implementation(libs.sikkerhetstjenesten.lib)
+    implementation(libs.sikkerhetstjenesten.lib) {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-web")
+    }
     implementation(libs.contract.pdl.avro)
     implementation(libs.boot.conditionals)
     implementation(libs.bundles.observability)
@@ -95,11 +97,10 @@ dependencies {
     implementation(libs.spring.boot.starter.oauth2.resource.server)
     implementation(libs.spring.boot.restclient)
     implementation(libs.spring.boot.starter.validation)
-    implementation(libs.spring.boot.starter.web) {
+    implementation(libs.spring.boot.starter.webmvc) {
         exclude(group = "org.springframework.boot", "spring-boot-starter-tomcat")
     }
     implementation(libs.spring.boot.starter.mustache)
-    implementation(libs.spring.boot.starter.webclient)
     implementation(libs.springdoc.openapi.webmvc.ui)
     testImplementation(libs.caffeine)
     testImplementation(libs.bundles.kotest)

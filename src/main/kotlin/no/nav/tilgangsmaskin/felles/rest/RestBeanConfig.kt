@@ -57,7 +57,11 @@ class RestBeanConfig(
             eachHeader { name, value ->
                 log.trace("Logbook header filter: $name")
                 if (name.equals(IDENT, ignoreCase = true) || name.equals(IDENTIFIKATOR, ignoreCase = true)) {
-                    value.maskFnr()
+                    value.maskFnr().also {
+                        log.trace("Logbook header filter masked: $it")
+
+                    }
+
                 } else {
                     value
                 }

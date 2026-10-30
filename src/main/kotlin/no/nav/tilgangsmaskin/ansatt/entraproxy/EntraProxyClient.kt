@@ -21,9 +21,9 @@ interface EntraProxyClient {
     @GetExchange(ENTRA_PROXY_PING_PATH)
     fun ping(): Any?
 
-    private companion object {
+     companion object {
         private const val ENTRA_PROXY_MAIL_PATH = "/api/v1/mail"
-        private const val ENTRA_PROXY_ANSATT_PATH = "/api/v1/ansatt/{navIdent}"
-        private const val ENTRA_PROXY_PING_PATH = "/monitoring/health/liveness"
+        const val ENTRA_PROXY_ANSATT_PATH = "/api/v1/ansatt/{navIdent}"
+        const val ENTRA_PROXY_PING_PATH = "/monitoring/health/liveness"
     }
 }

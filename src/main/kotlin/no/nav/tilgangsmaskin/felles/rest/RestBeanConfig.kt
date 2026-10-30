@@ -6,6 +6,8 @@ import no.nav.sikkerhetstjenesten.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.sikkerhetstjenesten.felles.rest.DefaultRestErrorHandler
 import no.nav.sikkerhetstjenesten.felles.rest.DownstreamUriCapturingInterceptor
 import no.nav.sikkerhetstjenesten.felles.security.AuthContext
+import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.maskFnr
+import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter.Companion.IDENT
 import org.apache.hc.core5.util.TimeValue
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.http.client.HttpComponentsClientHttpRequestFactoryBuilder
@@ -20,6 +22,10 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import org.zalando.logbook.HeaderFilter
+import org.zalando.logbook.HeaderFilter.merge
+import org.zalando.logbook.core.HeaderFilters.defaultValue
+import org.zalando.logbook.core.HeaderFilters.eachHeader
 import org.zalando.logbook.spring.LogbookClientHttpRequestInterceptor
 import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
 
@@ -38,6 +44,19 @@ class RestBeanConfig(
 
     @Bean
     fun handler() = DefaultRestErrorHandler()
+
+    @Bean
+    fun logbookHeaderFilter(): HeaderFilter =
+        merge(
+            defaultValue(),
+            eachHeader { name, value ->
+                if (name.equals(IDENT, ignoreCase = true) || name.equals("X-Identifikator", ignoreCase = true)) {
+                    value.maskFnr()
+                } else {
+                    value
+                }
+            }
+        )
 
     @Bean
     fun restClientCustomizer(handler: ErrorHandler) =

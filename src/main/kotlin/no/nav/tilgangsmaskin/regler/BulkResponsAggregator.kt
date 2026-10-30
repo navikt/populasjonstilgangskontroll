@@ -67,7 +67,7 @@ class BulkResponsAggregator(
         if (respons.isNotEmpty()) {
             log.debug("${respons.size} godkjent av bulk ({})", respons.map { it.brukerId.maskFnr() })
         }
-    }.also { log.info("${it.size} bruker(e) med identer ${it.map { ident -> ident.brukerId }.map { it.maskFnr() }} godkjent av bulk") }
+    }.also { log.info("${it.size} bruker(e) med ident(er) ${it.map { ident -> ident.brukerId }.map { it.maskFnr() }} godkjent av bulk") }
 
     private fun avviste(
         ansatt: Ansatt,

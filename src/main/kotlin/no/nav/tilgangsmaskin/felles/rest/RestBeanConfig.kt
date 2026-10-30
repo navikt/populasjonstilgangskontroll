@@ -10,6 +10,7 @@ import no.nav.sikkerhetstjenesten.felles.security.AuthContext
 import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.maskFnr
 import no.nav.tilgangsmaskin.bruker.pdl.PdlSyncGraphQLClientAdapter.Companion.IDENT
 import org.apache.hc.core5.util.TimeValue
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.http.client.HttpComponentsClientHttpRequestFactoryBuilder
 import org.springframework.boot.http.client.autoconfigure.ClientHttpRequestFactoryBuilderCustomizer
@@ -38,6 +39,9 @@ class RestBeanConfig(
     private val meterRegistry: MeterRegistry,
     private val logbookInterceptor: ObjectProvider<LogbookClientHttpRequestInterceptor>) : WebMvcConfigurer {
 
+    private val log = getLogger(javaClass)
+
+
     @Bean
     fun jackson3Customizer() = JsonMapperBuilderCustomizer {
         it.enable(INCLUDE_SOURCE_IN_LOCATION)
@@ -51,6 +55,7 @@ class RestBeanConfig(
         merge(
             defaultValue(),
             eachHeader { name, value ->
+                log.trace("Logbook header filter: $name=$value")
                 if (name.equals(IDENT, ignoreCase = true) || name.equals(IDENTIFIKATOR, ignoreCase = true)) {
                     value.maskFnr()
                 } else {

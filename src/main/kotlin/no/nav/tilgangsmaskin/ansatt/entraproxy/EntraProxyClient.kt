@@ -10,19 +10,13 @@ import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.PostExchange
 
+@ClientRegistrationId(ENTRAPROXY)
 interface EntraProxyClient {
     @GetExchange(ENTRA_PROXY_ANSATT_PATH)
-    @ClientRegistrationId(ENTRAPROXY)
-    fun enhet(
-        @PathVariable navIdent: String,
-        @RequestHeader(IDENTIFIKATOR) identifikator: String = navIdent,
-    ): EntraProxyEnhet
+    fun enhet(@PathVariable navIdent: String, @RequestHeader(IDENTIFIKATOR) identifikator: String = navIdent): EntraProxyEnhet
 
     @PostExchange(ENTRA_PROXY_MAIL_PATH)
-    @ClientRegistrationId(ENTRAPROXY)
-    fun mail(
-        @RequestBody message: MailRequest,
-    )
+    fun mail(@RequestBody message: MailRequest)
 
     @GetExchange(ENTRA_PROXY_PING_PATH)
     fun ping(): Any?

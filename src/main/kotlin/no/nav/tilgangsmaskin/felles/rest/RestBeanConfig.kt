@@ -47,7 +47,7 @@ class RestBeanConfig(
     fun handler() = DefaultRestErrorHandler()
 
     @Bean
-    fun logbookHeaderFilter(): HeaderFilter =
+    fun logbookHeaderFilter() =
         merge(
             defaultValue(),
             eachHeader { name, value ->

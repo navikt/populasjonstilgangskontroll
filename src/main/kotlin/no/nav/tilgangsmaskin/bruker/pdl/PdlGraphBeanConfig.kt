@@ -28,7 +28,7 @@ class PdlGraphBeanConfig {
             .requestInterceptors {
                 it.add(DownstreamUriCapturingInterceptor())
                 it.add(RestHeaderAddingRequestInterceptor(BEHANDLINGSNUMMER))
-                it.add(OAuth2ClientHttpRequestInterceptor(mgr).apply {
+                it.addFirst(OAuth2ClientHttpRequestInterceptor(mgr).apply {
                     setClientRegistrationIdResolver { PDLGRAPH }
                     setAuthorizationFailureHandler(failureHandler)
                 })

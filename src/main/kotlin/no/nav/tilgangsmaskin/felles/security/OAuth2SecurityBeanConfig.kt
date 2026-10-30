@@ -71,6 +71,14 @@ class OAuth2SecurityBeanConfig( private val logbookInterceptor: ObjectProvider<L
     fun oauth2GroupConfigurer(manager: OAuth2AuthorizedClientManager) =
         RestClientHttpServiceGroupConfigurer { groups ->
             from(manager).configureGroups(groups)
+            groups.forEachClient { _, builder ->
+                builder.requestInterceptors { interceptors ->
+                    logbookInterceptor.ifAvailable { interceptor ->
+                        interceptors.remove(interceptor)
+                        interceptors.addLast(interceptor)
+                    }
+                }
+            }
         }
 
 

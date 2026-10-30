@@ -9,7 +9,7 @@ val jvmTargetVersion = 26
 group = "no.nav.tilgangsmaskin.populasjonstilgangskontroll"
 version = "1.0.1"
 
-extra["jackson-bom.version"] = "3.2.2"
+//extra["jackson-bom.version"] = "3.2.2"
 extra["jackson-2-bom.version"] = "2.22.1"
 
 plugins {

@@ -14,8 +14,6 @@ class EntraProxyTjeneste(
 ) {
     fun enhet(ansattId: AnsattId) = client.enhet(ansattId.verdi).enhet
 
-    fun enheter(ansattId: AnsattId) = client.enheter(ansattId.verdi)
-
     fun mail(message: MailRequest) = client.mail(message)
 
     @NoCoverageAnalysis

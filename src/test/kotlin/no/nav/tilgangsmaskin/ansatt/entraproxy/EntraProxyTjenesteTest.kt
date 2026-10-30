@@ -72,44 +72,6 @@ class EntraProxyTjenesteTest(
             }
         }
 
-        Given("oppslag av enheter for ansatt") {
-            When("ansatt er tilknyttet enheter") {
-                Then("returnerer liste av enheter for ansatt") {
-                    server
-                        .expect(requestTo(cfg.enheterUri(ANSATTID.verdi)))
-                        .andExpect(method(GET))
-                        .andRespond(
-                            withSuccess(
-                                """
-                                [
-                                  { "enhetnummer": "1234", "navn": "NAV Testkontor" },
-                                  { "enhetnummer": "5678", "navn": "NAV Annenkontor" }
-                                ]
-                                """.trimIndent(),
-                                APPLICATION_JSON,
-                            ),
-                        )
-
-                    tjeneste.enheter(ANSATTID) shouldBe
-                        setOf(
-                            Enhet(Enhetsnummer("1234"), "NAV Testkontor"),
-                            Enhet(Enhetsnummer("5678"), "NAV Annenkontor"),
-                        )
-                }
-            }
-
-            When("ansatt ikke er tilknyttet enheter") {
-                Then("returneres tom liste") {
-                    server
-                        .expect(requestTo(cfg.enheterUri(ANSATTID.verdi)))
-                        .andExpect(method(GET))
-                        .andRespond(withSuccess("[]", APPLICATION_JSON))
-
-                    tjeneste.enheter(ANSATTID) shouldBe emptySet()
-                }
-            }
-        }
-
         Given("feilhaandtering") {
             When("tjenesten returnerer 404") {
                 Then("kaster NotFoundRestException uten retry") {

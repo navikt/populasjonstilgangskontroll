@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import no.nav.sikkerhetstjenesten.felles.NoCoverageAnalysis
 import no.nav.sikkerhetstjenesten.felles.rest.ConsumerAwareHandlerInterceptor
 import no.nav.sikkerhetstjenesten.felles.rest.DefaultRestErrorHandler
+import no.nav.sikkerhetstjenesten.felles.rest.DefaultRestErrorHandler.Companion.IDENTIFIKATOR
 import no.nav.sikkerhetstjenesten.felles.rest.DownstreamUriCapturingInterceptor
 import no.nav.sikkerhetstjenesten.felles.security.AuthContext
 import no.nav.sikkerhetstjenesten.felles.utils.extensions.DomainExtensions.maskFnr
@@ -50,7 +51,7 @@ class RestBeanConfig(
         merge(
             defaultValue(),
             eachHeader { name, value ->
-                if (name.equals(IDENT, ignoreCase = true) || name.equals("X-Identifikator", ignoreCase = true)) {
+                if (name.equals(IDENT, ignoreCase = true) || name.equals(IDENTIFIKATOR, ignoreCase = true)) {
                     value.maskFnr()
                 } else {
                     value
